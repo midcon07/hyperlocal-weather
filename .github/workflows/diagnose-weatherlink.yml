@@ -1,0 +1,17 @@
+name: Diagnose WeatherLink
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - env:
+          WEATHERLINK_API_KEY: ${{ secrets.WEATHERLINK_API_KEY }}
+          WEATHERLINK_API_SECRET: ${{ secrets.WEATHERLINK_API_SECRET }}
+        run: node scripts/diagnose-weatherlink.mjs
