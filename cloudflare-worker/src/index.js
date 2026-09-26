@@ -36,7 +36,10 @@ export default {
     }
 
     try {
-      const { WEATHERLINK_API_KEY, WEATHERLINK_API_SECRET, WEATHERLINK_STATION_ID } = env;
+      const WEATHERLINK_API_KEY = env.WEATHERLINK_API_KEY?.trim();
+      const WEATHERLINK_API_SECRET = env.WEATHERLINK_API_SECRET?.trim();
+      const WEATHERLINK_STATION_ID = env.WEATHERLINK_STATION_ID?.trim();
+
       const t = Math.floor(Date.now() / 1000);
       const params = { "api-key": WEATHERLINK_API_KEY, "station-id": WEATHERLINK_STATION_ID, t };
       const signature = await signParams(params, WEATHERLINK_API_SECRET);
