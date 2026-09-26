@@ -2,8 +2,12 @@ name: Fetch weather data
 
 on:
   schedule:
-    # Every 15 minutes
-    - cron: "*/15 * * * *"
+    # 5 minutes is the practical floor for GitHub Actions cron — shorter
+    # intervals aren't reliably supported and can run late under load.
+    # This feeds the persisted comparison-chart history; live "current
+    # conditions" now come from direct browser polling (see src/api/ and
+    # cloudflare-worker/), which isn't limited by this cadence.
+    - cron: "*/5 * * * *"
   workflow_dispatch: {}
 
 permissions:

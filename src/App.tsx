@@ -1,22 +1,24 @@
-import { CurrentConditions } from "./components/CurrentConditions";
+import { StationCard } from "./components/StationCard";
+import { NwsCard } from "./components/NwsCard";
 import { ForecastList } from "./components/ForecastList";
 import { ComparisonChart } from "./components/ComparisonChart";
 import { useWeatherData } from "./hooks/useWeatherData";
+import { useNwsLive } from "./hooks/useNwsLive";
+import { useStationLive } from "./hooks/useStationLive";
 import "./App.css";
 
 function App() {
   const { latest, history, loading, error } = useWeatherData();
+  const nwsLive = useNwsLive();
+  const stationLive = useStationLive();
+
+  const forecastPeriods = nwsLive.data?.forecast ?? latest?.nws?.forecast ?? [];
 
   return (
     <div className="app">
       <header className="app-header">
         <h1>Hyperlocal Weather</h1>
         <p className="location">{latest?.location.name ?? "Loading location…"}</p>
-        {latest?.generatedAt && (
-          <p className="timestamp">
-            Last data refresh: {new Date(latest.generatedAt).toLocaleString()}
-          </p>
-        )}
       </header>
 
       <main>
@@ -25,12 +27,12 @@ function App() {
 
         {!loading && !error && (
           <>
-            <CurrentConditions
-              station={latest?.station ?? null}
-              observation={latest?.nws?.observation ?? null}
-            />
+            <section className="card-grid">
+              <StationCard live={stationLive} fallback={latest?.station ?? null} />
+              <NwsCard live={nwsLive} fallback={latest?.nws ?? null} />
+            </section>
             <ComparisonChart history={history} />
-            <ForecastList periods={latest?.nws?.forecast ?? []} />
+            <ForecastList periods={forecastPeriods} />
           </>
         )}
       </main>

@@ -12,6 +12,25 @@ the first deploy finishes)
 
 ## How it works
 
+Two independent paths feed the "current conditions" cards, so each source
+refreshes as fast as it reasonably can — plus a slower persisted path for
+the historical comparison chart.
+
+**Live NWS (client-side, ~60s):** `src/api/nws.ts` calls `api.weather.gov`
+directly from the browser (no key needed, and NWS's API allows cross-origin
+requests). `useNwsLive` polls it every 60 seconds with a manual "Refresh
+now" too. Not limited by GitHub Actions' cron floor.
+
+**Live station (client-side via proxy, ~60s):** WeatherLink requires a
+signed, secret-holding request, so the browser can't call it directly.
+`src/api/weatherlink.ts` instead calls a small Cloudflare Worker
+(`cloudflare-worker/`) that holds your WeatherLink secret and signs the
+request server-side. If that Worker isn't deployed yet, the "Your Station"
+card falls back to the last GitHub-Actions-synced reading — see
+[cloudflare-worker/README.md](cloudflare-worker/README.md) to enable it.
+
+**Persisted history (GitHub Actions, every 5 min):**
+
 ```
 ┌─────────────────┐     ┌──────────────────┐
 │  api.weather.gov │     │ WeatherLink v2 API│
@@ -19,32 +38,30 @@ the first deploy finishes)
          │                        │
          └──────────┬─────────────┘
                      ▼
-     .github/workflows/fetch-data.yml   (runs every 15 min)
+     .github/workflows/fetch-data.yml   (cron: every 5 min — GitHub's floor)
         scripts/build-data.mjs
                      │
                      ▼
        public/data/latest.json, history.json   (committed to main)
                      │
                      ▼
-     .github/workflows/deploy.yml   (runs on every push to main)
+     .github/workflows/deploy.yml   (on push, or when fetch-data completes)
         npm run build → dist/  →  GitHub Pages
-                     │
-                     ▼
-              React dashboard (src/)
 ```
 
-- **`scripts/fetch-nws.mjs`** — pulls the point forecast, hourly forecast, and
-  nearest station's latest observation from `api.weather.gov` for the
-  location in `config/site.config.json`. No API key needed.
-- **`scripts/fetch-weatherlink.mjs`** — pulls current conditions for your
-  station from the WeatherLink v2 API (signed request using your API
-  key/secret).
-- **`scripts/build-data.mjs`** — runs both, writes `public/data/latest.json`,
-  and appends a capped rolling window to `public/data/history.json` for the
-  station-vs-NWS comparison chart.
-- **`src/`** — a Vite + React + TypeScript dashboard that fetches those two
-  JSON files client-side and renders current conditions, the forecast, and
-  the comparison chart. Nothing server-side is required at request time.
+This slower path exists so the comparison chart has a continuous trend even
+when nobody has the site open (the live client-side polling only runs while
+a browser tab is active), and so both cards have *something* to show on
+first load before the live fetches complete.
+
+- **`scripts/fetch-nws.mjs` / `scripts/fetch-weatherlink.mjs` /
+  `scripts/build-data.mjs`** — the Node versions of the same fetches, run by
+  GitHub Actions to build the persisted snapshot/history.
+- **`src/api/nws.ts` / `src/api/weatherlink.ts`** — the browser versions,
+  used for live polling.
+- **`src/hooks/useLiveSource.ts`** — generic polling hook (fetch on mount,
+  auto-refresh on an interval, manual refresh, countdown) used by both
+  `useNwsLive` and `useStationLive`.
 
 ## One-time setup (do this before the site has real data)
 
@@ -65,6 +82,10 @@ the first deploy finishes)
 5. Push to `main` (or run the `fetch-data` and `build-and-deploy` workflows
    manually from the Actions tab) and the dashboard will populate on the
    next scheduled run.
+6. **(Optional, for real-time station updates)** deploy the Cloudflare
+   Worker proxy — see [cloudflare-worker/README.md](cloudflare-worker/README.md).
+   Without it, the station card still works, just synced every 5 min
+   instead of every 60s.
 
 Until secrets are configured, the site still deploys and renders — it just
 shows "no station data yet" in place of your station's readings.
@@ -100,6 +121,9 @@ anywhere:
 config/site.config.json   Location + non-secret settings
 scripts/                   Node scripts run by GitHub Actions to fetch data
 public/data/               Generated JSON consumed by the frontend (committed)
-src/                       React + TypeScript dashboard
+src/api/                   Browser-side live fetchers (NWS direct, station via proxy)
+src/hooks/                 useLiveSource (polling) and the two source-specific hooks
+src/                        React + TypeScript dashboard
+cloudflare-worker/         Optional serverless proxy for real-time station data
 .github/workflows/         fetch-data.yml (cron) and deploy.yml (Pages)
 ```
