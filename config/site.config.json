@@ -1,0 +1,13 @@
+{
+  "location": {
+    "name": "Your Town, ST",
+    "latitude": 0.0,
+    "longitude": 0.0
+  },
+  "nws": {
+    "contact": "https://github.com/midcon07"
+  },
+  "history": {
+    "maxEntries": 500
+  }
+}

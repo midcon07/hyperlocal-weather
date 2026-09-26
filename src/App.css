@@ -1,0 +1,135 @@
+.app {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.9rem;
+}
+
+.location {
+  margin: 0.25rem 0 0;
+  font-size: 1.1rem;
+  color: var(--muted);
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1rem;
+}
+
+.card h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+}
+
+.big-stat {
+  font-size: 2.75rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.75rem;
+}
+
+.stat-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem 1rem;
+  margin: 0 0 0.75rem;
+}
+
+.stat-list div {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.2rem;
+}
+
+.stat-list dt {
+  color: var(--muted);
+}
+
+.stat-list dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.timestamp {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.empty-state {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.error-state {
+  color: #dc2626;
+}
+
+.forecast-scroll {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.forecast-item {
+  flex: 0 0 130px;
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.forecast-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.forecast-temp {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.forecast-desc {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin: 0.25rem 0;
+}
+
+.forecast-pop {
+  font-size: 0.75rem;
+  color: #2563eb;
+}
+
+.chart-wrap {
+  width: 100%;
+}
+
+.app-footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: 2rem;
+}
