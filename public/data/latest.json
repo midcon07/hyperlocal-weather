@@ -1,16 +1,16 @@
 {
-  "generatedAt": "2026-09-26T22:56:30.692Z",
+  "generatedAt": "2026-09-26T22:57:57.499Z",
   "location": {
     "name": "Altoona, IA",
     "latitude": 41.6312472,
     "longitude": -93.4658583
   },
   "station": {
-    "timestamp": "2026-09-26T22:56:00.000Z",
-    "temperatureF": 65,
-    "humidityPct": 87.1,
-    "windSpeedMph": 9.88,
-    "windDirectionDeg": 36,
+    "timestamp": "2026-09-26T22:57:00.000Z",
+    "temperatureF": 64.9,
+    "humidityPct": 86.9,
+    "windSpeedMph": 5.75,
+    "windDirectionDeg": 58,
     "rainRateInPerHr": 0,
     "rainDayIn": 0.26,
     "barometricPressureInHg": 30.042,
