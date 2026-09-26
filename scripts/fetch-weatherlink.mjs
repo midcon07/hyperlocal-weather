@@ -42,21 +42,8 @@ export async function fetchWeatherlinkData() {
   }
   const data = await res.json();
 
-  // WeatherLink bundles readings per physical sensor ("sensor type"); pick
-  // the ISS (integrated sensor suite) and any leaf/soil or extra sensors it
-  // finds so the scaffold works whether you have just the console or extra
-  // Davis sensors attached.
-  console.log(
-    "DEBUG sensor keys:",
-    JSON.stringify(
-      data.sensors.map((s) => ({
-        sensor_type: s.sensor_type,
-        data_structure_type: s.data_structure_type,
-        keys: s.data?.[0] ? Object.keys(s.data[0]) : null,
-      }))
-    )
-  );
-
+  // WeatherLink bundles readings per physical sensor ("sensor type"); find
+  // the one carrying the ISS (integrated sensor suite) fields.
   const iss = data.sensors.find((s) =>
     s.data?.[0] && "temp" in s.data[0] && "wind_speed_last" in s.data[0]
   );
@@ -74,7 +61,7 @@ export async function fetchWeatherlinkData() {
     windSpeedMph: reading.wind_speed_last ?? null,
     windDirectionDeg: reading.wind_dir_last ?? null,
     rainRateInPerHr: reading.rain_rate_last_in ?? null,
-    rainDayIn: reading.rainfall_daily_in ?? null,
+    rainDayIn: reading.rainfall_day_in ?? null,
     barometricPressureInHg: reading.bar_sea_level ?? null,
     uvIndex: reading.uv_index ?? null,
     solarRadiationWm2: reading.solar_rad ?? null,
