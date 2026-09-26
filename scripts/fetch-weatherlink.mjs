@@ -54,6 +54,10 @@ export async function fetchWeatherlinkData() {
     return { timestamp: new Date().toISOString(), raw: data };
   }
 
+  // The barometer is reported as a separate physical sensor from the ISS.
+  const baro = data.sensors.find((s) => s.data?.[0] && "bar_sea_level" in s.data[0]);
+  const baroReading = baro?.data?.[0];
+
   return {
     timestamp: new Date(reading.ts * 1000).toISOString(),
     temperatureF: reading.temp ?? null,
@@ -62,7 +66,7 @@ export async function fetchWeatherlinkData() {
     windDirectionDeg: reading.wind_dir_last ?? null,
     rainRateInPerHr: reading.rain_rate_last_in ?? null,
     rainDayIn: reading.rainfall_day_in ?? null,
-    barometricPressureInHg: reading.bar_sea_level ?? null,
+    barometricPressureInHg: baroReading?.bar_sea_level ?? null,
     uvIndex: reading.uv_index ?? null,
     solarRadiationWm2: reading.solar_rad ?? null,
   };
