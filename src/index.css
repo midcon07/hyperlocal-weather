@@ -25,7 +25,22 @@
 
 body {
   margin: 0;
-  background: var(--bg);
+  min-height: 100vh;
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(180deg, rgba(10, 14, 20, 0.2) 0%, rgba(10, 14, 20, 0.55) 55%, rgba(10, 14, 20, 0.75) 100%),
+    url("./assets/background-altoona.jpg");
+  background-size: cover;
+  background-position: 30% top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+@media (max-width: 800px) {
+  body {
+    /* iOS Safari handles fixed backgrounds poorly; scroll normally on small screens */
+    background-attachment: scroll;
+  }
 }

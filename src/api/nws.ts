@@ -4,7 +4,7 @@
 // often as we like without waiting on Actions' ~5 minute cron floor.
 
 import siteConfig from "../../config/site.config.json";
-import type { NwsData } from "../types/weather";
+import type { NwsAlert, NwsData } from "../types/weather";
 
 async function getJson<T>(url: string): Promise<T> {
   const res = await fetch(url, { headers: { Accept: "application/geo+json" } });
@@ -31,6 +31,23 @@ interface NwsForecastResponse {
 
 interface NwsStationsResponse {
   features: Array<{ id: string }>;
+}
+
+interface NwsAlertsResponse {
+  features: Array<{
+    properties: {
+      id: string;
+      event: string;
+      headline: string | null;
+      description: string;
+      severity: string;
+      urgency: string;
+      areaDesc: string;
+      effective: string;
+      expires: string;
+      messageType: string;
+    };
+  }>;
 }
 
 export async function fetchNwsLive(): Promise<NwsData> {
@@ -87,4 +104,28 @@ export async function fetchNwsLive(): Promise<NwsData> {
       probabilityOfPrecipitation: p.probabilityOfPrecipitation?.value ?? null,
     })),
   };
+}
+
+// Active watches/warnings/advisories for our point, straight from NWS —
+// same no-key, CORS-friendly API as the rest of this file.
+export async function fetchNwsAlerts(): Promise<NwsAlert[]> {
+  const { latitude, longitude } = siteConfig.location;
+
+  const alerts = await getJson<NwsAlertsResponse>(
+    `https://api.weather.gov/alerts/active?point=${latitude},${longitude}`
+  );
+
+  return alerts.features
+    .filter((f) => f.properties.messageType !== "Cancel")
+    .map((f) => ({
+      id: f.properties.id,
+      event: f.properties.event,
+      headline: f.properties.headline,
+      description: f.properties.description,
+      severity: f.properties.severity,
+      urgency: f.properties.urgency,
+      areaDesc: f.properties.areaDesc,
+      effective: f.properties.effective,
+      expires: f.properties.expires,
+    }));
 }

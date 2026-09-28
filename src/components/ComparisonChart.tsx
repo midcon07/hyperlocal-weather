@@ -30,7 +30,7 @@ export function ComparisonChart({ history }: Props) {
       <h2>Station vs. NWS Temperature</h2>
       {data.length > 1 ? (
         <div className="chart-wrap">
-          <ResponsiveContainer width="100%" height={280}>
+          <ResponsiveContainer width="100%" height={200}>
             <LineChart data={data}>
               <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
               <XAxis dataKey="time" tick={{ fontSize: 12 }} />

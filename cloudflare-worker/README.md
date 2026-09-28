@@ -50,3 +50,13 @@ falls back to whatever GitHub Actions last committed (every ~5 minutes).
   `ALLOWED_ORIGIN`. Update it if you ever change domains.
 - The Worker only ever returns current-conditions readings (temperature,
   humidity, wind, rain, pressure) — never your API key/secret.
+
+## METAR route
+
+The same Worker also serves `<your-worker-url>/metar`, which proxies the
+FAA's aviationweather.gov METAR API for KIKV (aviationweather.gov doesn't
+send CORS headers, so the browser can't call it directly). No credentials
+or extra setup needed — it reuses `VITE_WEATHERLINK_PROXY_URL`. To watch a
+different station, set a `METAR_STATION_ID` Worker variable; it defaults to
+`KIKV`. Redeploy (`npx wrangler deploy`) after pulling this change for the
+"Aviation METAR" card to go live.

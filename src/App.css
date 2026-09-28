@@ -1,43 +1,59 @@
 .app {
-  max-width: 900px;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 1.5rem 1rem 3rem;
+  padding: 0.6rem 1rem 0.6rem;
 }
 
 .app-header {
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.45rem;
 }
 
 .app-header h1 {
   margin: 0;
-  font-size: 1.9rem;
+  font-size: 1.3rem;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 }
 
 .location {
-  margin: 0.25rem 0 0;
-  font-size: 1.1rem;
-  color: var(--muted);
+  margin: 0.1rem 0 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+}
+
+.lower-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 0.85rem;
+  align-items: start;
+}
+
+@media (max-width: 800px) {
+  .lower-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .card {
   background: var(--card-bg);
   border-radius: 12px;
-  padding: 1.25rem;
+  padding: 0.55rem 1rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  margin-bottom: 1rem;
+  margin-bottom: 0;
 }
 
 .card h2 {
-  margin: 0 0 0.75rem;
-  font-size: 1.1rem;
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
 }
 
 .card-header {
@@ -51,8 +67,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  margin-top: 0.75rem;
-  padding-top: 0.6rem;
+  margin-top: 0.4rem;
+  padding-top: 0.4rem;
   border-top: 1px solid var(--border);
 }
 
@@ -79,32 +95,33 @@
 }
 
 .proxy-note {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: var(--muted);
-  margin: 0.5rem 0 0;
+  margin: 0.2rem 0 0;
   font-style: italic;
+  line-height: 1.25;
 }
 
 .big-stat {
-  font-size: 2.75rem;
+  font-size: 1.9rem;
   font-weight: 700;
   line-height: 1;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.3rem;
 }
 
 .stat-list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.5rem 1rem;
-  margin: 0 0 0.75rem;
+  gap: 0.2rem 1rem;
+  margin: 0 0 0.3rem;
 }
 
 .stat-list div {
   display: flex;
   justify-content: space-between;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   border-bottom: 1px solid var(--border);
-  padding-bottom: 0.2rem;
+  padding-bottom: 0.1rem;
 }
 
 .stat-list dt {
@@ -133,38 +150,38 @@
 
 .forecast-scroll {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.5rem;
   overflow-x: auto;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.25rem;
 }
 
 .forecast-item {
-  flex: 0 0 130px;
+  flex: 0 0 104px;
   background: var(--surface);
   border-radius: 10px;
-  padding: 0.75rem;
+  padding: 0.5rem;
   text-align: center;
 }
 
 .forecast-name {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.15rem;
 }
 
 .forecast-temp {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   font-weight: 700;
 }
 
 .forecast-desc {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--muted);
-  margin: 0.25rem 0;
+  margin: 0.15rem 0;
 }
 
 .forecast-pop {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: #2563eb;
 }
 
@@ -174,7 +191,263 @@
 
 .app-footer {
   text-align: center;
+  color: rgba(255, 255, 255, 0.75);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  font-size: 0.7rem;
+  margin-top: 0.5rem;
+}
+
+.app-footer p {
+  margin: 0.05rem 0;
+}
+
+/* Watches & Warnings banner */
+
+.alert-banner {
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.alert-banner--clear {
+  background: linear-gradient(90deg, #059669, #10b981);
+}
+
+.alert-banner--advisory {
+  background: linear-gradient(90deg, #b45309, #f59e0b);
+}
+
+.alert-banner--watch {
+  background: linear-gradient(90deg, #c2410c, #f97316);
+}
+
+.alert-banner--warning {
+  background: linear-gradient(90deg, #b91c1c, #ef4444);
+  animation: alert-glow 1.6s ease-in-out infinite;
+}
+
+.alert-banner-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.3rem 0.5rem;
+}
+
+.alert-banner-label {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #fff;
+  color: #dc2626;
+  font-weight: 800;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.alert-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #dc2626;
+  animation: alert-pulse 1.4s ease-in-out infinite;
+}
+
+.alert-clear-text {
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.alert-ticker {
+  flex: 1 1 auto;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+}
+
+.alert-ticker-track {
+  display: flex;
+  gap: 3rem;
+  width: max-content;
+  animation: alert-ticker-scroll 22s linear infinite;
+}
+
+.alert-ticker-item {
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.alert-list {
+  background: var(--card-bg);
+  border-top: 1px solid var(--border);
+}
+
+.alert-item + .alert-item {
+  border-top: 1px solid var(--border);
+}
+
+.alert-item--warning {
+  border-left: 4px solid #ef4444;
+}
+
+.alert-item--watch {
+  border-left: 4px solid #f97316;
+}
+
+.alert-item--advisory {
+  border-left: 4px solid #f59e0b;
+}
+
+.alert-item--statement {
+  border-left: 4px solid var(--muted);
+}
+
+.alert-item-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.3rem 0.85rem;
+  font: inherit;
+  color: var(--text);
+  text-align: left;
+}
+
+.alert-item-event {
+  font-weight: 700;
+  color: #dc2626;
+}
+
+.alert-item-area {
+  flex: 1 1 auto;
   color: var(--muted);
-  font-size: 0.8rem;
-  margin-top: 2rem;
+  font-size: 0.85rem;
+}
+
+.alert-item-chevron {
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.alert-item-body {
+  padding: 0 0.85rem 0.85rem;
+}
+
+.alert-item-headline {
+  font-weight: 600;
+  margin: 0 0 0.4rem;
+}
+
+.alert-item-desc {
+  white-space: pre-wrap;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+@keyframes alert-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.5; }
+}
+
+@keyframes alert-glow {
+  0%, 100% { box-shadow: 0 0 0 rgba(239, 68, 68, 0); }
+  50% { box-shadow: 0 0 14px rgba(239, 68, 68, 0.7); }
+}
+
+@keyframes alert-ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .alert-banner--warning,
+  .alert-dot,
+  .alert-ticker-track {
+    animation: none;
+  }
+}
+
+/* Aviation METAR strip */
+
+.metar-strip {
+  margin-top: 0.6rem;
+}
+
+.metar-strip .card-header {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.metar-badge {
+  flex: 0 0 auto;
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.metar-badge-detail {
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.metar-badge--vfr {
+  background: #059669;
+}
+
+.metar-badge--mvfr {
+  background: #2563eb;
+}
+
+.metar-badge--ifr {
+  background: #dc2626;
+}
+
+.metar-badge--lifr {
+  background: #c026d3;
+}
+
+.metar-speci {
+  display: inline-block;
+  background: #f59e0b;
+  color: #1c1300;
+  font-weight: 700;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 5px;
+  margin: 0 0 0.4rem;
+}
+
+.metar-raw {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.85rem;
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+  margin: 0 0 0.5rem;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.metar-decoded {
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
 }

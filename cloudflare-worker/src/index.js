@@ -1,7 +1,9 @@
 // Signs and forwards WeatherLink v2 "current conditions" requests so the
 // static site can poll for near-real-time station data without ever
-// holding the WeatherLink API secret client-side. Deploy with Wrangler;
-// see README.md in this folder.
+// holding the WeatherLink API secret client-side. Also proxies the
+// aviationweather.gov METAR API, which has no CORS headers of its own, so
+// the browser can poll KIKV directly. Deploy with Wrangler; see README.md
+// in this folder.
 
 async function signParams(params, apiSecret) {
   const sortedKeys = Object.keys(params).sort();
@@ -24,6 +26,39 @@ function jsonResponse(body, status, corsHeaders) {
   });
 }
 
+async function handleMetar(env, corsHeaders) {
+  const station = (env.METAR_STATION_ID || "KIKV").trim();
+  const res = await fetch(
+    `https://aviationweather.gov/api/data/metar?ids=${station}&format=json&hours=2`
+  );
+  if (!res.ok) {
+    return jsonResponse({ error: `METAR request failed: ${res.status}` }, 502, corsHeaders);
+  }
+  const reports = await res.json();
+  const latest = reports?.[0];
+  if (!latest) {
+    return jsonResponse({ error: `No recent METAR for ${station}.` }, 502, corsHeaders);
+  }
+
+  return jsonResponse(
+    {
+      stationId: latest.icaoId,
+      raw: latest.rawOb,
+      type: latest.metarType,
+      observedAt: latest.reportTime,
+      tempC: latest.temp ?? null,
+      dewpointC: latest.dewp ?? null,
+      windDirDeg: latest.wdir ?? null,
+      windSpeedKt: latest.wspd ?? null,
+      visibilitySm: latest.visib ?? null,
+      altimeterInHg: typeof latest.altim === "number" ? latest.altim / 33.8639 : null,
+      flightCategory: latest.fltCat ?? null,
+    },
+    200,
+    corsHeaders
+  );
+}
+
 export default {
   async fetch(request, env) {
     const corsHeaders = {
@@ -33,6 +68,15 @@ export default {
 
     if (request.method === "OPTIONS") {
       return new Response(null, { headers: corsHeaders });
+    }
+
+    const { pathname } = new URL(request.url);
+    if (pathname === "/metar") {
+      try {
+        return await handleMetar(env, corsHeaders);
+      } catch (err) {
+        return jsonResponse({ error: String(err) }, 500, corsHeaders);
+      }
     }
 
     try {

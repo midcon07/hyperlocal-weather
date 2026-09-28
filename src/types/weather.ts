@@ -68,3 +68,31 @@ export interface HistoryEntry {
   stationTemperatureF: number | null;
   nwsTemperatureC: number | null;
 }
+
+export interface NwsAlert {
+  id: string;
+  event: string;
+  headline: string | null;
+  description: string;
+  severity: string;
+  urgency: string;
+  areaDesc: string;
+  effective: string;
+  expires: string;
+}
+
+export type FlightCategory = "VFR" | "MVFR" | "IFR" | "LIFR";
+
+export interface MetarReading {
+  stationId: string;
+  raw: string;
+  type: string;
+  observedAt: string;
+  tempC: number | null;
+  dewpointC: number | null;
+  windDirDeg: number | null;
+  windSpeedKt: number | null;
+  visibilitySm: string | number | null;
+  altimeterInHg: number | null;
+  flightCategory: FlightCategory | null;
+}

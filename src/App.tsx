@@ -2,20 +2,32 @@ import { StationCard } from "./components/StationCard";
 import { NwsCard } from "./components/NwsCard";
 import { ForecastList } from "./components/ForecastList";
 import { ComparisonChart } from "./components/ComparisonChart";
+import { AlertBanner } from "./components/AlertBanner";
+import { MetarStrip } from "./components/MetarStrip";
 import { useWeatherData } from "./hooks/useWeatherData";
 import { useNwsLive } from "./hooks/useNwsLive";
 import { useStationLive } from "./hooks/useStationLive";
+import { useAlertsLive } from "./hooks/useAlertsLive";
+import { useMetarLive } from "./hooks/useMetarLive";
 import "./App.css";
 
 function App() {
   const { latest, history, loading, error } = useWeatherData();
   const nwsLive = useNwsLive();
   const stationLive = useStationLive();
+  const alertsLive = useAlertsLive();
+  const metarLive = useMetarLive();
 
   const forecastPeriods = nwsLive.data?.forecast ?? latest?.nws?.forecast ?? [];
+  const conditions =
+    nwsLive.data?.observation?.textDescription ??
+    latest?.nws?.observation?.textDescription ??
+    null;
 
   return (
     <div className="app">
+      <AlertBanner live={alertsLive} />
+
       <header className="app-header">
         <h1>Hyperlocal Weather</h1>
         <p className="location">{latest?.location.name ?? "Loading location…"}</p>
@@ -28,20 +40,24 @@ function App() {
         {!loading && !error && (
           <>
             <section className="card-grid">
-              <StationCard live={stationLive} fallback={latest?.station ?? null} />
+              <StationCard live={stationLive} fallback={latest?.station ?? null} conditions={conditions} />
               <NwsCard live={nwsLive} fallback={latest?.nws ?? null} />
             </section>
-            <ComparisonChart history={history} />
-            <ForecastList periods={forecastPeriods} />
+            <section className="lower-grid">
+              <ComparisonChart history={history} />
+              <ForecastList periods={forecastPeriods} />
+            </section>
+            <MetarStrip live={metarLive} />
           </>
         )}
       </main>
 
       <footer className="app-footer">
         <p>
-          Data from the National Weather Service (api.weather.gov) and a
-          personal Davis Vantage Pro 2 station via WeatherLink.
+          Data from the National Weather Service (api.weather.gov), aviationweather.gov,
+          and a personal Davis Vantage Pro 2 station via WeatherLink.
         </p>
+        <p>Background photo by Corey Coyle (CC BY 3.0) — placeholder until a licensed WHO 13 skycam photo is available.</p>
       </footer>
     </div>
   );
