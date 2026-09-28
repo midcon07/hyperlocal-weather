@@ -45,11 +45,9 @@ function App() {
             </section>
             <section className="lower-grid">
               <ComparisonChart history={history} />
-              <div className="forecast-column">
-                <ForecastList periods={forecastPeriods} />
-                <MetarStrip live={metarLive} />
-              </div>
+              <ForecastList periods={forecastPeriods} />
             </section>
+            <MetarStrip live={metarLive} />
           </>
         )}
       </main>

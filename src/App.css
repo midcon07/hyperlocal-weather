@@ -25,8 +25,8 @@
 
 .card-grid {
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  gap: 0.85rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.6rem;
   margin-bottom: 0.6rem;
 }
 
@@ -37,15 +37,11 @@
   align-items: start;
 }
 
-.forecast-column {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
+.lower-grid > * {
   min-width: 0;
 }
 
 @media (max-width: 800px) {
-  .card-grid,
   .lower-grid {
     grid-template-columns: 1fr;
   }
@@ -389,6 +385,10 @@
 }
 
 /* Aviation METAR strip */
+
+.metar-strip {
+  margin-top: 0.6rem;
+}
 
 .metar-station + .metar-station {
   margin-top: 0.6rem;
