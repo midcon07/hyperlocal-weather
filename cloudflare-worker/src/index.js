@@ -26,37 +26,49 @@ function jsonResponse(body, status, corsHeaders) {
   });
 }
 
+function toMetarReading(latest) {
+  return {
+    stationId: latest.icaoId,
+    raw: latest.rawOb,
+    type: latest.metarType,
+    observedAt: latest.reportTime,
+    tempC: latest.temp ?? null,
+    dewpointC: latest.dewp ?? null,
+    windDirDeg: latest.wdir ?? null,
+    windSpeedKt: latest.wspd ?? null,
+    visibilitySm: latest.visib ?? null,
+    altimeterInHg: typeof latest.altim === "number" ? latest.altim / 33.8639 : null,
+    flightCategory: latest.fltCat ?? null,
+  };
+}
+
 async function handleMetar(env, corsHeaders) {
-  const station = (env.METAR_STATION_ID || "KIKV").trim();
+  const stationIds = (env.METAR_STATION_IDS || "KDSM,KIKV")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
   const res = await fetch(
-    `https://aviationweather.gov/api/data/metar?ids=${station}&format=json&hours=2`
+    `https://aviationweather.gov/api/data/metar?ids=${stationIds.join(",")}&format=json&hours=2`
   );
   if (!res.ok) {
     return jsonResponse({ error: `METAR request failed: ${res.status}` }, 502, corsHeaders);
   }
   const reports = await res.json();
-  const latest = reports?.[0];
-  if (!latest) {
-    return jsonResponse({ error: `No recent METAR for ${station}.` }, 502, corsHeaders);
+
+  // aviationweather.gov returns every station's recent reports interleaved,
+  // newest first — keep just the first (latest) one per requested station,
+  // in the order the stations were requested.
+  const readings = stationIds
+    .map((id) => reports.find((r) => r.icaoId === id))
+    .filter(Boolean)
+    .map(toMetarReading);
+
+  if (readings.length === 0) {
+    return jsonResponse({ error: `No recent METAR for ${stationIds.join(", ")}.` }, 502, corsHeaders);
   }
 
-  return jsonResponse(
-    {
-      stationId: latest.icaoId,
-      raw: latest.rawOb,
-      type: latest.metarType,
-      observedAt: latest.reportTime,
-      tempC: latest.temp ?? null,
-      dewpointC: latest.dewp ?? null,
-      windDirDeg: latest.wdir ?? null,
-      windSpeedKt: latest.wspd ?? null,
-      visibilitySm: latest.visib ?? null,
-      altimeterInHg: typeof latest.altim === "number" ? latest.altim / 33.8639 : null,
-      flightCategory: latest.fltCat ?? null,
-    },
-    200,
-    corsHeaders
-  );
+  return jsonResponse(readings, 200, corsHeaders);
 }
 
 export default {
