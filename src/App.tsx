@@ -1,7 +1,7 @@
 import { StationCard } from "./components/StationCard";
 import { NwsCard } from "./components/NwsCard";
 import { ForecastList } from "./components/ForecastList";
-import { ComparisonChart } from "./components/ComparisonChart";
+import { RadarCard } from "./components/RadarCard";
 import { AlertBanner } from "./components/AlertBanner";
 import { MetarStrip } from "./components/MetarStrip";
 import { useWeatherData } from "./hooks/useWeatherData";
@@ -12,7 +12,7 @@ import { useMetarLive } from "./hooks/useMetarLive";
 import "./App.css";
 
 function App() {
-  const { latest, history, loading, error } = useWeatherData();
+  const { latest, loading, error } = useWeatherData();
   const nwsLive = useNwsLive();
   const stationLive = useStationLive();
   const alertsLive = useAlertsLive();
@@ -43,10 +43,8 @@ function App() {
               <StationCard live={stationLive} fallback={latest?.station ?? null} conditions={conditions} />
               <NwsCard live={nwsLive} fallback={latest?.nws ?? null} />
             </section>
-            <section className="lower-grid">
-              <ComparisonChart history={history} />
-              <ForecastList periods={forecastPeriods} />
-            </section>
+            <RadarCard />
+            <ForecastList periods={forecastPeriods} />
             <MetarStrip live={metarLive} />
           </>
         )}
