@@ -1,5 +1,4 @@
 import { StationCard } from "./components/StationCard";
-import { NwsCard } from "./components/NwsCard";
 import { ForecastList } from "./components/ForecastList";
 import { RadarCard } from "./components/RadarCard";
 import { AlertBanner } from "./components/AlertBanner";
@@ -19,10 +18,6 @@ function App() {
   const metarLive = useMetarLive();
 
   const forecastPeriods = nwsLive.data?.forecast ?? latest?.nws?.forecast ?? [];
-  const conditions =
-    nwsLive.data?.observation?.textDescription ??
-    latest?.nws?.observation?.textDescription ??
-    null;
 
   return (
     <div className="app">
@@ -39,10 +34,12 @@ function App() {
 
         {!loading && !error && (
           <>
-            <section className="card-grid">
-              <StationCard live={stationLive} fallback={latest?.station ?? null} conditions={conditions} />
-              <NwsCard live={nwsLive} fallback={latest?.nws ?? null} />
-            </section>
+            <StationCard
+              live={stationLive}
+              fallback={latest?.station ?? null}
+              nwsLive={nwsLive}
+              nwsFallback={latest?.nws ?? null}
+            />
             <RadarCard />
             <ForecastList periods={forecastPeriods} />
             <MetarStrip live={metarLive} />

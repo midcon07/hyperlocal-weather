@@ -23,11 +23,14 @@
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 0.6rem;
+.station-card {
   margin-bottom: 0.6rem;
+}
+
+.nws-crosscheck {
+  margin: 0.4rem 0 0;
+  font-size: 0.72rem;
+  color: var(--muted);
 }
 
 .radar-card {
@@ -190,6 +193,15 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 0.2rem 1rem;
   margin: 0 0 0.3rem;
+}
+
+@media (min-width: 640px) {
+  /* The station card is full-width now that NWS Observed moved into a
+     footnote line inside it, so a 2-column stat grid leaves a lot of
+     unused space on wider screens. */
+  .stat-list {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .icon-value {

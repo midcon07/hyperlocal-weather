@@ -1,4 +1,4 @@
-import { fmt, isLikelyDaytime } from "../lib/format";
+import { celsiusToFahrenheit, fmt, isLikelyDaytime } from "../lib/format";
 import { degreesToCompass } from "../lib/compass";
 import { RefreshControls } from "./RefreshControls";
 import {
@@ -11,22 +11,29 @@ import {
   windSpinSeconds,
 } from "../lib/weatherIcons";
 import type { LiveSourceState } from "../hooks/useLiveSource";
-import type { StationReading } from "../types/weather";
+import type { NwsData, StationReading } from "../types/weather";
 
 interface Props {
   live: LiveSourceState<StationReading>;
   fallback: StationReading | null;
-  conditions?: string | null;
+  nwsLive: LiveSourceState<NwsData>;
+  nwsFallback: NwsData | null;
 }
 
-export function StationCard({ live, fallback, conditions }: Props) {
+export function StationCard({ live, fallback, nwsLive, nwsFallback }: Props) {
   const isLive = live.data !== null;
   const station = live.data ?? fallback;
+
+  const nws = nwsLive.data ?? nwsFallback;
+  const observation = nws?.observation ?? null;
+  const conditions = observation?.textDescription ?? null;
+  const nwsTempF = celsiusToFahrenheit(observation?.temperatureC ?? null);
+
   const ConditionIcon = getConditionIcon(conditions, isLikelyDaytime(new Date()));
   const windDir = degreesToCompass(station?.windDirectionDeg ?? null);
 
   return (
-    <div className="card">
+    <div className="card station-card">
       <div className="card-header">
         <h2>Ironwood Weather</h2>
       </div>
@@ -106,6 +113,11 @@ export function StationCard({ live, fallback, conditions }: Props) {
       {!isLive && (
         <p className="proxy-note">
           Showing last GitHub Actions sync — see cloudflare-worker/README.md for real-time updates.
+        </p>
+      )}
+      {observation && (
+        <p className="nws-crosscheck">
+          NWS Observed: {fmt(nwsTempF, 0, "°F")} · {conditions ?? "—"}
         </p>
       )}
     </div>
