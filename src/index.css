@@ -1,25 +1,27 @@
 :root {
-  /* Warm off-white rather than pure #fff -- avoids the flat, stark card
-     blocks that read as "default theme" rather than a designed one. */
-  --bg: #f1efe9;
-  --card-bg: #fcfaf7;
-  --surface: #f3f0ea;
-  --border: #e3dfd5;
-  --muted: #6b7280;
-  --text: #1f2937;
+  /* Warm cream/ivory rather than pure #fff -- the previous pass (a
+     barely-off-white) still read as plain white at a glance; this is
+     deliberately warmer and more visibly tinted. */
+  --bg: #f5efe2;
+  --card-bg: #fffaf0;
+  --surface: #f7efdf;
+  --border: #e6d9bf;
+  --muted: #6b6253;
+  --text: #2a2419;
   color-scheme: light dark;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Deep slate-blue rather than pure black/neutral gray -- same idea
-       in the other direction. */
-    --bg: #10131a;
-    --card-bg: #1b212c;
-    --surface: #242b38;
-    --border: #323a4a;
-    --muted: #9aa5b8;
-    --text: #e8ecf2;
+    /* Deep navy/indigo with real color saturation rather than a barely-
+       tinted near-black -- the previous pass was too conservative to
+       read as anything but "basically black". */
+    --bg: #161c38;
+    --card-bg: #212a52;
+    --surface: #2b3563;
+    --border: #3e4a85;
+    --muted: #abb4e0;
+    --text: #f2f3fc;
   }
 }
 
