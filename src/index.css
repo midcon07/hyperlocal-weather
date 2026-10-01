@@ -35,12 +35,9 @@ body {
   background-size: cover;
   background-position: 30% top;
   background-repeat: no-repeat;
-  background-attachment: fixed;
-}
-
-@media (max-width: 800px) {
-  body {
-    /* iOS Safari handles fixed backgrounds poorly; scroll normally on small screens */
-    background-attachment: scroll;
-  }
+  /* `fixed` causes a Chromium/Windows compositing bug where content
+     (notably the radar iframe) can drop out and this background bleeds
+     through in its place, and iOS Safari handles it poorly too — so this
+     stays `scroll` everywhere rather than just on mobile. */
+  background-attachment: scroll;
 }
