@@ -1,3 +1,4 @@
+import { getConditionIcon } from "../lib/weatherIcons";
 import type { NwsForecastPeriod } from "../types/weather";
 
 interface Props {
@@ -18,16 +19,20 @@ export function ForecastList({ periods }: Props) {
     <section className="card">
       <h2>Forecast</h2>
       <div className="forecast-scroll">
-        {periods.map((p) => (
-          <div className="forecast-item" key={p.startTime}>
-            <div className="forecast-name">{p.name}</div>
-            <div className="forecast-temp">{p.temperature}°{p.temperatureUnit}</div>
-            <div className="forecast-desc">{p.shortForecast}</div>
-            {p.probabilityOfPrecipitation !== null && (
-              <div className="forecast-pop">☔ {p.probabilityOfPrecipitation}%</div>
-            )}
-          </div>
-        ))}
+        {periods.map((p) => {
+          const Icon = getConditionIcon(p.shortForecast, p.isDaytime);
+          return (
+            <div className="forecast-item" key={p.startTime}>
+              <div className="forecast-name">{p.name}</div>
+              <Icon size={28} className="forecast-icon" />
+              <div className="forecast-temp">{p.temperature}°{p.temperatureUnit}</div>
+              <div className="forecast-desc">{p.shortForecast}</div>
+              {p.probabilityOfPrecipitation !== null && p.probabilityOfPrecipitation > 0 && (
+                <div className="forecast-pop">☔ {p.probabilityOfPrecipitation}%</div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </section>
   );

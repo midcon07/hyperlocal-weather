@@ -1,5 +1,15 @@
-import { fmt } from "../lib/format";
+import { fmt, isLikelyDaytime } from "../lib/format";
+import { degreesToCompass } from "../lib/compass";
 import { RefreshControls } from "./RefreshControls";
+import {
+  AnemometerIcon,
+  CompassArrowIcon,
+  DropletIcon,
+  GaugeIcon,
+  UvIcon,
+  getConditionIcon,
+  windSpinSeconds,
+} from "../lib/weatherIcons";
 import type { LiveSourceState } from "../hooks/useLiveSource";
 import type { StationReading } from "../types/weather";
 
@@ -12,6 +22,8 @@ interface Props {
 export function StationCard({ live, fallback, conditions }: Props) {
   const isLive = live.data !== null;
   const station = live.data ?? fallback;
+  const ConditionIcon = getConditionIcon(conditions, isLikelyDaytime(new Date()));
+  const windDir = degreesToCompass(station?.windDirectionDeg ?? null);
 
   return (
     <div className="card">
@@ -20,15 +32,63 @@ export function StationCard({ live, fallback, conditions }: Props) {
       </div>
       {station ? (
         <>
-          <div className="big-stat">{fmt(station.temperatureF, 0, "°F")}</div>
+          <div className="big-stat-row">
+            <ConditionIcon size={44} className="big-stat-icon" />
+            <div className="big-stat">{fmt(station.temperatureF, 0, "°F")}</div>
+          </div>
           <dl className="stat-list">
-            <div><dt>Conditions</dt><dd>{conditions ?? "—"}</dd></div>
-            <div><dt>Humidity</dt><dd>{fmt(station.humidityPct, 0, "%")}</dd></div>
-            <div><dt>Wind</dt><dd>{fmt(station.windSpeedMph, 0, " mph")}</dd></div>
-            <div><dt>Rain rate</dt><dd>{fmt(station.rainRateInPerHr, 2, " in/hr")}</dd></div>
-            <div><dt>Rain today</dt><dd>{fmt(station.rainDayIn, 2, " in")}</dd></div>
-            <div><dt>Pressure</dt><dd>{fmt(station.barometricPressureInHg, 2, " inHg")}</dd></div>
-            <div><dt>UV Index</dt><dd>{fmt(station.uvIndex, 1)}</dd></div>
+            <div>
+              <dt>Conditions</dt>
+              <dd>{conditions ?? "—"}</dd>
+            </div>
+            <div>
+              <dt>Humidity</dt>
+              <dd className="icon-value">
+                <DropletIcon size={15} />
+                {fmt(station.humidityPct, 0, "%")}
+              </dd>
+            </div>
+            <div>
+              <dt>Wind</dt>
+              <dd className="icon-value">
+                <AnemometerIcon size={18} spinSeconds={windSpinSeconds(station.windSpeedMph)} />
+                {fmt(station.windSpeedMph, 0, " mph")}
+                {windDir && (
+                  <span className="wind-dir">
+                    <CompassArrowIcon size={11} directionDeg={station.windDirectionDeg ?? 0} />
+                    {windDir}
+                  </span>
+                )}
+              </dd>
+            </div>
+            <div>
+              <dt>Rain rate</dt>
+              <dd className="icon-value">
+                <DropletIcon size={15} />
+                {fmt(station.rainRateInPerHr, 2, " in/hr")}
+              </dd>
+            </div>
+            <div>
+              <dt>Rain today</dt>
+              <dd className="icon-value">
+                <DropletIcon size={15} />
+                {fmt(station.rainDayIn, 2, " in")}
+              </dd>
+            </div>
+            <div>
+              <dt>Pressure</dt>
+              <dd className="icon-value">
+                <GaugeIcon size={15} />
+                {fmt(station.barometricPressureInHg, 2, " inHg")}
+              </dd>
+            </div>
+            <div>
+              <dt>UV Index</dt>
+              <dd className="icon-value">
+                <UvIcon size={15} />
+                {fmt(station.uvIndex, 1)}
+              </dd>
+            </div>
           </dl>
         </>
       ) : (

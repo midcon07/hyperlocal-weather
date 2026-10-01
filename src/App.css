@@ -167,11 +167,22 @@
   line-height: 1.25;
 }
 
+.big-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.big-stat-icon {
+  color: #7c8fe0;
+  flex: none;
+}
+
 .big-stat {
   font-size: 1.9rem;
   font-weight: 700;
   line-height: 1;
-  margin-bottom: 0.3rem;
 }
 
 .stat-list {
@@ -179,6 +190,46 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 0.2rem 1rem;
   margin: 0 0 0.3rem;
+}
+
+.icon-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.icon-value svg {
+  color: #7c8fe0;
+  flex: none;
+}
+
+.wind-dir {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  margin-left: 0.3rem;
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.78em;
+}
+
+.wind-dir svg {
+  color: var(--muted);
+}
+
+@keyframes anemometer-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.anemometer-spin {
+  animation-name: anemometer-spin;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }
 
 .stat-list div {
@@ -226,6 +277,11 @@
   border-radius: 10px;
   padding: 0.5rem;
   text-align: center;
+}
+
+.forecast-icon {
+  color: #7c8fe0;
+  margin: 0.1rem 0;
 }
 
 .forecast-name {
