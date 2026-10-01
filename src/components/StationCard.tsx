@@ -2,11 +2,10 @@ import { celsiusToFahrenheit, fmt, isLikelyDaytime } from "../lib/format";
 import { degreesToCompass } from "../lib/compass";
 import { RefreshControls } from "./RefreshControls";
 import {
-  AnemometerIcon,
-  CompassArrowIcon,
   DropletIcon,
   GaugeIcon,
   UvIcon,
+  WindMastIcon,
   getConditionIcon,
   windSpinSeconds,
 } from "../lib/weatherIcons";
@@ -36,12 +35,34 @@ export function StationCard({ live, fallback, nwsLive, nwsFallback }: Props) {
     <div className="card station-card">
       <div className="card-header">
         <h2>Ironwood Weather</h2>
+        <RefreshControls
+          compact
+          lastUpdated={live.lastUpdated ?? (fallback ? new Date(fallback.timestamp) : null)}
+          secondsUntilRefresh={live.secondsUntilRefresh}
+          loading={live.loading}
+          live={isLive}
+          onRefresh={live.refreshNow}
+        />
       </div>
       {station ? (
         <>
           <div className="big-stat-row">
-            <ConditionIcon size={44} className="big-stat-icon" />
-            <div className="big-stat">{fmt(station.temperatureF, 0, "°F")}</div>
+            <div className="big-stat-left">
+              <ConditionIcon size={44} className="big-stat-icon" />
+              <div className="big-stat">{fmt(station.temperatureF, 0, "°F")}</div>
+            </div>
+            <div className="wind-feature">
+              <WindMastIcon
+                width={40}
+                height={76}
+                spinSeconds={windSpinSeconds(station.windSpeedMph)}
+                directionDeg={station.windDirectionDeg}
+              />
+              <div className="wind-feature-reading">
+                <div className="wind-feature-speed">{fmt(station.windSpeedMph, 0, " mph")}</div>
+                {windDir && <div className="wind-feature-dir">{windDir}</div>}
+              </div>
+            </div>
           </div>
           <dl className="stat-list">
             <div>
@@ -53,19 +74,6 @@ export function StationCard({ live, fallback, nwsLive, nwsFallback }: Props) {
               <dd className="icon-value">
                 <DropletIcon size={15} />
                 {fmt(station.humidityPct, 0, "%")}
-              </dd>
-            </div>
-            <div>
-              <dt>Wind</dt>
-              <dd className="icon-value">
-                <AnemometerIcon size={18} spinSeconds={windSpinSeconds(station.windSpeedMph)} />
-                {fmt(station.windSpeedMph, 0, " mph")}
-                {windDir && (
-                  <span className="wind-dir">
-                    <CompassArrowIcon size={11} directionDeg={station.windDirectionDeg ?? 0} />
-                    {windDir}
-                  </span>
-                )}
               </dd>
             </div>
             <div>
@@ -101,18 +109,6 @@ export function StationCard({ live, fallback, nwsLive, nwsFallback }: Props) {
       ) : (
         <p className="empty-state">
           No station data yet. Configure WeatherLink secrets to start collecting readings.
-        </p>
-      )}
-      <RefreshControls
-        lastUpdated={live.lastUpdated ?? (fallback ? new Date(fallback.timestamp) : null)}
-        secondsUntilRefresh={live.secondsUntilRefresh}
-        loading={live.loading}
-        live={isLive}
-        onRefresh={live.refreshNow}
-      />
-      {!isLive && (
-        <p className="proxy-note">
-          Showing last GitHub Actions sync — see cloudflare-worker/README.md for real-time updates.
         </p>
       )}
       {observation && (

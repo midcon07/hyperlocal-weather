@@ -162,6 +162,53 @@
   cursor: default;
 }
 
+.refresh-compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex: none;
+}
+
+.refresh-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex: none;
+}
+
+.refresh-dot-live {
+  background: #22c55e;
+}
+
+.refresh-compact-time {
+  font-size: 0.7rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.refresh-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.refresh-icon-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.refresh-icon-spin {
+  animation: anemometer-spin 0.8s linear infinite;
+}
+
 .proxy-note {
   font-size: 0.68rem;
   color: var(--muted);
@@ -173,8 +220,16 @@
 .big-stat-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+
+.big-stat-left {
+  display: flex;
+  align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.3rem;
 }
 
 .big-stat-icon {
@@ -188,6 +243,29 @@
   line-height: 1;
 }
 
+.wind-feature {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #7c8fe0;
+}
+
+.wind-feature-reading {
+  color: var(--text);
+}
+
+.wind-feature-speed {
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.wind-feature-dir {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
 .stat-list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -198,9 +276,10 @@
 @media (min-width: 640px) {
   /* The station card is full-width now that NWS Observed moved into a
      footnote line inside it, so a 2-column stat grid leaves a lot of
-     unused space on wider screens. */
+     unused space on wider screens. Wind moved up into the hero row
+     feature, so the remaining 6 stats fit a 3-column grid evenly. */
   .stat-list {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -213,20 +292,6 @@
 .icon-value svg {
   color: #7c8fe0;
   flex: none;
-}
-
-.wind-dir {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.15rem;
-  margin-left: 0.3rem;
-  color: var(--muted);
-  font-weight: 500;
-  font-size: 0.78em;
-}
-
-.wind-dir svg {
-  color: var(--muted);
 }
 
 @keyframes anemometer-spin {

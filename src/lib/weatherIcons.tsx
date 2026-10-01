@@ -166,6 +166,69 @@ export function AnemometerIcon({ size = 20, className, spinSeconds }: IconProps 
   );
 }
 
+// A taller, more illustrative version: the top few feet of a mast with the
+// anemometer cups mounted on top and a small wind vane below, rotated to
+// the actual wind direction. The pole deliberately runs off the bottom
+// edge of the viewBox -- it's meant to read as "the top of a taller pole",
+// not the whole thing.
+export function WindMastIcon({
+  width = 44,
+  height = 84,
+  className,
+  spinSeconds,
+  directionDeg,
+}: {
+  width?: number;
+  height?: number;
+  className?: string;
+  spinSeconds?: number;
+  directionDeg?: number | null;
+}) {
+  return (
+    <svg
+      className={className}
+      width={width}
+      height={height}
+      viewBox="0 0 48 90"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+    >
+      <line x1="24" y1="90" x2="24" y2="30" />
+      {typeof directionDeg === "number" && (
+        <g transform={`rotate(${directionDeg} 24 58)`}>
+          <line x1="24" y1="58" x2="24" y2="47" strokeWidth="1.6" />
+          <path d="M24 44.5 27 51 24 49.3 21 51Z" fill="currentColor" stroke="none" />
+        </g>
+      )}
+      <g
+        className={spinSeconds ? "anemometer-spin" : undefined}
+        style={spinSeconds ? { animationDuration: `${spinSeconds}s`, transformOrigin: "24px 18px" } : undefined}
+      >
+        <line x1="24" y1="18" x2="24" y2="7.5" />
+        <circle cx="24" cy="6" r="2.6" fill="currentColor" stroke="none" />
+        <line x1="24" y1="18" x2="32.4" y2="23" />
+        <circle cx="33.5" cy="23.6" r="2.6" fill="currentColor" stroke="none" />
+        <line x1="24" y1="18" x2="15.6" y2="23" />
+        <circle cx="14.5" cy="23.6" r="2.6" fill="currentColor" stroke="none" />
+      </g>
+      <circle cx="24" cy="18" r="1.9" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function RefreshIcon({ size = 14, className }: IconProps) {
+  return (
+    <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 12a9 9 0 0 1 15.4-6.4L21 8" />
+      <path d="M21 3v5h-5" />
+      <path d="M21 12a9 9 0 0 1-15.4 6.4L3 16" />
+      <path d="M3 21v-5h5" />
+    </svg>
+  );
+}
+
 export function CompassArrowIcon({ size = 14, className, directionDeg }: IconProps & { directionDeg: number }) {
   return (
     <svg
