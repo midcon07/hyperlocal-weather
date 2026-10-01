@@ -34,6 +34,13 @@ export function RadarCard() {
           src={RADAR_URL}
           title="NWS KDMX local radar — Super Resolution Base Reflectivity"
         />
+        {/* Masks the playback-speed selector (speed down/up buttons + the
+            8-step indicator) in the controls row — it sits mid-row, not at
+            an edge, so it can't be cropped away like the chrome blocks
+            above; this covers it with a solid rect matching the card
+            background instead. Pause and zoom +/- are just to its left and
+            stay visible. */}
+        <div className="radar-mask-speed" aria-hidden="true" />
       </div>
     </section>
   );
