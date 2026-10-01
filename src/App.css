@@ -45,24 +45,29 @@
   text-decoration: underline;
 }
 
-/* Crops NWS's radar iframe to hide its fixed-size chrome: the iframe
-   renders taller than the visible window and is shifted up by exactly the
-   top banner+title block's height (160px), so that block falls above the
-   clipped area. The bottom playback bar is pinned to the iframe's own
-   bottom edge, so the iframe's native height is chosen so the visible
-   window ends right at the boundary between the controls row and the
-   color-legend row beneath it (dropping just the legend). Formula:
-   iframe native height = visible height + 190 (160px top crop + 30px of
-   the bottom bar trimmed off). isolation/contain + translateZ(0) are
-   defensive hints against a Chromium/Windows compositing bug where this
-   iframe's content can intermittently drop out and the page's background
-   shows through. */
+/* Crops NWS's radar iframe to hide its fixed-size chrome entirely: the
+   iframe renders taller than the visible window and is shifted up by
+   exactly the top banner+title block's height (160px), so that block
+   falls above the clipped area. The bottom playback bar (timeline +
+   controls + legend, 100px) is pinned to the iframe's own bottom edge —
+   our visible window ends right before it starts, so none of it shows
+   (storms approach from the SW/W here, so that corner stays
+   unobstructed; "Full view" still gives the interactive version with
+   working pause/zoom). Formula: iframe native height = visible height +
+   260 (160px top crop + 100px bottom bar). isolation/contain +
+   translateZ(0) are defensive hints against a Chromium/Windows
+   compositing bug where this iframe's content can intermittently drop
+   out and the page's background shows through. */
 .radar-frame-wrap {
   position: relative;
   width: 100%;
-  height: 420px;
+  height: 350px;
   overflow: hidden;
-  border-radius: 8px;
+  /* No border-radius here deliberately: border-radius + overflow:hidden
+     directly wrapping a GPU-composited cross-origin iframe is a known
+     Chromium/Windows trigger for content dropping out and the page
+     background showing through underneath it. Square corners on the
+     radar specifically is the trade-off for not hitting that bug. */
   isolation: isolate;
   contain: paint;
 }
@@ -78,41 +83,17 @@
   transform: translateZ(0);
 }
 
-/* Covers the speed-selector group (speed down/up + the 8-step green
-   indicator) in the controls row; exact pixel position measured against
-   NWS's current layout (fixed-px, centered within their 500px-wide
-   control-bar container — independent of our card's width). Extends to
-   the wrapper's right edge so it still fully covers the group on
-   narrower cards where the iframe itself clips the rest. */
-.radar-mask-speed {
-  position: absolute;
-  left: 230px;
-  right: 0;
-  top: 380px;
-  height: 40px;
-  background: var(--card-bg);
-}
-
 @media (max-width: 600px) {
   /* At this narrow width NWS's chrome renders taller than at wider
      widths (measured empirically — ~230px here vs. 160px above 600px),
-     so both the crop offset and native height need their own numbers. */
+     so the crop offset needs its own number. */
   .radar-frame-wrap {
-    height: 340px;
+    height: 270px;
   }
 
   .radar-frame {
     top: -230px;
     height: 600px;
-  }
-
-  .radar-mask-speed {
-    /* The control bar itself goes responsive below 500px (320px wide
-       here instead of the fixed 500px above that), so button positions
-       shift too — measured separately at this width. */
-    left: 140px;
-    top: 300px;
-    height: 40px;
   }
 }
 

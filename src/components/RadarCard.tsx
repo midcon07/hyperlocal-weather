@@ -5,14 +5,15 @@
 // menu: false); radar.weather.gov sends no X-Frame-Options/CSP that would
 // block framing it.
 //
-// NWS's chrome (a 56+104px banner/title block top-left, and a 30+40+30px
+// NWS's chrome (a 56+104px banner/title block top-left, and a 100px
 // timeline/controls/legend bar bottom-left) is pinned to the iframe's own
 // viewport corners at fixed pixel sizes we can't reach into (cross-origin).
 // So instead of hiding pieces inside the iframe, we render it taller than
-// what we show and crop top/bottom via CSS (see .radar-frame-wrap/.radar-
-// frame in App.css): the top chrome (160px) is cropped away entirely, and
-// the bottom bar is trimmed to just the timeline + playback controls,
-// dropping the color-legend row, for a smaller footprint. These are exact
+// what we show and crop both top and bottom entirely via CSS (see
+// .radar-frame-wrap/.radar-frame in App.css) — the bottom bar sits over
+// the SW/W part of the map, where storms approach from here, so it's
+// cropped away rather than just trimmed. "Full view" still gives the
+// interactive version with working pause/zoom. These are exact
 // measurements against NWS's current layout — if they redesign the page,
 // this crop may need re-tuning.
 const RADAR_SETTINGS =
@@ -34,13 +35,6 @@ export function RadarCard() {
           src={RADAR_URL}
           title="NWS KDMX local radar — Super Resolution Base Reflectivity"
         />
-        {/* Masks the playback-speed selector (speed down/up buttons + the
-            8-step indicator) in the controls row — it sits mid-row, not at
-            an edge, so it can't be cropped away like the chrome blocks
-            above; this covers it with a solid rect matching the card
-            background instead. Pause and zoom +/- are just to its left and
-            stay visible. */}
-        <div className="radar-mask-speed" aria-hidden="true" />
       </div>
     </section>
   );
