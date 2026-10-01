@@ -45,17 +45,50 @@
   text-decoration: underline;
 }
 
+/* Crops NWS's radar iframe to hide its fixed-size chrome: the iframe
+   renders taller than the visible window and is shifted up by exactly the
+   top banner+title block's height (160px), so that block falls above the
+   clipped area. The bottom playback bar is pinned to the iframe's own
+   bottom edge, so the iframe's native height is chosen so the visible
+   window ends right at the boundary between the controls row and the
+   color-legend row beneath it (dropping just the legend). Formula:
+   iframe native height = visible height + 190 (160px top crop + 30px of
+   the bottom bar trimmed off). isolation/contain + translateZ(0) are
+   defensive hints against a Chromium/Windows compositing bug where this
+   iframe's content can intermittently drop out and the page's background
+   shows through. */
+.radar-frame-wrap {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  overflow: hidden;
+  border-radius: 8px;
+  isolation: isolate;
+  contain: paint;
+}
+
 .radar-frame {
   display: block;
+  position: absolute;
+  top: -160px;
+  left: 0;
   width: 100%;
-  height: 500px;
+  height: 610px;
   border: 0;
-  border-radius: 8px;
+  transform: translateZ(0);
 }
 
 @media (max-width: 600px) {
+  /* At this narrow width NWS's chrome renders taller than at wider
+     widths (measured empirically — ~230px here vs. 160px above 600px),
+     so both the crop offset and native height need their own numbers. */
+  .radar-frame-wrap {
+    height: 340px;
+  }
+
   .radar-frame {
-    height: 380px;
+    top: -230px;
+    height: 600px;
   }
 }
 
