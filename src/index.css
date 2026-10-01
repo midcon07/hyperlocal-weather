@@ -1,8 +1,10 @@
 :root {
-  --bg: #f4f6f8;
-  --card-bg: #ffffff;
-  --surface: #f1f4f8;
-  --border: #e5e7eb;
+  /* Warm off-white rather than pure #fff -- avoids the flat, stark card
+     blocks that read as "default theme" rather than a designed one. */
+  --bg: #f1efe9;
+  --card-bg: #fcfaf7;
+  --surface: #f3f0ea;
+  --border: #e3dfd5;
   --muted: #6b7280;
   --text: #1f2937;
   color-scheme: light dark;
@@ -10,12 +12,14 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0f1115;
-    --card-bg: #1a1d24;
-    --surface: #22262e;
-    --border: #2c313a;
-    --muted: #9ca3af;
-    --text: #e5e7eb;
+    /* Deep slate-blue rather than pure black/neutral gray -- same idea
+       in the other direction. */
+    --bg: #10131a;
+    --card-bg: #1b212c;
+    --surface: #242b38;
+    --border: #323a4a;
+    --muted: #9aa5b8;
+    --text: #e8ecf2;
   }
 }
 

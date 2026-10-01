@@ -30,9 +30,6 @@ export function StationCard({ live, fallback, conditions }: Props) {
             <div><dt>Pressure</dt><dd>{fmt(station.barometricPressureInHg, 2, " inHg")}</dd></div>
             <div><dt>UV Index</dt><dd>{fmt(station.uvIndex, 1)}</dd></div>
           </dl>
-          {conditions && (
-            <p className="proxy-note">Conditions via NWS KIKV, ~7 mi NNW.</p>
-          )}
         </>
       ) : (
         <p className="empty-state">
