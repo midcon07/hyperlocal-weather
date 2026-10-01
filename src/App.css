@@ -47,21 +47,30 @@
 
 /* Crops NWS's radar iframe to hide its fixed-size chrome entirely: the
    iframe renders taller than the visible window and is shifted up by
-   exactly the top banner+title block's height (160px), so that block
-   falls above the clipped area. The bottom playback bar (timeline +
-   controls + legend, 100px) is pinned to the iframe's own bottom edge —
-   our visible window ends right before it starts, so none of it shows
+   exactly the top banner+title block's height, so that block falls
+   above the clipped area. The bottom playback bar (timeline + controls
+   + legend, 100px) is pinned to the iframe's own bottom edge — our
+   visible window ends right before it starts, so none of it shows
    (storms approach from the SW/W here, so that corner stays
    unobstructed; "Full view" still gives the interactive version with
-   working pause/zoom). Formula: iframe native height = visible height +
-   260 (160px top crop + 100px bottom bar). isolation/contain +
-   translateZ(0) are defensive hints against a Chromium/Windows
-   compositing bug where this iframe's content can intermittently drop
-   out and the page's background shows through. */
+   working pause/zoom).
+
+   The top crop offset is fixed, so the north edge never moves — adding
+   height only extends the south edge further, which is deliberate (the
+   user is south of KC and wanted more coverage toward northern
+   Arkansas, not more of Minnesota). Both breakpoints share the same
+   iframe native height (1110px) since reaching a given latitude south
+   of the station only depends on zoom level, not on how much gets
+   cropped from the top — only the *visible* height differs, since
+   mobile's larger top-crop eats further into that shared budget.
+
+   isolation/contain + translateZ(0) are defensive hints against a
+   Chromium/Windows compositing bug where this iframe's content can
+   intermittently drop out and the page's background shows through. */
 .radar-frame-wrap {
   position: relative;
   width: 100%;
-  height: 500px;
+  height: 850px;
   overflow: hidden;
   /* No border-radius here deliberately: border-radius + overflow:hidden
      directly wrapping a GPU-composited cross-origin iframe is a known
@@ -78,7 +87,7 @@
   top: -160px;
   left: 0;
   width: 100%;
-  height: 760px;
+  height: 1110px;
   border: 0;
   transform: translateZ(0);
 }
@@ -86,14 +95,16 @@
 @media (max-width: 600px) {
   /* At this narrow width NWS's chrome renders taller than at wider
      widths (measured empirically — ~230px here vs. 160px above 600px),
-     so the crop offset needs its own number. */
+     so the crop offset needs its own number. Native height stays the
+     same as desktop (see comment above) — only the visible height
+     shrinks to account for the larger top crop. */
   .radar-frame-wrap {
-    height: 380px;
+    height: 780px;
   }
 
   .radar-frame {
     top: -230px;
-    height: 710px;
+    height: 1110px;
   }
 }
 
