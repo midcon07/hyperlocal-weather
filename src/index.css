@@ -1,13 +1,15 @@
 :root {
-  /* Warm cream/ivory rather than pure #fff -- the previous pass (a
-     barely-off-white) still read as plain white at a glance; this is
-     deliberately warmer and more visibly tinted. */
-  --bg: #f5efe2;
-  --card-bg: #fffaf0;
-  --surface: #f7efdf;
-  --border: #e6d9bf;
-  --muted: #6b6253;
-  --text: #2a2419;
+  /* Light indigo/lavender rather than pure #fff -- same hue family as
+     the dark-mode navy below (one consistent brand color across both
+     appearances), and saturated enough to be unmistakably tinted rather
+     than reading as plain white (an earlier warm-cream version was
+     still too subtle to register on an iOS device in light mode). */
+  --bg: #e4e6f7;
+  --card-bg: #f3f4fc;
+  --surface: #eceefa;
+  --border: #c9cdee;
+  --muted: #565d87;
+  --text: #1c2140;
   color-scheme: light dark;
 }
 
