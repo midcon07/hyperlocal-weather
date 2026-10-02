@@ -39,9 +39,11 @@ interface Props {
   live: LiveSourceState<MapAlert[]>;
   open: boolean;
   onToggle: () => void;
+  /** Short label ("4 alerts") for the small map, where space is tight. */
+  compact?: boolean;
 }
 
-export function MapAlerts({ live, open, onToggle }: Props) {
+export function MapAlerts({ live, open, onToggle, compact = false }: Props) {
   const [expanded, setExpanded] = useState<string | null>(null);
   const groups = group(live.data ?? []);
 
@@ -55,9 +57,11 @@ export function MapAlerts({ live, open, onToggle }: Props) {
     tone = "clear";
   } else {
     const top = groups[0];
-    label = `${top.event}${top.alerts.length > 1 ? ` ×${top.alerts.length}` : ""}${
-      groups.length > 1 ? ` +${groups.length - 1} more` : ""
-    }`;
+    label = compact
+      ? `${groups.length} alert${groups.length === 1 ? "" : "s"}`
+      : `${top.event}${top.alerts.length > 1 ? ` ×${top.alerts.length}` : ""}${
+          groups.length > 1 ? ` +${groups.length - 1} more` : ""
+        }`;
     tone = top.level;
   }
 

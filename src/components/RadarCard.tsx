@@ -225,6 +225,7 @@ export function RadarCard() {
             <div className="radar-card-alerts">
               <MapAlerts
                 live={alerts}
+                compact
                 open={false}
                 onToggle={() => {
                   setAlertsOpen(true);

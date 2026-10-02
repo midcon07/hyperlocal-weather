@@ -1,5 +1,5 @@
 import type { MapAlert } from "../api/mapAlerts";
-import { levelFor } from "../lib/alertLevel";
+import { LEVEL_RANK, levelFor } from "../lib/alertLevel";
 import { makeProjector } from "../lib/mapView";
 import type { MapViewSpec } from "../lib/mapView";
 
@@ -8,8 +8,15 @@ import type { MapViewSpec } from "../lib/mapView";
 // alerts get a box around their affected zones. Drawn in the iframe's own
 // pixel space, then cropped by viewBox to whatever part the card shows.
 
+export const ADVISORY_COLOR = "#2b7de9";
 export const WATCH_COLOR = "#f59e0b";
 export const WARNING_COLOR = "#e11d2e";
+
+const COLORS: Record<string, string> = {
+  advisory: ADVISORY_COLOR,
+  watch: WATCH_COLOR,
+  warning: WARNING_COLOR,
+};
 
 interface Props {
   alerts: MapAlert[];
@@ -22,14 +29,15 @@ interface Props {
 export function AlertOutlines({ alerts, iframe, visible }: Props) {
   const project = makeProjector(iframe);
 
-  // Watches first, so warnings land on top where they overlap.
+  // Least severe first, so warnings land on top where outlines overlap.
   const drawn = alerts
     .map((a) => ({ alert: a, level: levelFor(a.event) }))
-    .filter((d) => d.level === "watch" || d.level === "warning")
-    // Flood products are handled separately (river-point warnings alone can
-    // number in the dozens), so they stay in the alerts list but get no outline.
-    .filter((d) => !d.alert.event.toLowerCase().includes("flood"))
-    .sort((a, b) => (a.level === b.level ? 0 : a.level === "watch" ? -1 : 1));
+    .filter((d) => d.level === "advisory" || d.level === "watch" || d.level === "warning")
+    // Flood watches and warnings are handled separately (river-point
+    // warnings alone can number in the dozens), so they stay in the alerts
+    // list but get no outline. Flood advisories are few and are drawn.
+    .filter((d) => d.level === "advisory" || !d.alert.event.toLowerCase().includes("flood"))
+    .sort((a, b) => LEVEL_RANK[a.level] - LEVEL_RANK[b.level]);
 
   const paths = drawn.flatMap(({ alert, level }) =>
     alert.shapes.map((shape, i) => {
@@ -64,7 +72,7 @@ export function AlertOutlines({ alerts, iframe, visible }: Props) {
       {paths.map((p) => (
         <g key={p.key}>
           <path d={p.d} className="alert-outline-halo" />
-          <path d={p.d} className="alert-outline" stroke={p.level === "warning" ? WARNING_COLOR : WATCH_COLOR} />
+          <path d={p.d} className="alert-outline" stroke={COLORS[p.level]} />
         </g>
       ))}
     </svg>
@@ -74,6 +82,9 @@ export function AlertOutlines({ alerts, iframe, visible }: Props) {
 export function OutlineLegend() {
   return (
     <div className="outline-legend" aria-hidden="true">
+      <span>
+        <i style={{ borderColor: ADVISORY_COLOR }} /> Advisory
+      </span>
       <span>
         <i style={{ borderColor: WATCH_COLOR }} /> Watch
       </span>

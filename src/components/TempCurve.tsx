@@ -172,7 +172,7 @@ export function TempCurve({ hourly: allHourly }: Props) {
                   <text x={xAt(i)} y={baseline + 17} className="curve-hour" textAnchor={i === 0 ? "start" : "middle"}>
                     {i === 0 ? "Now" : hourOf(i)}
                   </text>
-                  {i !== hiIdx && i !== loIdx && (
+                  {Math.abs(xAt(i) - xAt(hiIdx)) > 36 && Math.abs(xAt(i) - xAt(loIdx)) > 36 && (
                     <text x={xAt(i)} y={pts[i].y - 9} className="curve-temp" textAnchor={i === 0 ? "start" : "middle"}>
                       {p.temperature}°
                     </text>
