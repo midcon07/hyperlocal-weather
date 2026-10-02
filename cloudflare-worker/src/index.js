@@ -128,6 +128,7 @@ export default {
           temperatureF: reading.temp ?? null,
           humidityPct: reading.hum ?? null,
           windSpeedMph: reading.wind_speed_last ?? null,
+          windGustMph: reading.wind_speed_hi_last_10_min ?? null,
           windDirectionDeg: reading.wind_dir_last ?? null,
           rainRateInPerHr: reading.rain_rate_last_in ?? null,
           rainDayIn: reading.rainfall_day_in ?? null,

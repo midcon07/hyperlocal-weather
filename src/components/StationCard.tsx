@@ -9,6 +9,7 @@ import {
   getConditionIcon,
   windSpinSeconds,
 } from "../lib/weatherIcons";
+import { hasGust, isGusty, windCategory, windMeterFraction } from "../lib/wind";
 import type { LiveSourceState } from "../hooks/useLiveSource";
 import type { NwsData, StationReading } from "../types/weather";
 
@@ -30,6 +31,12 @@ export function StationCard({ live, fallback, nwsLive, nwsFallback }: Props) {
 
   const ConditionIcon = getConditionIcon(conditions, isLikelyDaytime(new Date()));
   const windDir = degreesToCompass(station?.windDirectionDeg ?? null);
+  const windSpeed = station?.windSpeedMph ?? null;
+  const windGust = station?.windGustMph ?? null;
+  const category = windCategory(windSpeed);
+  const gustShown = hasGust(windSpeed, windGust);
+  const flutterSeconds = windSpeed && windSpeed >= 1 ? Math.min(3, Math.max(0.7, 6 / (windSpeed + 1))) : undefined;
+  const flutterDeg = Math.min(14, 3 + (windSpeed ?? 0) * 0.6);
 
   return (
     <div className="card station-card">
@@ -51,16 +58,27 @@ export function StationCard({ live, fallback, nwsLive, nwsFallback }: Props) {
               <ConditionIcon size={44} className="big-stat-icon" />
               <div className="big-stat">{fmt(station.temperatureF, 0, "°F")}</div>
             </div>
-            <div className="wind-feature">
+            <div className={`wind-feature wind-level-${category.level}`}>
               <WindMastIcon
                 width={40}
                 height={76}
                 spinSeconds={windSpinSeconds(station.windSpeedMph)}
                 directionDeg={station.windDirectionDeg}
+                flutterSeconds={flutterSeconds}
+                flutterDeg={flutterDeg}
+                gusting={isGusty(windSpeed, windGust)}
               />
               <div className="wind-feature-reading">
                 <div className="wind-feature-speed">{fmt(station.windSpeedMph, 0, " mph")}</div>
-                {windDir && <div className="wind-feature-dir">{windDir}</div>}
+                <div className="wind-feature-dir">
+                  {category.label}
+                  {windDir && ` · ${windDir}`}
+                </div>
+                {gustShown && <div className="wind-feature-gust">Gusts {fmt(windGust, 0, " mph")}</div>}
+                <div className="wind-meter" aria-hidden="true">
+                  <div className="wind-meter-fill" style={{ width: `${windMeterFraction(windSpeed) * 100}%` }} />
+                  {gustShown && <div className="wind-meter-gust" style={{ left: `${windMeterFraction(windGust) * 100}%` }} />}
+                </div>
               </div>
             </div>
           </div>

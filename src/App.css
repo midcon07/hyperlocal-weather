@@ -266,6 +266,88 @@
   font-weight: 600;
 }
 
+.wind-feature-gust {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: currentColor;
+}
+
+/* Mast/cups/vane take the wind category's color (calm -> gale). */
+.wind-level-0 { color: #7c8fe0; }
+.wind-level-1 { color: #5fb3d9; }
+.wind-level-2 { color: #4cc38a; }
+.wind-level-3 { color: #f0b429; }
+.wind-level-4 { color: #f2784b; }
+.wind-level-5 { color: #e5484d; }
+
+.wind-meter {
+  position: relative;
+  width: 96px;
+  height: 5px;
+  margin-top: 0.3rem;
+  border-radius: 3px;
+  background: var(--border);
+}
+
+.wind-meter-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: currentColor;
+  transition: width 0.6s ease;
+}
+
+.wind-meter-gust {
+  position: absolute;
+  top: -2px;
+  width: 2px;
+  height: 9px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: var(--text);
+  transition: left 0.6s ease;
+}
+
+@keyframes vane-flutter {
+  0%,
+  100% {
+    transform: rotate(calc(var(--flutter-deg, 6deg) * -1));
+  }
+  50% {
+    transform: rotate(var(--flutter-deg, 6deg));
+  }
+}
+
+.vane-flutter {
+  animation-name: vane-flutter;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes gust-ring-pulse {
+  0% {
+    transform: scale(0.55);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.25);
+    opacity: 0;
+  }
+}
+
+.gust-ring {
+  fill: none;
+  stroke: currentColor;
+  animation: gust-ring-pulse 1.6s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anemometer-spin,
+  .vane-flutter,
+  .gust-ring {
+    animation: none;
+  }
+}
+
 .stat-list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

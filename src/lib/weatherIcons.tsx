@@ -2,6 +2,8 @@
 // instead of as plain text/numbers. All icons use currentColor so they
 // inherit whatever text color the surrounding element sets.
 
+import type { CSSProperties } from "react";
+
 interface IconProps {
   size?: number;
   className?: string;
@@ -177,12 +179,20 @@ export function WindMastIcon({
   className,
   spinSeconds,
   directionDeg,
+  flutterSeconds,
+  flutterDeg = 6,
+  gusting,
 }: {
   width?: number;
   height?: number;
   className?: string;
   spinSeconds?: number;
   directionDeg?: number | null;
+  // Vane wobble about its heading: period and swing in degrees. Omit for calm.
+  flutterSeconds?: number;
+  flutterDeg?: number;
+  // Pulses a ring around the cups.
+  gusting?: boolean;
 }) {
   return (
     <svg
@@ -198,10 +208,20 @@ export function WindMastIcon({
       <line x1="24" y1="90" x2="24" y2="30" />
       {typeof directionDeg === "number" && (
         <g transform={`rotate(${directionDeg} 24 58)`}>
-          <line x1="24" y1="58" x2="24" y2="47" strokeWidth="1.6" />
-          <path d="M24 44.5 27 51 24 49.3 21 51Z" fill="currentColor" stroke="none" />
+          <g
+            className={flutterSeconds ? "vane-flutter" : undefined}
+            style={
+              flutterSeconds
+                ? ({ animationDuration: `${flutterSeconds}s`, transformOrigin: "24px 58px", "--flutter-deg": `${flutterDeg}deg` } as CSSProperties)
+                : undefined
+            }
+          >
+            <line x1="24" y1="58" x2="24" y2="47" strokeWidth="1.6" />
+            <path d="M24 44.5 27 51 24 49.3 21 51Z" fill="currentColor" stroke="none" />
+          </g>
         </g>
       )}
+      {gusting && <circle className="gust-ring" cx="24" cy="18" r="13" strokeWidth="1.4" style={{ transformOrigin: "24px 18px" }} />}
       <g
         className={spinSeconds ? "anemometer-spin" : undefined}
         style={spinSeconds ? { animationDuration: `${spinSeconds}s`, transformOrigin: "24px 18px" } : undefined}

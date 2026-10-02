@@ -3,6 +3,8 @@ export interface StationReading {
   temperatureF: number | null;
   humidityPct: number | null;
   windSpeedMph: number | null;
+  // 10-minute high; absent in snapshots committed before this field existed.
+  windGustMph?: number | null;
   windDirectionDeg: number | null;
   rainRateInPerHr: number | null;
   rainDayIn: number | null;
