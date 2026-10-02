@@ -14,6 +14,12 @@
 //     first visit during a big outbreak fills in over a couple of minutes;
 //     until a zone is known its state decides (core states only).
 
+// Where an alert applies, for drawing on the map: the real outline when NWS
+// supplies one (warnings), otherwise a box around its affected zones.
+export type AlertShape =
+  | { kind: "polygon"; rings: [number, number][][] } // [lon, lat] points
+  | { kind: "box"; south: number; north: number; west: number; east: number };
+
 export interface MapAlert {
   id: string;
   event: string;
@@ -22,6 +28,7 @@ export interface MapAlert {
   severity: string;
   areaDesc: string;
   expires: string | null;
+  shapes: AlertShape[];
 }
 
 const BOX = { south: 35.6, north: 46.1, west: -102.7, east: -84.8 };
@@ -152,7 +159,43 @@ async function resolveZones(urls: string[], cache: ZoneCache) {
   if (pending.length) saveZoneCache(cache);
 }
 
-const SEVERITY_RANK: Record<string, number> = { Extreme: 4, Severe: 3, Moderate: 2, Minor: 1 };
+// Zone-only alerts: group the affected zones that are in view into clusters
+// of neighbours (so one alert covering two separate regions draws two
+// boxes, not one huge one) and box each cluster, padded by about half a
+// county since only zone centers are known.
+const CLUSTER_GAP_DEG = 1.1;
+const BOX_PAD_DEG = 0.32;
+
+function zoneBoxes(urls: string[], cache: ZoneCache): AlertShape[] {
+  const spots = urls.map((u) => cache[u]).filter((s): s is [number, number] => !!s && inBox(s[0], s[1]));
+  const parent = spots.map((_, i) => i);
+  const find = (i: number): number => (parent[i] === i ? i : (parent[i] = find(parent[i])));
+  for (let i = 0; i < spots.length; i++) {
+    for (let j = i + 1; j < spots.length; j++) {
+      if (Math.hypot(spots[i][0] - spots[j][0], spots[i][1] - spots[j][1]) <= CLUSTER_GAP_DEG) {
+        parent[find(i)] = find(j);
+      }
+    }
+  }
+  const clusters = new Map<number, [number, number][]>();
+  spots.forEach((s, i) => clusters.set(find(i), [...(clusters.get(find(i)) ?? []), s]));
+  return [...clusters.values()].map((pts) => ({
+    kind: "box" as const,
+    south: Math.min(...pts.map((p) => p[0])) - BOX_PAD_DEG,
+    north: Math.max(...pts.map((p) => p[0])) + BOX_PAD_DEG,
+    west: Math.min(...pts.map((p) => p[1])) - BOX_PAD_DEG,
+    east: Math.max(...pts.map((p) => p[1])) + BOX_PAD_DEG,
+  }));
+}
+
+function polygonShapes(geometry: GeoJsonGeometry): AlertShape[] {
+  const outlines = rings(geometry).map((ring) =>
+    ring.map(([lon, lat]) => [Math.round(lon * 1000) / 1000, Math.round(lat * 1000) / 1000] as [number, number])
+  );
+  return outlines.length ? [{ kind: "polygon", rings: outlines }] : [];
+}
+
+const SEVERITY_RANK: Record<string, number> ={ Extreme: 4, Severe: 3, Moderate: 2, Minor: 1 };
 
 export async function fetchMapAlerts(): Promise<MapAlert[]> {
   const data = await getJson<{ features: AlertFeature[] }>(
@@ -192,6 +235,7 @@ export async function fetchMapAlerts(): Promise<MapAlert[]> {
       severity: f.properties.severity,
       areaDesc: f.properties.areaDesc,
       expires: f.properties.ends ?? f.properties.expires,
+      shapes: f.geometry ? polygonShapes(f.geometry) : zoneBoxes(f.properties.affectedZones ?? [], cache),
     }))
     .sort((a, b) => (SEVERITY_RANK[b.severity] ?? 0) - (SEVERITY_RANK[a.severity] ?? 0) || a.event.localeCompare(b.event));
 }

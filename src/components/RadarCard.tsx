@@ -3,6 +3,8 @@ import type { MapAlert } from "../api/mapAlerts";
 import { useElementSize, useElementWidth } from "../hooks/useElementWidth";
 import { useMapAlertsLive } from "../hooks/useMapAlertsLive";
 import type { LiveSourceState } from "../hooks/useLiveSource";
+import { MAP_DEFAULT_ZOOM } from "../lib/mapView";
+import { AlertOutlines, OutlineLegend } from "./AlertOutlines";
 import { MapAlerts } from "./MapAlerts";
 
 // Embeds NWS's own radar viewer, pre-configured to National Composite
@@ -28,7 +30,16 @@ import { MapAlerts } from "./MapAlerts";
 // need re-tuning.
 const RADAR_SETTINGS =
   "v1_eyJhZ2VuZGEiOnsiaWQiOiJuYXRpb25hbCIsImNlbnRlciI6Wy05My43MjMsNDEuNzMxXSwibG9jYXRpb24iOm51bGwsInpvb20iOjYuNSwibGF5ZXIiOiJicmVmX3FjZCJ9LCJhbmltYXRpbmciOnRydWUsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51IjpmYWxzZSwic2hvcnRGdXNlZE9ubHkiOnRydWUsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19";
-const RADAR_URL = `https://radar.weather.gov/?settings=${RADAR_SETTINGS}`;
+
+// The same embed URL with the zoom swapped in (the alert view's +/- buttons
+// reload the map at a new zoom so we always know where it is).
+function radarUrl(zoom: number = MAP_DEFAULT_ZOOM) {
+  const settings = JSON.parse(atob(RADAR_SETTINGS.slice(3)));
+  settings.agenda.zoom = zoom;
+  return `https://radar.weather.gov/?settings=v1_${encodeURIComponent(btoa(JSON.stringify(settings)))}`;
+}
+
+const RADAR_URL = radarUrl();
 
 // The coverage the card shows, in NWS's own pixels: a 1100px-wide window
 // onto a 1110px-tall iframe, with the top 160px (banner) shifted off and
@@ -63,13 +74,27 @@ interface ModalProps {
   onClose: () => void;
 }
 
+const MIN_ZOOM = 5.5;
+const MAX_ZOOM = 8.5;
+
 // The enlarged radar: the same crop as the card (NWS's banner, menu panel
-// and playback bar are cut off) at the size of the dialog, fully
-// interactive by mouse wheel, drag and pinch. Our own alerts button takes
-// the place of the NWS one that lived in the cropped panel.
+// and playback bar are cut off) at the size of the dialog. Our own alerts
+// button takes the place of the NWS one that lived in the cropped panel.
+//
+// Two modes. In the default "alert view" the map is held at a view we
+// control (center + zoom, changed with the +/- buttons, which reload it),
+// so alert outlines can be drawn on it accurately. "Explore" hands the map
+// back to NWS's own mouse/touch pan and zoom, and hides the outlines,
+// because once the user moves the map we can no longer tell where it is.
 function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose }: ModalProps) {
   const { ref, width, height } = useElementSize();
+  const [zoom, setZoom] = useState(MAP_DEFAULT_ZOOM);
+  const [explore, setExplore] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
   const chromeTop = width > 600 ? CHROME_TOP : CHROME_TOP_NARROW;
+  const iframeHeight = height + chromeTop + CHROME_BOTTOM;
+
+  const changeZoom = (delta: number) => setZoom((z) => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z + delta)));
 
   return (
     <div className="radar-modal" role="dialog" aria-modal="true" aria-label="Radar, enlarged" onClick={onClose}>
@@ -77,7 +102,7 @@ function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose }: ModalProps)
         <div className="radar-modal-bar">
           <strong>Radar — Composite Reflectivity</strong>
           <span>
-            <a className="radar-link" href={RADAR_URL} target="_blank" rel="noreferrer">
+            <a className="radar-link" href={radarUrl()} target="_blank" rel="noreferrer">
               Open in new tab ↗
             </a>
             <button type="button" className="radar-modal-close" onClick={onClose} autoFocus>
@@ -88,14 +113,51 @@ function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose }: ModalProps)
         <div className="radar-modal-map" ref={ref}>
           {width > 0 && (
             <iframe
-              className="radar-modal-frame"
-              src={RADAR_URL}
+              key={`${zoom}-${resetKey}`}
+              className={`radar-modal-frame${explore ? "" : " radar-modal-frame--locked"}`}
+              src={radarUrl(zoom)}
               title="NWS radar, enlarged"
-              style={{ top: -chromeTop, width, height: height + chromeTop + CHROME_BOTTOM }}
+              style={{ top: -chromeTop, width, height: iframeHeight }}
             />
+          )}
+          {width > 0 && !explore && alerts.data && (
+            <div className="alert-outlines-wrap">
+              <AlertOutlines
+                alerts={alerts.data}
+                iframe={{ width, height: iframeHeight, zoom }}
+                visible={{ top: chromeTop, width, height }}
+              />
+            </div>
           )}
           <div className="radar-modal-alerts">
             <MapAlerts live={alerts} open={alertsOpen} onToggle={onToggleAlerts} />
+          </div>
+          <div className="radar-modal-controls">
+            {explore ? (
+              <button
+                type="button"
+                className="radar-ctl radar-ctl--wide"
+                onClick={() => {
+                  setExplore(false);
+                  setResetKey((k) => k + 1);
+                }}
+              >
+                Back to alert view
+              </button>
+            ) : (
+              <>
+                <button type="button" className="radar-ctl" onClick={() => changeZoom(1)} disabled={zoom >= MAX_ZOOM} aria-label="Zoom in">
+                  +
+                </button>
+                <button type="button" className="radar-ctl" onClick={() => changeZoom(-1)} disabled={zoom <= MIN_ZOOM} aria-label="Zoom out">
+                  −
+                </button>
+                <button type="button" className="radar-ctl radar-ctl--wide" onClick={() => setExplore(true)}>
+                  Pan &amp; explore
+                </button>
+                <OutlineLegend />
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -147,6 +209,15 @@ export function RadarCard() {
                 tabIndex={-1}
                 style={{ top: -CHROME_TOP, width: nativeWidth, height: NATIVE_HEIGHT }}
               />
+              {alerts.data && (
+                <div className="alert-outlines-wrap">
+                  <AlertOutlines
+                    alerts={alerts.data}
+                    iframe={{ width: nativeWidth, height: NATIVE_HEIGHT, zoom: MAP_DEFAULT_ZOOM }}
+                    visible={{ top: CHROME_TOP, width: nativeWidth, height: VISIBLE_HEIGHT }}
+                  />
+                </div>
+              )}
             </div>
             <button type="button" className="radar-expand" onClick={() => setOpen(true)} aria-label="Enlarge radar">
               <span className="radar-expand-pill">Click to enlarge</span>

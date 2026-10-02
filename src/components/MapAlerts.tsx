@@ -1,6 +1,8 @@
 import { useState } from "react";
 import type { MapAlert } from "../api/mapAlerts";
 import type { LiveSourceState } from "../hooks/useLiveSource";
+import { LEVEL_RANK, levelFor } from "../lib/alertLevel";
+import type { AlertLevel } from "../lib/alertLevel";
 
 // Our own stand-in for NWS's "Alert" button on the radar: the same kind of
 // list (watches, warnings, advisories), but limited to the area the map
@@ -8,17 +10,6 @@ import type { LiveSourceState } from "../hooks/useLiveSource";
 // grouped by type, because one event can be dozens of near-identical
 // alerts (for instance a river flood warning per forecast point).
 
-type Level = "warning" | "watch" | "advisory" | "statement";
-
-const LEVEL_RANK: Record<Level, number> = { warning: 3, watch: 2, advisory: 1, statement: 0 };
-
-function levelFor(event: string): Level {
-  const e = event.toLowerCase();
-  if (e.includes("warning")) return "warning";
-  if (e.includes("watch")) return "watch";
-  if (e.includes("advisory")) return "advisory";
-  return "statement";
-}
 
 const untilFmt = new Intl.DateTimeFormat("en-US", { weekday: "short", hour: "numeric", minute: "2-digit" });
 const clockFmt = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" });
@@ -32,7 +23,7 @@ function until(expires: string | null) {
 
 interface Group {
   event: string;
-  level: Level;
+  level: AlertLevel;
   alerts: MapAlert[];
 }
 

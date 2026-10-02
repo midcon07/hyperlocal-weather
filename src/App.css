@@ -185,6 +185,102 @@
   /* Square, no border-radius: same compositing-bug caution as the card. */
 }
 
+/* Locked: the map is held at a view we control, so outlines stay accurate.
+   Clicks fall through to nothing; "Pan & explore" removes this class. */
+.radar-modal-frame--locked {
+  pointer-events: none;
+}
+
+/* Alert outlines sit exactly over the (cropped) iframe, never take clicks. */
+.alert-outlines-wrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.alert-outlines {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.alert-outline-halo {
+  fill: none;
+  stroke: #fff;
+  stroke-opacity: 0.8;
+  stroke-width: 5;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.alert-outline {
+  fill: none;
+  stroke-width: 2.6;
+  stroke-dasharray: 8 5;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.radar-modal-controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.radar-ctl {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 0.7rem;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(20, 35, 63, 0.82);
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.radar-ctl--wide {
+  font-size: 0.76rem;
+}
+
+.radar-ctl:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.radar-ctl:hover:not(:disabled) {
+  background: rgba(31, 95, 208, 0.92);
+}
+
+.outline-legend {
+  display: flex;
+  gap: 0.7rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #14233f;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.outline-legend i {
+  display: inline-block;
+  width: 16px;
+  height: 0;
+  margin-right: 4px;
+  vertical-align: middle;
+  border-top: 3px dashed;
+}
+
 .radar-card-alerts {
   position: absolute;
   top: 8px;
