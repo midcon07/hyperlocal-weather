@@ -307,6 +307,11 @@
   stroke: var(--mast-body);
 }
 
+.mast-edge-stroke {
+  fill: none;
+  stroke: var(--mast-edge);
+}
+
 /* Mast/cups/vane take the wind category's color (calm -> gale). */
 .wind-level-0 { color: #7c8fe0; }
 .wind-level-1 { color: #5fb3d9; }

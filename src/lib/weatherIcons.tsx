@@ -209,32 +209,37 @@ export function WindMastIcon({
       <polygon className="mast-silver" points="23,110 26.5,82 33.5,82 37,110" strokeWidth="0.8" />
       <line className="mast-highlight" x1="27.8" y1="86" x2="25.4" y2="110" strokeWidth="1.1" />
 
-      <path className="mast-body-stroke" d="M30 78 C29 62 33 49 41 37" strokeWidth="2.6" />
+      <path className="mast-body-stroke" d="M30 78 C29 62 33 49 41 38" strokeWidth="2.6" />
+      <rect className="mast-body-fill" x="37" y="35.5" width="8.5" height="4" rx="1" />
       <rect className="mast-body-fill" x="22" y="76" width="16" height="9" rx="2.2" />
       <circle className="mast-body-fill" cx="19.6" cy="82" r="1.7" />
 
-      <line className="mast-body-stroke" x1="41" y1="24" x2="41" y2="33" strokeWidth="2" />
+      <line className="mast-body-stroke" x1="41" y1="15" x2="41" y2="33" strokeWidth="2" />
       <ellipse className="mast-body-fill" cx="41" cy="33" rx="3.2" ry="4.2" />
 
       {gusting && (
-        <ellipse className="gust-ring" cx="41" cy="31" rx="14" ry="8" strokeWidth="1.2" style={{ transformOrigin: "41px 31px" }} />
+        <ellipse className="gust-ring" cx="41" cy="31" rx="17" ry="10" strokeWidth="1.2" style={{ transformOrigin: "41px 31px" }} />
       )}
 
-      <g transform="translate(41 31) scale(1 0.55)">
+      <g transform="translate(41 31) scale(1 0.6)">
         <g
           className={spinSeconds ? "anemometer-spin" : undefined}
           style={spinSeconds ? { animationDuration: `${spinSeconds}s`, transformOrigin: "0px 0px" } : undefined}
         >
           {[0, 120, 240].map((angle) => (
             <g key={angle} transform={`rotate(${angle})`}>
-              <line className="mast-body-stroke" x1="0" y1="0" x2="0" y2="-7" strokeWidth="1.3" />
-              <circle cx="0" cy="-8.6" r="3.1" fill="currentColor" />
+              <line className="mast-body-stroke" x1="0" y1="0" x2="0" y2="-9" strokeWidth="1.3" />
+              <path d="M0 -14.4 A4.2 4.2 0 0 0 0 -6 Z" fill="currentColor" />
+              <circle cx="-1.9" cy="-11.6" r="0.9" fill="rgba(255,255,255,0.55)" />
             </g>
           ))}
         </g>
       </g>
 
-      <g transform={`translate(41 22) scale(${vaneScaleX} 1)`}>
+      <ellipse className="mast-edge-stroke" cx="41" cy="31" rx="4.2" ry="2.3" strokeWidth="0.9" />
+      <circle cx="40" cy="31.6" r="1.1" fill="rgba(255,255,255,0.75)" />
+
+      <g transform={`translate(41 13) scale(${vaneScaleX} 1)`}>
         <g
           className={flutterSeconds ? "vane-flutter" : undefined}
           style={
@@ -247,7 +252,7 @@ export function WindMastIcon({
           <path className="mast-body-fill" d="M2.5 -1.3 L14 -0.9 L17 0 L14 0.9 L2.5 1.3Z" />
         </g>
       </g>
-      <ellipse className="mast-body-fill" cx="41" cy="22" rx="2.8" ry="3.2" />
+      <ellipse className="mast-body-fill" cx="41" cy="13" rx="2.8" ry="3.2" />
     </svg>
   );
 }
