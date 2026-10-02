@@ -172,6 +172,7 @@
   position: relative;
   flex: 1 1 auto;
   min-height: 0;
+  background: #e9eef3;
   overflow: hidden;
   isolation: isolate;
   contain: paint;
@@ -189,6 +190,46 @@
    Clicks fall through to nothing; "Pan & explore" removes this class. */
 .radar-modal-frame--locked {
   pointer-events: none;
+}
+
+/* One copy of the NWS map. Layers are stacked; the newest ready one shows,
+   shifted/scaled by inline transform to match where the user has dragged. */
+.radar-layer {
+  position: absolute;
+  inset: 0;
+  /* Clip to this layer's own window so dragging the stand-in picture never
+     reveals NWS's cropped banner, menu panel or playback bar. */
+  overflow: hidden;
+  will-change: transform;
+  transition: opacity 0.35s ease;
+}
+
+.radar-updating {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 2;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(20, 35, 63, 0.78);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+/* Catches drag, wheel and pinch for the whole map area. The alert areas
+   beneath it are still found by hit-testing for hover and taps. */
+.radar-gesture {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  touch-action: none;
+  cursor: grab;
+}
+
+.radar-gesture:active {
+  cursor: grabbing;
 }
 
 /* Scroll position strip + "More below" cue (see ScrollHint.tsx). The strip
