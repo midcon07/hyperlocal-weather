@@ -426,20 +426,34 @@
   margin-left: 0.4rem;
 }
 
-.sun-strip {
+/* Sun and moon arcs, side by side */
+.sky-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+@media (min-width: 600px) {
+  .sky-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.sky-tile {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0.5rem 0.75rem 0.5rem;
-  margin-bottom: 0.4rem;
+  min-width: 0;
+  padding: 0.5rem 0.5rem 0.5rem;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
 }
 
-.sun-strip svg {
+.sky-tile svg {
   width: 100%;
-  max-width: 420px;
+  max-width: 320px;
   height: auto;
 }
 
@@ -480,24 +494,63 @@
   stroke-width: 2;
 }
 
+.moon-track-done {
+  fill: none;
+  stroke: #9fb0e0;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+
+.moon-end {
+  fill: var(--card-bg);
+  stroke: #9fb0e0;
+  stroke-width: 2;
+}
+
+.moon-glow {
+  fill: #b9c6f0;
+  fill-opacity: 0.3;
+}
+
+.moon-dark {
+  fill: #3a4668;
+}
+
+.moon-lit {
+  fill: #f3edd6;
+}
+
+.moon-craters circle {
+  fill: #8d93a8;
+  fill-opacity: 0.28;
+}
+
+.moon-rim {
+  fill: none;
+  stroke: #7d87a8;
+  stroke-width: 1;
+}
+
 .sun-times {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  gap: 0.25rem;
   width: 100%;
-  max-width: 420px;
 }
 
 .sun-times div {
   display: flex;
   flex-direction: column;
-  font-size: 0.7rem;
+  font-size: 0.66rem;
   color: var(--muted);
+  min-width: 0;
 }
 
 .sun-times strong {
   color: var(--text);
-  font-size: 0.95rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
 }
 
 .sun-times .sun-center {
@@ -505,17 +558,31 @@
   text-align: center;
 }
 
+.sun-times div:last-child {
+  align-items: flex-end;
+  text-align: right;
+}
+
 /* Instruments: each reading drawn as the device it comes from. */
 .instrument-row {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0.5rem;
-  margin: 0.5rem 0 0.4rem;
+  margin: 0.5rem 0 0.5rem;
+}
+
+/* On phones the barometer gets a full row; rain and humidity share the next. */
+.instrument-row .instrument:first-child {
+  grid-column: 1 / -1;
 }
 
 @media (min-width: 640px) {
   .instrument-row {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .instrument-row .instrument:first-child {
+    grid-column: auto;
   }
 }
 
@@ -540,8 +607,8 @@
 
 .instrument-art svg {
   display: block;
-  width: 112px;
-  height: 112px;
+  width: 132px;
+  height: 132px;
   margin: 0.15rem 0;
 }
 
@@ -557,20 +624,16 @@
   min-height: 1em;
 }
 
-/* Shared dial parts */
-.dial-bezel {
-  fill: #b98f3e;
-  stroke: #8a6a28;
-  stroke-width: 1;
+.thermometer {
+  display: block;
+  width: 44px;
+  height: 108px;
+  flex: none;
+  margin-left: 0.4rem;
+  filter: drop-shadow(0 1px 3px rgba(0, 20, 60, 0.25));
 }
 
-.dial-face {
-  fill: var(--card-bg);
-  stroke: #8a6a28;
-  stroke-width: 0.6;
-}
-
-/* Antique barometer face */
+/* Antique dial faces (barometer, hygrometer) and shared scale text */
 .antique-tick {
   stroke: #3b2b0e;
   stroke-width: 0.5;
@@ -621,63 +684,18 @@
 .trend-falling { color: #e0663a; }
 .trend-steady { color: var(--muted); }
 
-.baro-tick {
-  stroke: var(--muted);
-  stroke-width: 0.8;
-}
-
-.baro-tick-major {
-  stroke: var(--text);
-  stroke-width: 1.3;
-}
-
-.dial-num {
-  fill: var(--text);
-  font-size: 9px;
-  font-weight: 700;
-}
-
-.dial-word {
-  fill: var(--muted);
-  font-size: 6.5px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-
 .needle {
   transition: transform 0.9s cubic-bezier(0.3, 1.4, 0.5, 1);
 }
 
-.needle-line {
-  stroke: #d64545;
-  stroke-width: 2;
-  stroke-linecap: round;
-}
-
-.needle-hub {
-  fill: var(--text);
-  stroke: var(--card-bg);
-  stroke-width: 1;
-}
-
-/* Rain gauge */
-.gauge-tube {
-  fill: var(--card-bg);
-}
-
+/* Rain gauge water */
 .gauge-water {
-  fill: #4aa3e8;
-  fill-opacity: 0.85;
+  fill: #3f98e0;
+  fill-opacity: 0.9;
 }
 
 .gauge-water-top {
   fill: #8cc8f5;
-}
-
-.gauge-outline {
-  fill: none;
-  stroke: var(--muted);
-  stroke-width: 1.6;
 }
 
 .rain-drop {
@@ -699,55 +717,107 @@
     opacity: 1;
   }
   to {
-    transform: translateY(10px);
+    transform: translateY(14px);
     opacity: 0;
   }
 }
 
-/* Hygrometer droplet */
-.drop-bg {
-  fill: var(--card-bg);
-}
-
-.drop-fill {
-  fill: #4aa3e8;
-  fill-opacity: 0.8;
-}
-
-.drop-wave {
-  animation: drop-wave 4s ease-in-out infinite alternate;
-}
-
-@keyframes drop-wave {
-  from {
-    transform: translateX(-6px);
-  }
-  to {
-    transform: translateX(6px);
-  }
-}
-
-.drop-outline {
-  fill: none;
-  stroke: #3a86c8;
-  stroke-width: 2.2;
-}
-
-/* UV meter */
-.uv-band {
-  fill: none;
-  stroke-width: 9;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .rain-drop,
-  .drop-wave {
+  .rain-drop {
     animation: none;
   }
 
   .needle {
     transition: none;
   }
+}
+
+/* Next-24-hours temperature curve */
+.temp-curve-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin: 0.1rem 0 0.2rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.temp-curve-summary small {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.72rem;
+}
+
+.temp-curve-summary .hi {
+  color: #e0663a;
+}
+
+.temp-curve-summary .lo {
+  color: #2f8fe0;
+}
+
+.temp-curve-plot svg {
+  display: block;
+}
+
+.curve-axis {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.curve-line {
+  fill: none;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.curve-now {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}
+
+.curve-hour {
+  fill: var(--muted);
+  font-size: 11px;
+}
+
+.curve-temp {
+  fill: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.curve-now-dot {
+  fill: var(--card-bg);
+  stroke: var(--text);
+  stroke-width: 2;
+}
+
+.curve-hi-dot {
+  fill: #e0663a;
+  stroke: var(--card-bg);
+  stroke-width: 2;
+}
+
+.curve-lo-dot {
+  fill: #2f8fe0;
+  stroke: var(--card-bg);
+  stroke-width: 2;
+}
+
+.curve-extreme {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.curve-extreme-hi {
+  fill: #e0663a;
+}
+
+.curve-extreme-lo {
+  fill: #2f8fe0;
 }
 
 @keyframes anemometer-spin {

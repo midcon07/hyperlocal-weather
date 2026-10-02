@@ -1,5 +1,6 @@
 import { StationCard } from "./components/StationCard";
 import { ForecastList } from "./components/ForecastList";
+import { TempCurve } from "./components/TempCurve";
 import { RadarCard } from "./components/RadarCard";
 import { AlertBanner } from "./components/AlertBanner";
 import { MetarStrip } from "./components/MetarStrip";
@@ -19,6 +20,7 @@ function App() {
   const metarLive = useMetarLive();
 
   const forecastPeriods = nwsLive.data?.forecast ?? latest?.nws?.forecast ?? [];
+  const hourlyPeriods = nwsLive.data?.hourly ?? latest?.nws?.hourly ?? [];
 
   useSkyTheme(nwsLive.data?.observation?.textDescription ?? latest?.nws?.observation?.textDescription ?? null);
 
@@ -44,6 +46,7 @@ function App() {
               nwsFallback={latest?.nws ?? null}
             />
             <RadarCard />
+            <TempCurve hourly={hourlyPeriods} />
             <ForecastList periods={forecastPeriods} />
             <MetarStrip live={metarLive} />
           </>

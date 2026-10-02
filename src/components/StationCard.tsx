@@ -3,7 +3,9 @@ import { degreesToCompass } from "../lib/compass";
 import { RefreshControls } from "./RefreshControls";
 import siteConfig from "../../config/site.config.json";
 import { iconTone, isSunUp, sunTimes } from "../lib/sky";
-import { Barometer, Hygrometer, RainGauge, SunArc, UvMeter } from "./Instruments";
+import { moonPass, moonPhase } from "../lib/moon";
+import { Barometer, Hygrometer, RainGauge, Thermometer } from "./Instruments";
+import { MoonArc, SunArc } from "./SkyArcs";
 import { WindMastIcon, getConditionIcon, windSpinSeconds } from "../lib/weatherIcons";
 import { hasGust, isGusty, windCategory, windMeterFraction } from "../lib/wind";
 import type { LiveSourceState } from "../hooks/useLiveSource";
@@ -29,6 +31,8 @@ export function StationCard({ live, fallback, nwsLive, nwsFallback }: Props) {
   const { latitude, longitude } = siteConfig.location;
   const isDaytime = isSunUp(now, latitude, longitude);
   const times = sunTimes(now, latitude, longitude);
+  const moon = moonPhase(now);
+  const moonToday = moonPass(now, latitude, longitude);
 
   // The next daytime period is the coming high, the next night period the
   // coming low (NWS periods alternate and start with the current one).
@@ -76,6 +80,7 @@ export function StationCard({ live, fallback, nwsLive, nwsFallback }: Props) {
                   )}
                 </div>
               </div>
+              <Thermometer tempF={station.temperatureF} />
             </div>
             <div className={`wind-feature wind-level-${category.level}`}>
               <WindMastIcon
@@ -105,9 +110,11 @@ export function StationCard({ live, fallback, nwsLive, nwsFallback }: Props) {
             <Barometer inHg={station.barometricPressureInHg} trendInHg={station.pressureTrendInHg} />
             <RainGauge todayIn={station.rainDayIn} rateInPerHr={station.rainRateInPerHr} />
             <Hygrometer pct={station.humidityPct} />
-            <UvMeter uv={station.uvIndex} />
           </div>
-          <SunArc times={times} now={now} />
+          <div className="sky-row">
+            <SunArc times={times} now={now} />
+            <MoonArc pass={moonToday} moon={moon} now={now} />
+          </div>
         </>
       ) : (
         <p className="empty-state">
