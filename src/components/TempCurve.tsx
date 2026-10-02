@@ -1,5 +1,6 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useId } from "react";
 import siteConfig from "../../config/site.config.json";
+import { useElementWidth } from "../hooks/useElementWidth";
 import { isSunUp, sunTimes } from "../lib/sky";
 import type { NwsHourlyPeriod } from "../types/weather";
 
@@ -11,20 +12,6 @@ const HEIGHT = 190;
 const PAD = { left: 16, right: 16, top: 58, bottom: 28 };
 
 const hourFmt = new Intl.DateTimeFormat("en-US", { hour: "numeric" });
-
-function useElementWidth() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(0);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    setWidth(el.clientWidth);
-    const observer = new ResizeObserver(() => setWidth(el.clientWidth));
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-  return { ref, width };
-}
 
 // Smooth curve through the points that never overshoots between them
 // (monotone cubic), so a flat afternoon doesn't sprout fake bumps.

@@ -24,7 +24,7 @@
 }
 
 .station-card {
-  margin-bottom: 0.6rem;
+  margin-bottom: 0;
 }
 
 .nws-crosscheck {
@@ -34,7 +34,7 @@
 }
 
 .radar-card {
-  margin-bottom: 0.6rem;
+  margin-bottom: 0;
 }
 
 .radar-link {
@@ -48,66 +48,155 @@
   text-decoration: underline;
 }
 
-/* Crops NWS's radar iframe to hide its fixed-size chrome entirely: the
-   iframe renders taller than the visible window and is shifted up by
-   exactly the top banner+title block's height, so that block falls
-   above the clipped area. The bottom playback bar (timeline + controls
-   + legend, 100px) is pinned to the iframe's own bottom edge — our
-   visible window ends right before it starts, so none of it shows
-   (storms approach from the SW/W here, so that corner stays
-   unobstructed; "Full view" still gives the interactive version with
-   working pause/zoom).
+/* The radar card shows NWS's iframe at a fixed native size, cropped past
+   its chrome and scaled to fit (see RadarCard.tsx), so coverage is the same
+   on every device. The wrapper is exactly the scaled size.
 
-   The top crop offset is fixed, so the north edge never moves — adding
-   height only extends the south edge further, which is deliberate (the
-   user is south of KC and wanted more coverage toward northern
-   Arkansas, not more of Minnesota). Both breakpoints share the same
-   iframe native height (1110px) since reaching a given latitude south
-   of the station only depends on zoom level, not on how much gets
-   cropped from the top — only the *visible* height differs, since
-   mobile's larger top-crop eats further into that shared budget.
+   No border-radius on the wrapper deliberately: border-radius +
+   overflow:hidden directly wrapping a GPU-composited cross-origin iframe is
+   a known Chromium/Windows trigger for content dropping out and the page
+   background showing through. isolation/contain + translateZ(0) are
+   further defensive hints against the same bug. */
+.radar-measure {
+  width: 100%;
+}
 
-   isolation/contain + translateZ(0) are defensive hints against a
-   Chromium/Windows compositing bug where this iframe's content can
-   intermittently drop out and the page's background shows through. */
 .radar-frame-wrap {
   position: relative;
-  width: 100%;
-  height: 850px;
   overflow: hidden;
-  /* No border-radius here deliberately: border-radius + overflow:hidden
-     directly wrapping a GPU-composited cross-origin iframe is a known
-     Chromium/Windows trigger for content dropping out and the page
-     background showing through underneath it. Square corners on the
-     radar specifically is the trade-off for not hitting that bug. */
   isolation: isolate;
   contain: paint;
+}
+
+.radar-scale {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  overflow: hidden;
 }
 
 .radar-frame {
   display: block;
   position: absolute;
-  top: -160px;
   left: 0;
-  width: 100%;
-  height: 1110px;
   border: 0;
   transform: translateZ(0);
+  /* The card version is a preview; clicking anywhere opens the big one. */
+  pointer-events: none;
 }
 
-@media (max-width: 600px) {
-  /* At this narrow width NWS's chrome renders taller than at wider
-     widths (measured empirically — ~230px here vs. 160px above 600px),
-     so the crop offset needs its own number. Native height stays the
-     same as desktop (see comment above) — only the visible height
-     shrinks to account for the larger top crop. */
-  .radar-frame-wrap {
-    height: 780px;
-  }
+.radar-expand {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
 
-  .radar-frame {
-    top: -230px;
-    height: 1110px;
+.radar-expand-pill {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(20, 35, 63, 0.78);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(3px);
+}
+
+.radar-expand:hover .radar-expand-pill,
+.radar-expand:focus-visible .radar-expand-pill {
+  background: rgba(31, 95, 208, 0.92);
+}
+
+.radar-expand:focus-visible {
+  outline: 3px solid var(--link);
+  outline-offset: -3px;
+}
+
+.radar-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2vh 2vw;
+  background: rgba(5, 12, 30, 0.72);
+}
+
+.radar-modal-body {
+  display: flex;
+  flex-direction: column;
+  width: min(1400px, 100%);
+  height: 100%;
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+}
+
+.radar-modal-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.95rem;
+}
+
+.radar-modal-bar > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.radar-modal-close {
+  padding: 0.3rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.radar-modal-frame {
+  flex: 1 1 auto;
+  width: 100%;
+  border: 0;
+  /* Square, no clipping parent: same compositing-bug caution as above. */
+}
+
+/* Radar beside the forecast stack on wide screens; stacked everywhere else. */
+.app > main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.map-forecast-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.6rem;
+  align-items: start;
+}
+
+.map-forecast-side {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+@media (min-width: 1000px) {
+  .map-forecast-row {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   }
 }
 

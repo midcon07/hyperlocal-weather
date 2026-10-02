@@ -45,9 +45,13 @@ function App() {
               nwsLive={nwsLive}
               nwsFallback={latest?.nws ?? null}
             />
-            <RadarCard />
-            <TempCurve hourly={hourlyPeriods} />
-            <ForecastList periods={forecastPeriods} />
+            <div className="map-forecast-row">
+              <RadarCard />
+              <div className="map-forecast-side">
+                <TempCurve hourly={hourlyPeriods} />
+                <ForecastList periods={forecastPeriods} />
+              </div>
+            </div>
             <MetarStrip live={metarLive} />
           </>
         )}
