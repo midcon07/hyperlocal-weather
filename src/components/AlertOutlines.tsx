@@ -26,9 +26,72 @@ interface Props {
   iframe: MapViewSpec;
   /** The part of the iframe that is visible: left/top offset and size. */
   visible: { top: number; width: number; height: number };
+  /** Alerts under the pointer, drawn a little stronger. */
+  highlight?: Set<string>;
 }
 
-export function AlertOutlines({ alerts, iframe, visible }: Props) {
+// ---- Hover / tap details
+
+export interface HoverInfo {
+  alerts: MapAlert[];
+  /** Pointer position relative to the map container. */
+  x: number;
+  y: number;
+}
+
+// Every drawn alert whose area is under the given screen point, most
+// serious first. Works by asking the browser what's at that point (the
+// tinted areas carry data-alert-id), so overlapping alerts are all found.
+export function alertsAt(clientX: number, clientY: number, all: MapAlert[]): MapAlert[] {
+  const byId = new Map(all.map((a) => [a.id, a]));
+  const found = new Map<string, MapAlert>();
+  for (const el of document.elementsFromPoint(clientX, clientY)) {
+    const id = (el as SVGElement).dataset?.alertId;
+    const alert = id ? byId.get(id) : undefined;
+    if (alert) found.set(alert.id, alert);
+  }
+  return [...found.values()].sort((a, b) => LEVEL_RANK[levelFor(b.event)] - LEVEL_RANK[levelFor(a.event)]);
+}
+
+const untilFmt = new Intl.DateTimeFormat("en-US", { weekday: "short", hour: "numeric", minute: "2-digit" });
+const clockFmt = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" });
+
+function untilText(expires: string | null) {
+  if (!expires) return null;
+  const date = new Date(expires);
+  return `Until ${date.toDateString() === new Date().toDateString() ? clockFmt.format(date) : untilFmt.format(date)}`;
+}
+
+const MAX_LISTED = 4;
+
+export function AlertTooltip({ info, width, height }: { info: HoverInfo; width: number; height: number }) {
+  const TIP_WIDTH = 260;
+  // Flip to the other side of the pointer near the right and bottom edges.
+  const left = info.x + 16 + TIP_WIDTH > width ? Math.max(4, info.x - 16 - TIP_WIDTH) : info.x + 16;
+  const top = info.y + 16 + 120 > height ? Math.max(4, info.y - 16 - 110) : info.y + 16;
+  const shown = info.alerts.slice(0, MAX_LISTED);
+
+  return (
+    <div className="alert-tip" style={{ left, top, width: TIP_WIDTH }} role="tooltip">
+      {shown.map((a) => {
+        const level = levelFor(a.event);
+        return (
+          <div className="alert-tip-item" key={a.id}>
+            <div className="alert-tip-event">
+              <i style={{ background: COLORS[level] ?? "#888" }} />
+              {a.event}
+            </div>
+            <div className="alert-tip-area">{a.areaDesc}</div>
+            {untilText(a.expires) && <div className="alert-tip-until">{untilText(a.expires)}</div>}
+          </div>
+        );
+      })}
+      {info.alerts.length > MAX_LISTED && <div className="alert-tip-more">+{info.alerts.length - MAX_LISTED} more here</div>}
+    </div>
+  );
+}
+
+export function AlertOutlines({ alerts, iframe, visible, highlight }: Props) {
   const project = makeProjector(iframe);
 
   // Least severe first, so warnings land on top where outlines overlap.
@@ -54,7 +117,7 @@ export function AlertOutlines({ alerts, iframe, visible }: Props) {
               .join(" ") + " Z"
         )
         .join(" ");
-      return { key: `${alert.id}-${i}`, d, level };
+      return { key: `${alert.id}-${i}`, id: alert.id, d, level };
     })
   );
 
@@ -67,7 +130,12 @@ export function AlertOutlines({ alerts, iframe, visible }: Props) {
     >
       {paths.map((p) => (
         <g key={p.key}>
-          <path d={p.d} className="alert-outline-fill" fill={COLORS[p.level]} />
+          <path
+            d={p.d}
+            className={`alert-outline-fill${highlight?.has(p.id) ? " alert-outline-fill--hot" : ""}`}
+            fill={COLORS[p.level]}
+            data-alert-id={p.id}
+          />
           <path d={p.d} className="alert-outline-halo" />
           <path d={p.d} className="alert-outline" stroke={COLORS[p.level]} />
         </g>

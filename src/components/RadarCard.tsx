@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import type { MouseEvent as ReactMouseEvent } from "react";
 import type { MapAlert } from "../api/mapAlerts";
 import { useElementSize, useElementWidth } from "../hooks/useElementWidth";
 import { useMapAlertsLive } from "../hooks/useMapAlertsLive";
 import type { LiveSourceState } from "../hooks/useLiveSource";
 import { MAP_DEFAULT_ZOOM } from "../lib/mapView";
-import { AlertOutlines, OutlineLegend } from "./AlertOutlines";
+import { AlertOutlines, AlertTooltip, OutlineLegend, alertsAt } from "./AlertOutlines";
+import type { HoverInfo } from "./AlertOutlines";
 import { MapAlerts } from "./MapAlerts";
 
 // Embeds NWS's own radar viewer, pre-configured to National Composite
@@ -96,6 +98,20 @@ function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose }: ModalProps)
 
   const changeZoom = (delta: number) => setZoom((z) => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z + delta)));
 
+  // Hover (mouse) or tap (touch) on a tinted area names the alerts there.
+  // The locked iframe lets pointer events through to this container.
+  const [hover, setHover] = useState<HoverInfo | null>(null);
+  const pointAt = (e: ReactMouseEvent<HTMLDivElement>) => {
+    if (explore || (e.target as HTMLElement).closest(".radar-modal-controls, .radar-modal-alerts")) {
+      setHover(null);
+      return;
+    }
+    const rect = e.currentTarget.getBoundingClientRect();
+    const hit = alertsAt(e.clientX, e.clientY, alerts.data ?? []);
+    setHover(hit.length ? { alerts: hit, x: e.clientX - rect.left, y: e.clientY - rect.top } : null);
+  };
+  const highlight = new Set(hover?.alerts.map((a) => a.id));
+
   return (
     <div className="radar-modal" role="dialog" aria-modal="true" aria-label="Radar, enlarged" onClick={onClose}>
       <div className="radar-modal-body" onClick={(e) => e.stopPropagation()}>
@@ -110,7 +126,13 @@ function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose }: ModalProps)
             </button>
           </span>
         </div>
-        <div className="radar-modal-map" ref={ref}>
+        <div
+          className="radar-modal-map"
+          ref={ref}
+          onMouseMove={pointAt}
+          onMouseLeave={() => setHover(null)}
+          onClick={pointAt}
+        >
           {width > 0 && (
             <iframe
               key={`${zoom}-${resetKey}`}
@@ -126,9 +148,11 @@ function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose }: ModalProps)
                 alerts={alerts.data}
                 iframe={{ width, height: iframeHeight, zoom }}
                 visible={{ top: chromeTop, width, height }}
+                highlight={highlight}
               />
             </div>
           )}
+          {hover && !explore && <AlertTooltip info={hover} width={width} height={height} />}
           <div className="radar-modal-alerts">
             <MapAlerts live={alerts} open={alertsOpen} onToggle={onToggleAlerts} />
           </div>
@@ -169,6 +193,7 @@ export function RadarCard() {
   const { ref, width } = useElementWidth();
   const [open, setOpen] = useState(false);
   const [alertsOpen, setAlertsOpen] = useState(false);
+  const [cardHover, setCardHover] = useState<HoverInfo | null>(null);
   const alerts = useMapAlertsLive();
 
   useEffect(() => {
@@ -215,13 +240,26 @@ export function RadarCard() {
                     alerts={alerts.data}
                     iframe={{ width: nativeWidth, height: NATIVE_HEIGHT, zoom: MAP_DEFAULT_ZOOM }}
                     visible={{ top: CHROME_TOP, width: nativeWidth, height: VISIBLE_HEIGHT }}
+                    highlight={new Set(cardHover?.alerts.map((a) => a.id))}
                   />
                 </div>
               )}
             </div>
-            <button type="button" className="radar-expand" onClick={() => setOpen(true)} aria-label="Enlarge radar">
+            <button
+              type="button"
+              className="radar-expand"
+              onClick={() => setOpen(true)}
+              onMouseMove={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const hit = alertsAt(e.clientX, e.clientY, alerts.data ?? []);
+                setCardHover(hit.length ? { alerts: hit, x: e.clientX - rect.left, y: e.clientY - rect.top } : null);
+              }}
+              onMouseLeave={() => setCardHover(null)}
+              aria-label="Enlarge radar"
+            >
               <span className="radar-expand-pill">Click to enlarge</span>
             </button>
+            {cardHover && <AlertTooltip info={cardHover} width={width} height={VISIBLE_HEIGHT * scale} />}
             <div className="radar-card-alerts">
               <MapAlerts
                 live={alerts}

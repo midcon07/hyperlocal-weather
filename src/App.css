@@ -276,6 +276,68 @@
 .alert-outline-fill {
   fill-opacity: 0.13;
   stroke: none;
+  /* The tinted areas are what the pointer hits (the wrapper itself is
+     click-through), so hover/tap can say which alert is underneath. */
+  pointer-events: all;
+}
+
+.alert-outline-fill--hot {
+  fill-opacity: 0.32;
+}
+
+.alert-tip {
+  position: absolute;
+  z-index: 3;
+  padding: 0.5rem 0.65rem;
+  border-radius: 10px;
+  background: var(--card-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  font-size: 0.78rem;
+}
+
+.alert-tip-item + .alert-tip-item {
+  margin-top: 0.45rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--border);
+}
+
+.alert-tip-event {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.alert-tip-event i {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.alert-tip-area {
+  margin-top: 0.1rem;
+  color: var(--muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.alert-tip-until {
+  margin-top: 0.1rem;
+  font-weight: 600;
+  color: var(--link);
+}
+
+.alert-tip-more {
+  margin-top: 0.4rem;
+  color: var(--muted);
+  font-style: italic;
 }
 
 .alert-outline-halo {
@@ -293,6 +355,20 @@
   stroke-dasharray: 8 5;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
+}
+
+/* The wrappers only position their buttons; the empty space around the
+   buttons must let hover/taps through to the map's alert areas. */
+.radar-modal-controls,
+.radar-modal-alerts,
+.radar-card-alerts {
+  pointer-events: none;
+}
+
+.radar-modal-controls > *,
+.radar-modal-alerts > *,
+.radar-card-alerts > * {
+  pointer-events: auto;
 }
 
 .radar-modal-controls {
