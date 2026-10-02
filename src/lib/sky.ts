@@ -28,6 +28,19 @@ export function isSunUp(date: Date, latitude: number, longitude: number): boolea
   return elevation / rad > -0.833;
 }
 
+export type IconTone = "sun" | "moon" | "cloud" | "rain" | "snow" | "storm";
+
+// Picks the accent color family for a condition icon, so a sunny icon
+// reads orange and rain reads blue instead of everything being one tint.
+export function iconTone(text: string | null | undefined, isDaytime: boolean): IconTone {
+  if (text && /snow|sleet|flurr|wintry|ice/i.test(text)) return "snow";
+  const sky = skyFromConditions(text);
+  if (sky === "storm") return "storm";
+  if (sky === "precip") return "rain";
+  if (sky === "cloudy") return "cloud";
+  return isDaytime ? "sun" : "moon";
+}
+
 // Buckets NWS's free-form observation text into the four looks the page has.
 export function skyFromConditions(text: string | null | undefined): SkyCondition {
   if (!text) return "clear";

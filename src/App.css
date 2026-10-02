@@ -233,9 +233,26 @@
 }
 
 .big-stat-icon {
-  color: #7c8fe0;
   flex: none;
 }
+
+/* Condition icons take a vivid color by kind (sun orange, rain blue...)
+   rather than one shared tint. */
+.icon-tone {
+  display: inline-flex;
+  color: #7c8fe0;
+}
+
+.icon-tone svg {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18));
+}
+
+.icon-tone[data-tone="sun"] { color: #f59e0b; }
+.icon-tone[data-tone="moon"] { color: #b8c4ff; }
+.icon-tone[data-tone="cloud"] { color: #7d93b2; }
+.icon-tone[data-tone="rain"] { color: #2f8fe0; }
+.icon-tone[data-tone="snow"] { color: #5fb8e6; }
+.icon-tone[data-tone="storm"] { color: #8a5fd6; }
 
 .big-stat {
   font-size: 1.9rem;
@@ -386,32 +403,205 @@
   }
 }
 
-.stat-list {
+.big-stat-caption {
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* Instruments: each reading drawn as the device it comes from. */
+.instrument-row {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.2rem 1rem;
-  margin: 0 0 0.3rem;
+  gap: 0.5rem;
+  margin: 0.5rem 0 0.4rem;
 }
 
 @media (min-width: 640px) {
-  /* The station card is full-width now that NWS Observed moved into a
-     footnote line inside it, so a 2-column stat grid leaves a lot of
-     unused space on wider screens. Wind moved up into the hero row
-     feature, so the remaining 6 stats fit a 3-column grid evenly. */
-  .stat-list {
-    grid-template-columns: repeat(3, 1fr);
+  .instrument-row {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
-.icon-value {
-  display: inline-flex;
+.instrument {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.3rem;
+  padding: 0.5rem 0.4rem 0.45rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-align: center;
 }
 
-.icon-value svg {
-  color: #7c8fe0;
-  flex: none;
+.instrument-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.instrument-art svg {
+  display: block;
+  width: 112px;
+  height: 112px;
+  margin: 0.15rem 0;
+}
+
+.instrument-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.instrument-sub {
+  font-size: 0.7rem;
+  color: var(--muted);
+  min-height: 1em;
+}
+
+/* Shared dial parts */
+.dial-bezel {
+  fill: #b98f3e;
+  stroke: #8a6a28;
+  stroke-width: 1;
+}
+
+.dial-face {
+  fill: var(--card-bg);
+  stroke: #8a6a28;
+  stroke-width: 0.6;
+}
+
+.baro-tick {
+  stroke: var(--muted);
+  stroke-width: 0.8;
+}
+
+.baro-tick-major {
+  stroke: var(--text);
+  stroke-width: 1.3;
+}
+
+.dial-num {
+  fill: var(--text);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.dial-word {
+  fill: var(--muted);
+  font-size: 6.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.needle {
+  transition: transform 0.9s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+.needle-line {
+  stroke: #d64545;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.needle-hub {
+  fill: var(--text);
+  stroke: var(--card-bg);
+  stroke-width: 1;
+}
+
+/* Rain gauge */
+.gauge-tube {
+  fill: var(--card-bg);
+}
+
+.gauge-water {
+  fill: #4aa3e8;
+  fill-opacity: 0.85;
+}
+
+.gauge-water-top {
+  fill: #8cc8f5;
+}
+
+.gauge-outline {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.6;
+}
+
+.rain-drop {
+  fill: #4aa3e8;
+  animation: rain-fall 1.1s linear infinite;
+}
+
+.rain-drop-2 {
+  animation-delay: 0.35s;
+}
+
+.rain-drop-3 {
+  animation-delay: 0.7s;
+}
+
+@keyframes rain-fall {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+}
+
+/* Hygrometer droplet */
+.drop-bg {
+  fill: var(--card-bg);
+}
+
+.drop-fill {
+  fill: #4aa3e8;
+  fill-opacity: 0.8;
+}
+
+.drop-wave {
+  animation: drop-wave 4s ease-in-out infinite alternate;
+}
+
+@keyframes drop-wave {
+  from {
+    transform: translateX(-6px);
+  }
+  to {
+    transform: translateX(6px);
+  }
+}
+
+.drop-outline {
+  fill: none;
+  stroke: #3a86c8;
+  stroke-width: 2.2;
+}
+
+/* UV meter */
+.uv-band {
+  fill: none;
+  stroke-width: 9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rain-drop,
+  .drop-wave {
+    animation: none;
+  }
+
+  .needle {
+    transition: none;
+  }
 }
 
 @keyframes anemometer-spin {
@@ -427,23 +617,6 @@
   animation-name: anemometer-spin;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
-}
-
-.stat-list div {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.82rem;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 0.1rem;
-}
-
-.stat-list dt {
-  color: var(--muted);
-}
-
-.stat-list dd {
-  margin: 0;
-  font-weight: 600;
 }
 
 .timestamp {
@@ -477,7 +650,6 @@
 }
 
 .forecast-icon {
-  color: #7c8fe0;
   margin: 0.1rem 0;
 }
 

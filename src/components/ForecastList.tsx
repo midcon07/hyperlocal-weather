@@ -1,4 +1,5 @@
 import { getConditionIcon } from "../lib/weatherIcons";
+import { iconTone } from "../lib/sky";
 import type { NwsForecastPeriod } from "../types/weather";
 
 interface Props {
@@ -24,7 +25,9 @@ export function ForecastList({ periods }: Props) {
           return (
             <div className="forecast-item" key={p.startTime}>
               <div className="forecast-name">{p.name}</div>
-              <Icon size={28} className="forecast-icon" />
+              <span className="icon-tone forecast-icon" data-tone={iconTone(p.shortForecast, p.isDaytime)}>
+                <Icon size={32} />
+              </span>
               <div className="forecast-temp">{p.temperature}°{p.temperatureUnit}</div>
               <div className="forecast-desc">{p.shortForecast}</div>
               {p.probabilityOfPrecipitation !== null && p.probabilityOfPrecipitation > 0 && (

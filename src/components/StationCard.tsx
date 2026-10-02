@@ -1,14 +1,9 @@
 import { celsiusToFahrenheit, fmt, isLikelyDaytime } from "../lib/format";
 import { degreesToCompass } from "../lib/compass";
 import { RefreshControls } from "./RefreshControls";
-import {
-  DropletIcon,
-  GaugeIcon,
-  UvIcon,
-  WindMastIcon,
-  getConditionIcon,
-  windSpinSeconds,
-} from "../lib/weatherIcons";
+import { iconTone } from "../lib/sky";
+import { Barometer, Hygrometer, RainGauge, UvMeter } from "./Instruments";
+import { WindMastIcon, getConditionIcon, windSpinSeconds } from "../lib/weatherIcons";
 import { hasGust, isGusty, windCategory, windMeterFraction } from "../lib/wind";
 import type { LiveSourceState } from "../hooks/useLiveSource";
 import type { NwsData, StationReading } from "../types/weather";
@@ -29,7 +24,8 @@ export function StationCard({ live, fallback, nwsLive, nwsFallback }: Props) {
   const conditions = observation?.textDescription ?? null;
   const nwsTempF = celsiusToFahrenheit(observation?.temperatureC ?? null);
 
-  const ConditionIcon = getConditionIcon(conditions, isLikelyDaytime(new Date()));
+  const isDaytime = isLikelyDaytime(new Date());
+  const ConditionIcon = getConditionIcon(conditions, isDaytime);
   const windDir = degreesToCompass(station?.windDirectionDeg ?? null);
   const windSpeed = station?.windSpeedMph ?? null;
   const windGust = station?.windGustMph ?? null;
@@ -55,8 +51,13 @@ export function StationCard({ live, fallback, nwsLive, nwsFallback }: Props) {
         <>
           <div className="big-stat-row">
             <div className="big-stat-left">
-              <ConditionIcon size={44} className="big-stat-icon" />
-              <div className="big-stat">{fmt(station.temperatureF, 0, "°F")}</div>
+              <span className="icon-tone big-stat-icon" data-tone={iconTone(conditions, isDaytime)}>
+                <ConditionIcon size={56} />
+              </span>
+              <div>
+                <div className="big-stat">{fmt(station.temperatureF, 0, "°F")}</div>
+                <div className="big-stat-caption">{conditions ?? "—"}</div>
+              </div>
             </div>
             <div className={`wind-feature wind-level-${category.level}`}>
               <WindMastIcon
@@ -82,47 +83,12 @@ export function StationCard({ live, fallback, nwsLive, nwsFallback }: Props) {
               </div>
             </div>
           </div>
-          <dl className="stat-list">
-            <div>
-              <dt>Conditions</dt>
-              <dd>{conditions ?? "—"}</dd>
-            </div>
-            <div>
-              <dt>Humidity</dt>
-              <dd className="icon-value">
-                <DropletIcon size={15} />
-                {fmt(station.humidityPct, 0, "%")}
-              </dd>
-            </div>
-            <div>
-              <dt>Rain rate</dt>
-              <dd className="icon-value">
-                <DropletIcon size={15} />
-                {fmt(station.rainRateInPerHr, 2, " in/hr")}
-              </dd>
-            </div>
-            <div>
-              <dt>Rain today</dt>
-              <dd className="icon-value">
-                <DropletIcon size={15} />
-                {fmt(station.rainDayIn, 2, " in")}
-              </dd>
-            </div>
-            <div>
-              <dt>Pressure</dt>
-              <dd className="icon-value">
-                <GaugeIcon size={15} />
-                {fmt(station.barometricPressureInHg, 2, " inHg")}
-              </dd>
-            </div>
-            <div>
-              <dt>UV Index</dt>
-              <dd className="icon-value">
-                <UvIcon size={15} />
-                {fmt(station.uvIndex, 1)}
-              </dd>
-            </div>
-          </dl>
+          <div className="instrument-row">
+            <Barometer inHg={station.barometricPressureInHg} />
+            <RainGauge todayIn={station.rainDayIn} rateInPerHr={station.rainRateInPerHr} />
+            <Hygrometer pct={station.humidityPct} />
+            <UvMeter uv={station.uvIndex} />
+          </div>
         </>
       ) : (
         <p className="empty-state">
