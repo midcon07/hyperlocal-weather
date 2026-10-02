@@ -1,8 +1,9 @@
-import { celsiusToFahrenheit, fmt, isLikelyDaytime } from "../lib/format";
+import { celsiusToFahrenheit, fmt } from "../lib/format";
 import { degreesToCompass } from "../lib/compass";
 import { RefreshControls } from "./RefreshControls";
-import { iconTone } from "../lib/sky";
-import { Barometer, Hygrometer, RainGauge, UvMeter } from "./Instruments";
+import siteConfig from "../../config/site.config.json";
+import { iconTone, isSunUp, sunTimes } from "../lib/sky";
+import { Barometer, Hygrometer, RainGauge, SunArc, UvMeter } from "./Instruments";
 import { WindMastIcon, getConditionIcon, windSpinSeconds } from "../lib/weatherIcons";
 import { hasGust, isGusty, windCategory, windMeterFraction } from "../lib/wind";
 import type { LiveSourceState } from "../hooks/useLiveSource";
@@ -24,7 +25,16 @@ export function StationCard({ live, fallback, nwsLive, nwsFallback }: Props) {
   const conditions = observation?.textDescription ?? null;
   const nwsTempF = celsiusToFahrenheit(observation?.temperatureC ?? null);
 
-  const isDaytime = isLikelyDaytime(new Date());
+  const now = new Date();
+  const { latitude, longitude } = siteConfig.location;
+  const isDaytime = isSunUp(now, latitude, longitude);
+  const times = sunTimes(now, latitude, longitude);
+
+  // The next daytime period is the coming high, the next night period the
+  // coming low (NWS periods alternate and start with the current one).
+  const periods = nws?.forecast ?? [];
+  const high = periods.find((p) => p.isDaytime)?.temperature ?? null;
+  const low = periods.find((p) => !p.isDaytime)?.temperature ?? null;
   const ConditionIcon = getConditionIcon(conditions, isDaytime);
   const windDir = degreesToCompass(station?.windDirectionDeg ?? null);
   const windSpeed = station?.windSpeedMph ?? null;
@@ -56,7 +66,15 @@ export function StationCard({ live, fallback, nwsLive, nwsFallback }: Props) {
               </span>
               <div>
                 <div className="big-stat">{fmt(station.temperatureF, 0, "°F")}</div>
-                <div className="big-stat-caption">{conditions ?? "—"}</div>
+                <div className="big-stat-caption">
+                  {conditions ?? "—"}
+                  {high !== null && low !== null && (
+                    <span className="hi-lo">
+                      <span className="hi">H {high}°</span>
+                      <span className="lo">L {low}°</span>
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
             <div className={`wind-feature wind-level-${category.level}`}>
@@ -89,6 +107,7 @@ export function StationCard({ live, fallback, nwsLive, nwsFallback }: Props) {
             <Hygrometer pct={station.humidityPct} />
             <UvMeter uv={station.uvIndex} />
           </div>
+          <SunArc times={times} now={now} />
         </>
       ) : (
         <p className="empty-state">

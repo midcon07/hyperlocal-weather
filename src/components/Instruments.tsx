@@ -1,6 +1,7 @@
 import { useId } from "react";
 import type { ReactNode } from "react";
 import { fmt } from "../lib/format";
+import type { SunTimes } from "../lib/sky";
 
 // Small drawn instruments (barometer, rain gauge, hygrometer, UV meter)
 // in place of plain text rows. Colors come from the theme variables, so
@@ -35,6 +36,84 @@ function Tile({ label, value, sub, children }: TileProps) {
       <div className="instrument-art">{children}</div>
       <div className="instrument-value">{value}</div>
       <div className="instrument-sub">{sub ?? " "}</div>
+    </div>
+  );
+}
+
+// ---- Sun arc: today's sunrise-to-sunset path with the sun's current spot.
+
+const ARC_X0 = 20;
+const ARC_X1 = 280;
+const ARC_BASE = 66;
+const ARC_PEAK = 52;
+
+function arcPoint(f: number) {
+  return { x: ARC_X0 + (ARC_X1 - ARC_X0) * f, y: ARC_BASE - ARC_PEAK * Math.sin(Math.PI * f) };
+}
+
+function arcPolyline(from: number, to: number) {
+  const pts = [];
+  const steps = 40;
+  for (let i = 0; i <= steps; i++) {
+    const p = arcPoint(from + ((to - from) * i) / steps);
+    pts.push(`${p.x.toFixed(1)},${p.y.toFixed(1)}`);
+  }
+  return pts.join(" ");
+}
+
+const clockFmt = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" });
+
+function duration(ms: number) {
+  const mins = Math.max(0, Math.round(ms / 60000));
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
+export function SunArc({ times, now }: { times: SunTimes | null; now: Date }) {
+  if (!times) return null;
+  const { sunrise, sunset } = times;
+  const total = sunset.getTime() - sunrise.getTime();
+  const raw = (now.getTime() - sunrise.getTime()) / total;
+  const isUp = raw >= 0 && raw <= 1;
+  const f = clamp(raw, 0, 1);
+  const sun = arcPoint(f);
+
+  let status: string;
+  if (isUp) status = `Sunset in ${duration(sunset.getTime() - now.getTime())}`;
+  else if (raw < 0) status = `Sunrise in ${duration(sunrise.getTime() - now.getTime())}`;
+  else status = `Sunrise in ${duration(sunrise.getTime() + 86400000 - now.getTime())}`;
+
+  return (
+    <div className="sun-strip">
+      <div className="instrument-label">Sun</div>
+      <svg viewBox="0 0 300 80" role="img" aria-label={`Sunrise ${clockFmt.format(sunrise)}, sunset ${clockFmt.format(sunset)}`}>
+        <line x1="6" y1={ARC_BASE} x2="294" y2={ARC_BASE} className="sun-horizon" />
+        <polyline points={arcPolyline(0, 1)} className="sun-track" />
+        {isUp && f > 0 && <polyline points={arcPolyline(0, f)} className="sun-track-done" />}
+        <circle cx={arcPoint(0).x} cy={ARC_BASE} r="4" className="sun-end" />
+        <circle cx={arcPoint(1).x} cy={ARC_BASE} r="4" className="sun-end" />
+        {isUp && (
+          <g>
+            <circle cx={sun.x} cy={sun.y} r="11" className="sun-glow" />
+            <circle cx={sun.x} cy={sun.y} r="6.5" className="sun-dot" />
+          </g>
+        )}
+      </svg>
+      <div className="sun-times">
+        <div>
+          <strong>{clockFmt.format(sunrise)}</strong>
+          <span>Sunrise</span>
+        </div>
+        <div className="sun-center">
+          <strong>{duration(total)}</strong>
+          <span>{status}</span>
+        </div>
+        <div>
+          <strong>{clockFmt.format(sunset)}</strong>
+          <span>Sunset</span>
+        </div>
+      </div>
     </div>
   );
 }

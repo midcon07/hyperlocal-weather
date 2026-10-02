@@ -410,6 +410,101 @@
   font-weight: 600;
 }
 
+.hi-lo {
+  margin-left: 0.6rem;
+  white-space: nowrap;
+}
+
+.hi-lo .hi {
+  color: #e0663a;
+  font-weight: 700;
+}
+
+.hi-lo .lo {
+  color: #2f8fe0;
+  font-weight: 700;
+  margin-left: 0.4rem;
+}
+
+.sun-strip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem 0.75rem 0.5rem;
+  margin-bottom: 0.4rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.sun-strip svg {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+}
+
+.sun-horizon {
+  stroke: var(--border);
+  stroke-width: 1.5;
+}
+
+.sun-track {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 1 6;
+}
+
+.sun-track-done {
+  fill: none;
+  stroke: #f59e0b;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+
+.sun-end {
+  fill: var(--card-bg);
+  stroke: #f59e0b;
+  stroke-width: 2;
+}
+
+.sun-glow {
+  fill: #f59e0b;
+  fill-opacity: 0.28;
+}
+
+.sun-dot {
+  fill: #f5a014;
+  stroke: #fff3c4;
+  stroke-width: 2;
+}
+
+.sun-times {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 420px;
+}
+
+.sun-times div {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.sun-times strong {
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.sun-times .sun-center {
+  align-items: center;
+  text-align: center;
+}
+
 /* Instruments: each reading drawn as the device it comes from. */
 .instrument-row {
   display: grid;

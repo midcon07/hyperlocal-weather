@@ -5,6 +5,11 @@ export type SkyTheme = "day" | "night";
 // (standard low-precision solar position, good to about a minute --
 // plenty for choosing a day or night look).
 export function isSunUp(date: Date, latitude: number, longitude: number): boolean {
+  return solarElevationDeg(date, latitude, longitude) > -0.833;
+}
+
+// Sun's height above the horizon in degrees (negative = below it).
+function solarElevationDeg(date: Date, latitude: number, longitude: number): number {
   const rad = Math.PI / 180;
   const d = date.getTime() / 86400000 + 2440587.5 - 2451545.0;
 
@@ -24,8 +29,42 @@ export function isSunUp(date: Date, latitude: number, longitude: number): boolea
       Math.cos(latitude * rad) * Math.cos(declination) * Math.cos(hourAngle)
   );
 
-  // -0.833 degrees accounts for atmospheric refraction and the sun's radius.
-  return elevation / rad > -0.833;
+  return elevation / rad;
+}
+
+export interface SunTimes {
+  sunrise: Date;
+  sunset: Date;
+}
+
+// Sunrise and sunset around the solar noon nearest to `date` (so the arc
+// stays on the "current" day until solar midnight). -0.833 degrees
+// accounts for atmospheric refraction and the sun's radius.
+export function sunTimes(date: Date, latitude: number, longitude: number): SunTimes | null {
+  const HOUR = 3600000;
+  const dayStart = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+  let noon = dayStart + (12 - longitude / 15) * HOUR;
+  while (noon - date.getTime() > 12 * HOUR) noon -= 24 * HOUR;
+  while (date.getTime() - noon > 12 * HOUR) noon += 24 * HOUR;
+
+  const up = (t: number) => solarElevationDeg(new Date(t), latitude, longitude) > -0.833;
+  if (!up(noon)) return null; // polar night; not a concern at this latitude
+
+  // Bisect for the moment the sun crosses the horizon on each side of noon.
+  function crossing(sunUpAt: number, sunDownAt: number) {
+    let lo = sunUpAt;
+    let hi = sunDownAt;
+    for (let i = 0; i < 30; i++) {
+      const mid = (lo + hi) / 2;
+      if (up(mid) === up(sunUpAt)) lo = mid;
+      else hi = mid;
+    }
+    return (lo + hi) / 2;
+  }
+
+  const rise = crossing(noon, noon - 12 * HOUR);
+  const set = crossing(noon, noon + 12 * HOUR);
+  return { sunrise: new Date(rise), sunset: new Date(set) };
 }
 
 export type IconTone = "sun" | "moon" | "cloud" | "rain" | "snow" | "storm";
