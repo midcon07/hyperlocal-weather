@@ -8,6 +8,7 @@ import { useNwsLive } from "./hooks/useNwsLive";
 import { useStationLive } from "./hooks/useStationLive";
 import { useAlertsLive } from "./hooks/useAlertsLive";
 import { useMetarLive } from "./hooks/useMetarLive";
+import { useSkyTheme } from "./hooks/useSkyTheme";
 import "./App.css";
 
 function App() {
@@ -18,6 +19,8 @@ function App() {
   const metarLive = useMetarLive();
 
   const forecastPeriods = nwsLive.data?.forecast ?? latest?.nws?.forecast ?? [];
+
+  useSkyTheme(nwsLive.data?.observation?.textDescription ?? latest?.nws?.observation?.textDescription ?? null);
 
   return (
     <div className="app">
@@ -52,7 +55,6 @@ function App() {
           Data from the National Weather Service (api.weather.gov), aviationweather.gov,
           and a personal Davis Vantage Pro 2 station via WeatherLink.
         </p>
-        <p>Background photo by Corey Coyle (CC BY 3.0) — placeholder until a licensed WHO 13 skycam photo is available.</p>
       </footer>
     </div>
   );

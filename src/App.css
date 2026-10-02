@@ -13,14 +13,14 @@
   margin: 0;
   font-size: 1.3rem;
   color: #fff;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 1px 4px rgba(0, 20, 60, 0.45);
 }
 
 .location {
   margin: 0.1rem 0 0;
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.85);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 3px rgba(0, 20, 60, 0.45);
 }
 
 .station-card {
@@ -39,7 +39,7 @@
 
 .radar-link {
   font-size: 0.75rem;
-  color: #60a5fa;
+  color: var(--link);
   text-decoration: none;
   white-space: nowrap;
 }
@@ -281,12 +281,10 @@
   --mast-edge: #8c96b6;
 }
 
-@media (prefers-color-scheme: dark) {
-  .wind-feature {
-    --mast-body: #9aa6d6;
-    --mast-silver: #dfe5f6;
-    --mast-edge: #b9c3e8;
-  }
+:root[data-theme="night"] .wind-feature {
+  --mast-body: #9aa6d6;
+  --mast-silver: #dfe5f6;
+  --mast-edge: #b9c3e8;
 }
 
 .mast-silver {
@@ -502,14 +500,13 @@
 
 .forecast-pop {
   font-size: 0.7rem;
-  color: #2563eb;
+  color: var(--link);
 }
 
 
 .app-footer {
   text-align: center;
-  color: rgba(255, 255, 255, 0.75);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  color: var(--footer-text);
   font-size: 0.7rem;
   margin-top: 0.5rem;
 }

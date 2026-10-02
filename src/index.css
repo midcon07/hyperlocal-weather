@@ -1,34 +1,77 @@
+/* Theme is driven by data-theme (day/night, from the real sun position at
+   the station) and data-sky (clear/cloudy/precip/storm, from current
+   conditions) on <html> -- see hooks/useSkyTheme.ts. With neither set it
+   renders the clear-day look. */
+
 :root {
-  /* Light indigo/lavender rather than pure #fff -- same hue family as
-     the dark-mode navy below (one consistent brand color across both
-     appearances), and saturated enough to be unmistakably tinted rather
-     than reading as plain white (an earlier warm-cream version was
-     still too subtle to register on an iOS device in light mode). */
-  --bg: #e4e6f7;
-  --card-bg: #f3f4fc;
-  --surface: #eceefa;
-  --border: #c9cdee;
-  --muted: #565d87;
-  --text: #1c2140;
-  color-scheme: light dark;
+  /* Day: soft cool-tinted whites rather than pure #fff cards. */
+  --card-bg: #f4f8ff;
+  --surface: #e8f0fb;
+  --border: #cddcf0;
+  --muted: #5a6b8a;
+  --text: #14233f;
+  --link: #1d5fd0;
+  --accent: #3f7fd4;
+  --footer-text: #12294a;
+
+  --sky-top: #2f7fd3;
+  --sky-bottom: #a9d7f7;
+
+  color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Deep navy/indigo with real color saturation rather than a barely-
-       tinted near-black -- the previous pass was too conservative to
-       read as anything but "basically black". */
-    --bg: #161c38;
-    --card-bg: #212a52;
-    --surface: #2b3563;
-    --border: #3e4a85;
-    --muted: #abb4e0;
-    --text: #f2f3fc;
-  }
+:root[data-sky="cloudy"] {
+  --sky-top: #6b8aab;
+  --sky-bottom: #c4d1de;
+}
+
+:root[data-sky="precip"] {
+  --sky-top: #4a6485;
+  --sky-bottom: #9fb2c6;
+}
+
+:root[data-sky="storm"] {
+  --sky-top: #34445f;
+  --sky-bottom: #7d8ba3;
+}
+
+:root[data-theme="night"] {
+  --card-bg: #1b2447;
+  --surface: #252f5a;
+  --border: #36427a;
+  --muted: #a7b1de;
+  --text: #eef0fb;
+  --link: #7fb0ff;
+  --accent: #7c8fe0;
+  --footer-text: rgba(255, 255, 255, 0.75);
+
+  --sky-top: #070d24;
+  --sky-bottom: #1b2a5e;
+
+  color-scheme: dark;
+}
+
+:root[data-theme="night"][data-sky="cloudy"] {
+  --sky-top: #0f1626;
+  --sky-bottom: #2a3350;
+}
+
+:root[data-theme="night"][data-sky="precip"] {
+  --sky-top: #0d1424;
+  --sky-bottom: #263049;
+}
+
+:root[data-theme="night"][data-sky="storm"] {
+  --sky-top: #0a0e1c;
+  --sky-bottom: #1f2438;
 }
 
 * {
   box-sizing: border-box;
+}
+
+html {
+  background-color: var(--sky-bottom);
 }
 
 body {
@@ -36,16 +79,10 @@ body {
   min-height: 100vh;
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: var(--bg);
-  background-image:
-    linear-gradient(180deg, rgba(10, 14, 20, 0.2) 0%, rgba(10, 14, 20, 0.55) 55%, rgba(10, 14, 20, 0.75) 100%),
-    url("./assets/background-altoona.jpg");
-  background-size: cover;
-  background-position: 30% top;
-  background-repeat: no-repeat;
-  /* `fixed` causes a Chromium/Windows compositing bug where content
-     (notably the radar iframe) can drop out and this background bleeds
-     through in its place, and iOS Safari handles it poorly too — so this
-     stays `scroll` everywhere rather than just on mobile. */
+  background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 100%) no-repeat;
+  background-size: 100% 100%;
+  /* Deliberately not `fixed`: a fixed background triggers a Chromium/Windows
+     compositing bug that can make the radar iframe drop out, and iOS Safari
+     handles it poorly too. */
   background-attachment: scroll;
 }
