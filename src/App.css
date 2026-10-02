@@ -93,7 +93,43 @@
   padding: 0;
   border: 0;
   background: transparent;
-  cursor: zoom-in;
+  cursor: grab;
+}
+
+.radar-expand:active {
+  cursor: grabbing;
+}
+
+/* Mouse users get "drag to move"; touch users keep "tap to enlarge" (a
+   one-finger drag there must scroll the page). */
+.hint-touch {
+  display: none;
+}
+
+@media (hover: none) {
+  .hint-mouse {
+    display: none;
+  }
+
+  .hint-touch {
+    display: inline;
+  }
+}
+
+.radar-reset {
+  position: absolute;
+  top: 40px;
+  right: 8px;
+  z-index: 2;
+  padding: 0.25rem 0.7rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #14233f;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
 .radar-expand-pill {

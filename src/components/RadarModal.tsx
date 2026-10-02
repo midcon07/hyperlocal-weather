@@ -1,49 +1,24 @@
-import { useEffect, useRef, useState } from "react";
-import type { PointerEvent as ReactPointerEvent, WheelEvent as ReactWheelEvent } from "react";
+import { useRef, useState } from "react";
+import type { PointerEvent as ReactPointerEvent, WheelEvent as ReactWheelEvent, MouseEvent as ReactMouseEvent } from "react";
 import type { MapAlert } from "../api/mapAlerts";
 import { useElementSize } from "../hooks/useElementWidth";
 import type { LiveSourceState } from "../hooks/useLiveSource";
-import { MAP_CENTER, MAP_DEFAULT_ZOOM, makeInverse, makeProjector } from "../lib/mapView";
-import type { MapViewSpec } from "../lib/mapView";
+import { MAX_ZOOM, MIN_ZOOM, clampPosition, samePosition, useRadarMap } from "../hooks/useRadarMap";
+import { MAP_CENTER, MAP_DEFAULT_ZOOM } from "../lib/mapView";
 import { CHROME_BOTTOM, CHROME_TOP, CHROME_TOP_NARROW, VISIBLE_HEIGHT, radarUrl } from "../lib/radarEmbed";
 import type { MapPosition } from "../lib/radarEmbed";
 import { AlertOutlines, AlertTooltip, OutlineLegend, alertsAt } from "./AlertOutlines";
 import type { HoverInfo } from "./AlertOutlines";
 import { MapAlerts } from "./MapAlerts";
+import { RadarLayers } from "./RadarLayers";
 
 // The enlarged radar: NWS's radar cropped past its banner, menu panel and
 // playback bar, at the size of the dialog, with our own alerts button in
-// place of the NWS one that lived in the cropped panel.
-//
-// We can't read the NWS map's state, so we own it. Dragging, the mouse wheel,
-// pinching and the +/- buttons move a target position that we know exactly;
-// alert outlines are drawn from that target, so they always sit on the right
-// counties. The NWS map itself follows in two steps: the picture already on
-// screen is shifted/scaled to match instantly, and after the gesture settles a
-// fresh copy is loaded at the target position behind it and swapped in once
-// it has drawn. (Edges can look blank for a moment while panning far.)
+// place of the NWS one that lived in the cropped panel. Dragging, the mouse
+// wheel, double-click, pinching and the +/- buttons move the map (see
+// useRadarMap for how the NWS map is kept in step with our own position).
 
-interface Layer {
-  id: number;
-  view: MapPosition;
-  ready: boolean;
-}
-
-const MIN_ZOOM = 4.5;
-const MAX_ZOOM = 9;
-const IDLE_MS = 600; // how long the target must hold still before reloading
-const SETTLE_MS = 4500; // after the page loads, time for the map tiles to draw
-const GIVE_UP_MS = 20000; // swap in a slow layer anyway
 const DRAG_PX = 5;
-
-const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));
-const clampPosition = (p: MapPosition): MapPosition => ({
-  lon: clamp(p.lon, -128, -64),
-  lat: clamp(p.lat, 22, 52),
-  zoom: clamp(p.zoom, MIN_ZOOM, MAX_ZOOM),
-});
-const samePosition = (a: MapPosition, b: MapPosition) =>
-  Math.abs(a.zoom - b.zoom) < 0.002 && Math.abs(a.lon - b.lon) < 0.0005 && Math.abs(a.lat - b.lat) < 0.0005;
 
 interface Props {
   alerts: LiveSourceState<MapAlert[]>;
@@ -52,88 +27,24 @@ interface Props {
   onClose: () => void;
   /** Native width of the small map; the first view covers at least this much. */
   coverageWidth: number;
+  /** Where the small map was looking when it was enlarged. */
+  startView: MapPosition | null;
 }
 
-export function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose, coverageWidth }: Props) {
+export function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose, coverageWidth, startView }: Props) {
   const { ref, width, height } = useElementSize();
   const chromeTop = width > 600 ? CHROME_TOP : CHROME_TOP_NARROW;
-  const iframeHeight = height + chromeTop + CHROME_BOTTOM;
 
-  const [target, setTarget] = useState<MapPosition | null>(null);
-  const [layers, setLayers] = useState<Layer[]>([]);
-  const nextId = useRef(1);
-  const home = useRef<MapPosition | null>(null);
+  // Zoom out just enough that this dialog shows at least what the small map
+  // shows (so no alert disappears when it opens).
+  const fit = Math.min(1, width / coverageWidth, height / VISIBLE_HEIGHT);
+  const zoomAdjust = Math.log2(fit || 1);
+  const start = startView ?? { ...MAP_CENTER, zoom: MAP_DEFAULT_ZOOM };
+  const initial = width > 0 && height > 0 ? clampPosition({ ...start, zoom: start.zoom + zoomAdjust }) : null;
+  const homeView = clampPosition({ ...MAP_CENTER, zoom: MAP_DEFAULT_ZOOM + zoomAdjust });
 
-  // Geometry helpers in container pixels (the iframe sits chromeTop above).
-  const specFor = (p: MapPosition): MapViewSpec => ({
-    width,
-    height: iframeHeight,
-    zoom: p.zoom,
-    center: { lon: p.lon, lat: p.lat },
-  });
-  const toScreen = (p: MapPosition, lon: number, lat: number) => {
-    const q = makeProjector(specFor(p))(lon, lat);
-    return { x: q.x, y: q.y - chromeTop };
-  };
-  const fromScreen = (p: MapPosition, x: number, y: number) => makeInverse(specFor(p))(x, y + chromeTop);
-  const centerOf = (p: MapPosition) => toScreen(p, p.lon, p.lat);
-
-  const panBy = (p: MapPosition, dx: number, dy: number): MapPosition => {
-    const c = centerOf(p);
-    const ll = fromScreen(p, c.x - dx, c.y - dy);
-    return clampPosition({ ...p, lon: ll.lon, lat: ll.lat });
-  };
-  // Zoom while keeping the map point under (ax, ay) where it is.
-  const zoomAbout = (p: MapPosition, zoom: number, ax: number, ay: number): MapPosition => {
-    const ll = fromScreen(p, ax, ay);
-    const next = { ...p, zoom: clamp(zoom, MIN_ZOOM, MAX_ZOOM) };
-    const at = toScreen(next, ll.lon, ll.lat);
-    const c = centerOf(next);
-    const moved = fromScreen(next, c.x + (at.x - ax), c.y + (at.y - ay));
-    return clampPosition({ ...next, lon: moved.lon, lat: moved.lat });
-  };
-
-  // First view: the home center, zoomed out just enough that this dialog
-  // shows at least what the small map shows (so no alert disappears when it
-  // opens).
-  useEffect(() => {
-    if (width === 0 || height === 0 || target) return;
-    const fit = Math.min(1, width / coverageWidth, height / VISIBLE_HEIGHT);
-    const view = clampPosition({ ...MAP_CENTER, zoom: MAP_DEFAULT_ZOOM + Math.log2(fit) });
-    home.current = view;
-    setTarget(view);
-    setLayers([{ id: nextId.current++, view, ready: true }]);
-  }, [width, height, target, coverageWidth]);
-
-  // When the target has been still for a moment and the newest layer is
-  // ready, load a fresh layer at the target (one at a time).
-  useEffect(() => {
-    if (!target || layers.length === 0) return;
-    const latest = layers[layers.length - 1];
-    if (!latest.ready || samePosition(latest.view, target)) return;
-    const timer = setTimeout(
-      () => setLayers((ls) => [...ls, { id: nextId.current++, view: target, ready: false }]),
-      IDLE_MS
-    );
-    return () => clearTimeout(timer);
-  }, [target, layers]);
-
-  // A layer that never finishes loading is shown anyway after a while.
-  const pendingId = layers.find((l) => !l.ready)?.id;
-  useEffect(() => {
-    if (pendingId === undefined) return;
-    const timer = setTimeout(() => markReady(pendingId), GIVE_UP_MS);
-    return () => clearTimeout(timer);
-  }, [pendingId]);
-
-  function markReady(id: number) {
-    // Once a layer is showing, the ones under it are no longer needed.
-    setLayers((ls) => {
-      const index = ls.findIndex((l) => l.id === id);
-      if (index < 0) return ls;
-      return ls.slice(index).map((l) => (l.id === id ? { ...l, ready: true } : l));
-    });
-  }
+  const map = useRadarMap({ width, height, chromeTop, chromeBottom: CHROME_BOTTOM, initial });
+  const { target, setTarget, panBy, zoomAbout, centerOf } = map;
 
   // ---- Pointer gestures: drag to pan, wheel/pinch/double-click to zoom.
   const [hover, setHover] = useState<HoverInfo | null>(null);
@@ -148,8 +59,7 @@ export function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose, covera
 
   const showAlertsAt = (e: ReactPointerEvent<HTMLDivElement>) => {
     const hit = alertsAt(e.clientX, e.clientY, alerts.data ?? []);
-    const pos = local(e);
-    setHover(hit.length ? { alerts: hit, ...pos } : null);
+    setHover(hit.length ? { alerts: hit, ...local(e) } : null);
   };
 
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
@@ -182,7 +92,9 @@ export function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose, covera
       const dist = Math.hypot(a.x - b.x, a.y - b.y);
       const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
       const last = pinch.current;
-      setTarget((t) => (t ? zoomAbout(panBy(t, mid.x - last.mid.x, mid.y - last.mid.y), t.zoom + Math.log2(dist / last.dist), mid.x, mid.y) : t));
+      setTarget((t) =>
+        t ? zoomAbout(panBy(t, mid.x - last.mid.x, mid.y - last.mid.y), t.zoom + Math.log2(dist / last.dist), mid.x, mid.y) : t
+      );
       pinch.current = { dist, mid };
     }
     if (drag.current.moved) setHover(null);
@@ -203,7 +115,7 @@ export function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose, covera
     setHover(null);
   };
 
-  const onDoubleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const onDoubleClick = (e: ReactMouseEvent<HTMLDivElement>) => {
     const pos = local(e);
     setTarget((t) => (t ? zoomAbout(t, t.zoom + 1, pos.x, pos.y) : t));
   };
@@ -214,11 +126,6 @@ export function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose, covera
   };
 
   const highlight = new Set(hover?.alerts.map((a) => a.id));
-
-  // The picture on screen is the newest ready layer; while it differs from
-  // the target the map is a shifted/scaled stand-in until a sharp copy swaps in.
-  const showing = [...layers].reverse().find((l) => l.ready);
-  const refreshing = !!target && !!showing && (!samePosition(showing.view, target) || layers.some((l) => !l.ready));
 
   return (
     <div className="radar-modal" role="dialog" aria-modal="true" aria-label="Radar, enlarged" onClick={onClose}>
@@ -235,39 +142,17 @@ export function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose, covera
           </span>
         </div>
         <div className="radar-modal-map" ref={ref}>
-          {target &&
-            width > 0 &&
-            layers.map((layer) => {
-              const c = centerOf(layer.view);
-              const at = toScreen(target, layer.view.lon, layer.view.lat);
-              const scale = 2 ** (target.zoom - layer.view.zoom);
-              return (
-                <div
-                  key={layer.id}
-                  className="radar-layer"
-                  style={{
-                    opacity: layer.ready ? 1 : 0,
-                    transformOrigin: `${c.x}px ${c.y}px`,
-                    transform: `translate(${at.x - c.x}px, ${at.y - c.y}px) scale(${scale})`,
-                  }}
-                >
-                  <iframe
-                    className="radar-modal-frame radar-modal-frame--locked"
-                    src={radarUrl(layer.view)}
-                    title="NWS radar, enlarged"
-                    style={{ top: -chromeTop, width, height: iframeHeight }}
-                    onLoad={() => {
-                      if (!layer.ready) setTimeout(() => markReady(layer.id), SETTLE_MS);
-                    }}
-                  />
-                </div>
-              );
-            })}
+          <RadarLayers
+            map={map}
+            width={width}
+            chromeTop={chromeTop}
+            frameClass="radar-modal-frame radar-modal-frame--locked"
+          />
           {target && width > 0 && alerts.data && (
             <div className="alert-outlines-wrap">
               <AlertOutlines
                 alerts={alerts.data}
-                iframe={specFor(target)}
+                iframe={map.specFor(target)}
                 visible={{ top: chromeTop, width, height }}
                 highlight={highlight}
               />
@@ -284,7 +169,7 @@ export function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose, covera
             onDoubleClick={onDoubleClick}
           />
           {hover && <AlertTooltip info={hover} width={width} height={height} />}
-          {refreshing && <div className="radar-updating">Updating map…</div>}
+          {map.refreshing && <div className="radar-updating">Updating map…</div>}
           <div className="radar-modal-alerts">
             <MapAlerts live={alerts} open={alertsOpen} onToggle={onToggleAlerts} />
           </div>
@@ -298,8 +183,8 @@ export function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose, covera
             <button
               type="button"
               className="radar-ctl radar-ctl--wide"
-              onClick={() => home.current && setTarget(home.current)}
-              disabled={!target || !home.current || samePosition(target, home.current)}
+              onClick={() => setTarget(homeView)}
+              disabled={!target || samePosition(target, homeView)}
             >
               Reset view
             </button>
