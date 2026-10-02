@@ -4,8 +4,10 @@ import { makeProjector } from "../lib/mapView";
 import type { MapViewSpec } from "../lib/mapView";
 
 // Dashed outlines of active watches (orange) and warnings (red) drawn over
-// the radar. Warnings use NWS's real polygon; watches and other zone-based
-// alerts get a box around their affected zones. Drawn in the iframe's own
+// the radar. Tornado/severe thunderstorm/flash flood warnings use NWS's own
+// storm polygon; watches, advisories and other warnings are drawn as the
+// actual counties (or forecast zones) they were issued for, with a light
+// tint inside so it's clear what is covered. Drawn in the iframe's own
 // pixel space, then cropped by viewBox to whatever part the card shows.
 
 export const ADVISORY_COLOR = "#2b7de9";
@@ -41,23 +43,17 @@ export function AlertOutlines({ alerts, iframe, visible }: Props) {
 
   const paths = drawn.flatMap(({ alert, level }) =>
     alert.shapes.map((shape, i) => {
-      let d: string;
-      if (shape.kind === "polygon") {
-        d = shape.rings
-          .map((ring) =>
+      const d = shape.rings
+        .map(
+          (ring) =>
             ring
               .map(([lon, lat], k) => {
                 const p = project(lon, lat);
                 return `${k === 0 ? "M" : "L"}${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
               })
               .join(" ") + " Z"
-          )
-          .join(" ");
-      } else {
-        const nw = project(shape.west, shape.north);
-        const se = project(shape.east, shape.south);
-        d = `M${nw.x.toFixed(1)} ${nw.y.toFixed(1)} H${se.x.toFixed(1)} V${se.y.toFixed(1)} H${nw.x.toFixed(1)} Z`;
-      }
+        )
+        .join(" ");
       return { key: `${alert.id}-${i}`, d, level };
     })
   );
@@ -71,6 +67,7 @@ export function AlertOutlines({ alerts, iframe, visible }: Props) {
     >
       {paths.map((p) => (
         <g key={p.key}>
+          <path d={p.d} className="alert-outline-fill" fill={COLORS[p.level]} />
           <path d={p.d} className="alert-outline-halo" />
           <path d={p.d} className="alert-outline" stroke={COLORS[p.level]} />
         </g>

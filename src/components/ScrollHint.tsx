@@ -2,15 +2,14 @@ import { useEffect, useState } from "react";
 
 // Touch browsers (iPhone, iPad) hide the scrollbar until you scroll, so a
 // visitor can miss that the page continues. This draws a slim, always-on
-// position strip along the right edge (touch devices only; desktop browsers
-// have their own scrollbar) and a "More below" cue that fades once the page
-// has been scrolled.
+// position strip along the right edge, in the page's side margin so it
+// never covers content. Touch devices only: desktop browsers have their own
+// scrollbar. (The header also carries a "scroll down" note, see App.tsx.)
 
 interface HintState {
   scrollable: boolean;
   thumbTop: number;
   thumbHeight: number;
-  atTop: boolean;
 }
 
 const EDGE = 12; // gap above and below the strip
@@ -23,16 +22,11 @@ function measure(): HintState {
   const track = viewport - EDGE * 2;
   const thumbHeight = Math.max(36, (track * viewport) / total);
   const progress = scrollable ? Math.min(1, Math.max(0, window.scrollY / (total - viewport))) : 0;
-  return {
-    scrollable,
-    thumbHeight,
-    thumbTop: EDGE + (track - thumbHeight) * progress,
-    atTop: window.scrollY < 60,
-  };
+  return { scrollable, thumbHeight, thumbTop: EDGE + (track - thumbHeight) * progress };
 }
 
 export function ScrollHint() {
-  const [state, setState] = useState<HintState>(() => ({ scrollable: false, thumbTop: EDGE, thumbHeight: 0, atTop: true }));
+  const [state, setState] = useState<HintState>({ scrollable: false, thumbTop: EDGE, thumbHeight: 0 });
 
   useEffect(() => {
     const update = () => setState(measure());
@@ -52,19 +46,8 @@ export function ScrollHint() {
   if (!state.scrollable) return null;
 
   return (
-    <>
-      <div className="scroll-strip" aria-hidden="true">
-        <div className="scroll-strip-thumb" style={{ height: state.thumbHeight, transform: `translateY(${state.thumbTop}px)` }} />
-      </div>
-      <button
-        type="button"
-        className={`scroll-cue${state.atTop ? "" : " scroll-cue--hidden"}`}
-        onClick={() => window.scrollBy({ top: window.innerHeight * 0.8, behavior: "smooth" })}
-        tabIndex={state.atTop ? 0 : -1}
-        aria-hidden={!state.atTop}
-      >
-        More below <span className="scroll-cue-arrow">&#9660;</span>
-      </button>
-    </>
+    <div className="scroll-strip" aria-hidden="true">
+      <div className="scroll-strip-thumb" style={{ height: state.thumbHeight, transform: `translateY(${state.thumbTop}px)` }} />
+    </div>
   );
 }

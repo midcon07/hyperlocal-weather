@@ -32,6 +32,13 @@ function App() {
       <header className="app-header">
         <h1>Hyperlocal Weather</h1>
         <p className="location">{latest?.location.name ?? "Loading location…"}</p>
+        <button
+          type="button"
+          className="scroll-note"
+          onClick={() => window.scrollBy({ top: window.innerHeight * 0.8, behavior: "smooth" })}
+        >
+          Scroll down for radar, forecast &amp; more <span className="scroll-note-arrow">&#9660;</span>
+        </button>
       </header>
 
       <main>
