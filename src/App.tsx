@@ -4,6 +4,7 @@ import { TempCurve } from "./components/TempCurve";
 import { RadarCard } from "./components/RadarCard";
 import { AlertBanner } from "./components/AlertBanner";
 import { MetarStrip } from "./components/MetarStrip";
+import { ScrollHint } from "./components/ScrollHint";
 import { useWeatherData } from "./hooks/useWeatherData";
 import { useNwsLive } from "./hooks/useNwsLive";
 import { useStationLive } from "./hooks/useStationLive";
@@ -56,6 +57,8 @@ function App() {
           </>
         )}
       </main>
+
+      <ScrollHint />
 
       <footer className="app-footer">
         <p>

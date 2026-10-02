@@ -191,6 +191,77 @@
   pointer-events: none;
 }
 
+/* Scroll position strip + "More below" cue (see ScrollHint.tsx). The strip
+   is for touch screens; mouse browsers already show a scrollbar. */
+.scroll-strip {
+  position: fixed;
+  top: 0;
+  right: 3px;
+  bottom: 0;
+  width: 5px;
+  z-index: 900;
+  pointer-events: none;
+}
+
+.scroll-strip-thumb {
+  width: 100%;
+  border-radius: 3px;
+  background: rgba(20, 35, 63, 0.5);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.55);
+}
+
+:root[data-theme="night"] .scroll-strip-thumb {
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .scroll-strip {
+    display: none;
+  }
+}
+
+.scroll-cue {
+  position: fixed;
+  left: 50%;
+  bottom: 14px;
+  z-index: 900;
+  transform: translateX(-50%);
+  padding: 0.4rem 0.95rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(20, 35, 63, 0.88);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.scroll-cue--hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(10px);
+}
+
+.scroll-cue-arrow {
+  display: inline-block;
+  font-size: 0.7rem;
+  animation: scroll-cue-bob 1.4s ease-in-out infinite;
+}
+
+@keyframes scroll-cue-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue-arrow {
+    animation: none;
+  }
+}
+
 /* Alert outlines sit exactly over the (cropped) iframe, never take clicks. */
 .alert-outlines-wrap {
   position: absolute;
