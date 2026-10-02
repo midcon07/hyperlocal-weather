@@ -60,8 +60,8 @@ export function StationCard({ live, fallback, nwsLive, nwsFallback }: Props) {
             </div>
             <div className={`wind-feature wind-level-${category.level}`}>
               <WindMastIcon
-                width={40}
-                height={76}
+                width={56}
+                height={96}
                 spinSeconds={windSpinSeconds(station.windSpeedMph)}
                 directionDeg={station.windDirectionDeg}
                 flutterSeconds={flutterSeconds}

@@ -272,6 +272,41 @@
   color: currentColor;
 }
 
+/* Mast parts that are black/silver on the real hardware: neutral tones
+   that stay visible on both the light and dark card colors. The cups
+   (currentColor) take the wind category color below. */
+.wind-feature {
+  --mast-body: #2b3354;
+  --mast-silver: #c9d0e2;
+  --mast-edge: #8c96b6;
+}
+
+@media (prefers-color-scheme: dark) {
+  .wind-feature {
+    --mast-body: #9aa6d6;
+    --mast-silver: #dfe5f6;
+    --mast-edge: #b9c3e8;
+  }
+}
+
+.mast-silver {
+  fill: var(--mast-silver);
+  stroke: var(--mast-edge);
+}
+
+.mast-highlight {
+  stroke: rgba(255, 255, 255, 0.75);
+}
+
+.mast-body-fill {
+  fill: var(--mast-body);
+}
+
+.mast-body-stroke {
+  fill: none;
+  stroke: var(--mast-body);
+}
+
 /* Mast/cups/vane take the wind category's color (calm -> gale). */
 .wind-level-0 { color: #7c8fe0; }
 .wind-level-1 { color: #5fb3d9; }

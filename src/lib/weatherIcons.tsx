@@ -168,14 +168,21 @@ export function AnemometerIcon({ size = 20, className, spinSeconds }: IconProps 
   );
 }
 
-// A taller, more illustrative version: the top few feet of a mast with the
-// anemometer cups mounted on top and a small wind vane below, rotated to
-// the actual wind direction. The pole deliberately runs off the bottom
-// edge of the viewBox -- it's meant to read as "the top of a taller pole",
-// not the whole thing.
+// The top of the author's own Davis anemometer mast, redrawn from a photo:
+// a silver pole with a black clamp bracket, a curved arm rising to the
+// instrument, the wind vane on top (silver fin, pointed nose) and the three
+// wind cups on their own hub just below it. The pole deliberately runs off
+// the bottom edge -- it reads as "the top of a taller pole".
+//
+// The real thing is photographed from slightly below, so this keeps that
+// view honestly: the cups orbit on a squashed ellipse (viewed at a tilt),
+// and the vane is foreshortened by its heading -- broadside when the wind
+// is from the east or west, nearly end-on from the north or south, with
+// the pointed nose toward the side the wind comes from. Black parts adapt
+// to the theme via CSS variables; the cups take the wind-level color.
 export function WindMastIcon({
   width = 44,
-  height = 84,
+  height = 76,
   className,
   spinSeconds,
   directionDeg,
@@ -194,46 +201,53 @@ export function WindMastIcon({
   // Pulses a ring around the cups.
   gusting?: boolean;
 }) {
+  const sin = typeof directionDeg === "number" ? Math.sin((directionDeg * Math.PI) / 180) : 0.55;
+  const vaneScaleX = (sin >= 0 ? 1 : -1) * Math.max(0.2, Math.abs(sin));
+
   return (
-    <svg
-      className={className}
-      width={width}
-      height={height}
-      viewBox="0 0 48 90"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.2"
-      strokeLinecap="round"
-    >
-      <line x1="24" y1="90" x2="24" y2="30" />
-      {typeof directionDeg === "number" && (
-        <g transform={`rotate(${directionDeg} 24 58)`}>
-          <g
-            className={flutterSeconds ? "vane-flutter" : undefined}
-            style={
-              flutterSeconds
-                ? ({ animationDuration: `${flutterSeconds}s`, transformOrigin: "24px 58px", "--flutter-deg": `${flutterDeg}deg` } as CSSProperties)
-                : undefined
-            }
-          >
-            <line x1="24" y1="58" x2="24" y2="47" strokeWidth="1.6" />
-            <path d="M24 44.5 27 51 24 49.3 21 51Z" fill="currentColor" stroke="none" />
-          </g>
-        </g>
+    <svg className={className} width={width} height={height} viewBox="0 0 64 110" fill="none" strokeLinecap="round" strokeLinejoin="round">
+      <polygon className="mast-silver" points="23,110 26.5,82 33.5,82 37,110" strokeWidth="0.8" />
+      <line className="mast-highlight" x1="27.8" y1="86" x2="25.4" y2="110" strokeWidth="1.1" />
+
+      <path className="mast-body-stroke" d="M30 78 C29 62 33 49 41 37" strokeWidth="2.6" />
+      <rect className="mast-body-fill" x="22" y="76" width="16" height="9" rx="2.2" />
+      <circle className="mast-body-fill" cx="19.6" cy="82" r="1.7" />
+
+      <line className="mast-body-stroke" x1="41" y1="24" x2="41" y2="33" strokeWidth="2" />
+      <ellipse className="mast-body-fill" cx="41" cy="33" rx="3.2" ry="4.2" />
+
+      {gusting && (
+        <ellipse className="gust-ring" cx="41" cy="31" rx="14" ry="8" strokeWidth="1.2" style={{ transformOrigin: "41px 31px" }} />
       )}
-      {gusting && <circle className="gust-ring" cx="24" cy="18" r="13" strokeWidth="1.4" style={{ transformOrigin: "24px 18px" }} />}
-      <g
-        className={spinSeconds ? "anemometer-spin" : undefined}
-        style={spinSeconds ? { animationDuration: `${spinSeconds}s`, transformOrigin: "24px 18px" } : undefined}
-      >
-        <line x1="24" y1="18" x2="24" y2="7.5" />
-        <circle cx="24" cy="6" r="2.6" fill="currentColor" stroke="none" />
-        <line x1="24" y1="18" x2="32.4" y2="23" />
-        <circle cx="33.5" cy="23.6" r="2.6" fill="currentColor" stroke="none" />
-        <line x1="24" y1="18" x2="15.6" y2="23" />
-        <circle cx="14.5" cy="23.6" r="2.6" fill="currentColor" stroke="none" />
+
+      <g transform="translate(41 31) scale(1 0.55)">
+        <g
+          className={spinSeconds ? "anemometer-spin" : undefined}
+          style={spinSeconds ? { animationDuration: `${spinSeconds}s`, transformOrigin: "0px 0px" } : undefined}
+        >
+          {[0, 120, 240].map((angle) => (
+            <g key={angle} transform={`rotate(${angle})`}>
+              <line className="mast-body-stroke" x1="0" y1="0" x2="0" y2="-7" strokeWidth="1.3" />
+              <circle cx="0" cy="-8.6" r="3.1" fill="currentColor" />
+            </g>
+          ))}
+        </g>
       </g>
-      <circle cx="24" cy="18" r="1.9" fill="currentColor" stroke="none" />
+
+      <g transform={`translate(41 22) scale(${vaneScaleX} 1)`}>
+        <g
+          className={flutterSeconds ? "vane-flutter" : undefined}
+          style={
+            flutterSeconds
+              ? ({ animationDuration: `${flutterSeconds}s`, transformOrigin: "0px 0px", "--flutter-deg": `${flutterDeg}deg` } as CSSProperties)
+              : undefined
+          }
+        >
+          <polygon className="mast-silver" points="-3,-1.4 -21,-4.6 -17.2,0.4 -3,1.2" strokeWidth="0.6" />
+          <path className="mast-body-fill" d="M2.5 -1.3 L14 -0.9 L17 0 L14 0.9 L2.5 1.3Z" />
+        </g>
+      </g>
+      <ellipse className="mast-body-fill" cx="41" cy="22" rx="2.8" ry="3.2" />
     </svg>
   );
 }
