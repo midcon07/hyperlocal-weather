@@ -102,7 +102,7 @@ export function StationCard({ live, fallback, nwsLive, nwsFallback }: Props) {
             </div>
           </div>
           <div className="instrument-row">
-            <Barometer inHg={station.barometricPressureInHg} />
+            <Barometer inHg={station.barometricPressureInHg} trendInHg={station.pressureTrendInHg} />
             <RainGauge todayIn={station.rainDayIn} rateInPerHr={station.rainRateInPerHr} />
             <Hygrometer pct={station.humidityPct} />
             <UvMeter uv={station.uvIndex} />

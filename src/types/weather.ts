@@ -9,6 +9,8 @@ export interface StationReading {
   rainRateInPerHr: number | null;
   rainDayIn: number | null;
   barometricPressureInHg: number | null;
+  /** Barometer's own 3-hour change in inHg (positive = rising). */
+  pressureTrendInHg?: number | null;
   uvIndex: number | null;
   solarRadiationWm2: number | null;
 }

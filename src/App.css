@@ -570,6 +570,57 @@
   stroke-width: 0.6;
 }
 
+/* Antique barometer face */
+.antique-tick {
+  stroke: #3b2b0e;
+  stroke-width: 0.5;
+}
+
+.antique-tick-major {
+  stroke: #1f1606;
+  stroke-width: 1;
+}
+
+.antique-num {
+  fill: #1f1606;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 6.2px;
+  font-weight: 700;
+}
+
+.antique-word {
+  fill: #2b1d08;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 3.5px;
+  font-weight: 700;
+  letter-spacing: 0.1px;
+}
+
+.antique-name {
+  fill: #2b1d08;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 4.6px;
+  font-weight: 700;
+  letter-spacing: 0.9px;
+}
+
+.antique-name-small {
+  fill: #6b5527;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 3.2px;
+  letter-spacing: 0.9px;
+}
+
+.trend-arrow {
+  display: inline-block;
+  vertical-align: -2px;
+  margin-left: 0.25rem;
+}
+
+.trend-rising { color: #1f9d55; }
+.trend-falling { color: #e0663a; }
+.trend-steady { color: var(--muted); }
+
 .baro-tick {
   stroke: var(--muted);
   stroke-width: 0.8;

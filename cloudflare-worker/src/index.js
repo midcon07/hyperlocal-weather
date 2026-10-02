@@ -133,6 +133,7 @@ export default {
           rainRateInPerHr: reading.rain_rate_last_in ?? null,
           rainDayIn: reading.rainfall_day_in ?? null,
           barometricPressureInHg: baroReading?.bar_sea_level ?? null,
+          pressureTrendInHg: baroReading?.bar_trend ?? null,
           uvIndex: reading.uv_index ?? null,
           solarRadiationWm2: reading.solar_rad ?? null,
         },

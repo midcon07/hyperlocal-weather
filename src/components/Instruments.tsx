@@ -1,4 +1,4 @@
-import { useId } from "react";
+﻿import { useId } from "react";
 import type { ReactNode } from "react";
 import { fmt } from "../lib/format";
 import type { SunTimes } from "../lib/sky";
@@ -24,7 +24,7 @@ function arcPath(cx: number, cy: number, r: number, fromDeg: number, toDeg: numb
 
 interface TileProps {
   label: string;
-  value: string;
+  value: ReactNode;
   sub?: string;
   children: ReactNode;
 }
@@ -118,7 +118,9 @@ export function SunArc({ times, now }: { times: SunTimes | null; now: Date }) {
   );
 }
 
-// ---- Barometer: round aneroid dial, 28.5-31.0 inHg over a 240 degree sweep.
+// ---- Barometer: antique brass aneroid, 28.5-31.0 inHg over a 240 degree
+// sweep. Colors are fixed (not theme variables) -- it's meant to look like
+// a cream porcelain dial in a brass case on both the day and night cards.
 
 const BARO_MIN = 28.5;
 const BARO_MAX = 31.0;
@@ -129,41 +131,142 @@ function baroAngle(inHg: number) {
   return -SWEEP + f * SWEEP * 2;
 }
 
-export function Barometer({ inHg }: { inHg: number | null }) {
+// The traditional weather words, each centered over its pressure range.
+const BARO_WORDS: { text: string; center: number }[] = [
+  { text: "STORMY", center: -95 },
+  { text: "RAIN", center: -46 },
+  { text: "CHANGE", center: 0 },
+  { text: "FAIR", center: 46 },
+  { text: "VERY DRY", center: 96 },
+];
+
+export type PressureTrend = {
+  direction: "rising" | "falling" | "steady";
+  rate: "slowly" | "" | "rapidly";
+  label: string;
+};
+
+// Classifies the 3-hour barometer change (inHg) the way weather desks do.
+export function pressureTrend(change: number | null | undefined): PressureTrend | null {
+  if (change === null || change === undefined) return null;
+  const size = Math.abs(change);
+  if (size < 0.02) return { direction: "steady", rate: "", label: "Steady" };
+  const rate = size >= 0.12 ? "rapidly" : size >= 0.06 ? "" : "slowly";
+  const direction = change > 0 ? "rising" : "falling";
+  const word = direction === "rising" ? "Rising" : "Falling";
+  return { direction, rate, label: rate ? `${word} ${rate}` : word };
+}
+
+function TrendArrow({ trend }: { trend: PressureTrend }) {
+  if (trend.direction === "steady") {
+    return (
+      <svg className="trend-arrow trend-steady" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+        <path d="M2 8h11M9.5 4.5 13 8l-3.5 3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+  const up = trend.direction === "rising";
+  // Down arrows are the up arrow flipped vertically.
+  const flip = up ? undefined : "translate(0 16) scale(1 -1)";
+  return (
+    <svg className={`trend-arrow trend-${trend.direction}`} viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+      <g transform={flip} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M8 14V3M4 7l4-4 4 4" />
+        {trend.rate === "rapidly" && <path d="M4 11.5l4-4 4 4" opacity="0.55" />}
+      </g>
+    </svg>
+  );
+}
+
+export function Barometer({ inHg, trendInHg }: { inHg: number | null; trendInHg?: number | null }) {
+  const id = useId();
+  const trend = pressureTrend(trendInHg);
+
   const ticks = [];
   for (let v = 28.5; v <= 31.001; v += 0.1) {
     const angle = baroAngle(v);
     const major = Math.abs(v * 2 - Math.round(v * 2)) < 0.01;
-    const outer = polar(50, 50, 38, angle);
-    const inner = polar(50, 50, major ? 31 : 34, angle);
+    const outer = polar(50, 50, 40, angle);
+    const inner = polar(50, 50, major ? 34.5 : 37, angle);
     ticks.push(
       <line key={v.toFixed(1)} x1={outer.x} y1={outer.y} x2={inner.x} y2={inner.y}
-        className={major ? "baro-tick-major" : "baro-tick"} />
+        className={major ? "antique-tick-major" : "antique-tick"} />
     );
   }
-  const labels = [29, 30, 31].map((v) => {
-    const p = polar(50, 50, 23, baroAngle(v));
+  const numerals = [29, 30, 31].map((v) => {
+    const p = polar(50, 50, 30.5, baroAngle(v));
     return (
-      <text key={v} x={p.x} y={p.y} className="dial-num" textAnchor="middle" dominantBaseline="central">
+      <text key={v} x={p.x} y={p.y} className="antique-num" textAnchor="middle" dominantBaseline="central">
         {v}
       </text>
     );
   });
-  const needleAngle = inHg === null ? baroAngle(29.92) : baroAngle(inHg);
+  const words = BARO_WORDS.map((w) => (
+    <g key={w.text}>
+      <path id={`${id}-${w.text}`} d={arcPath(50, 50, 24, w.center - 50, w.center + 50)} fill="none" />
+      <text className="antique-word">
+        <textPath href={`#${id}-${w.text}`} startOffset="50%" textAnchor="middle">{w.text}</textPath>
+      </text>
+    </g>
+  ));
+
+  const reading = inHg ?? 29.92;
+  const needleAngle = baroAngle(reading);
+  // The brass tell-tale hand parks at the pressure three hours ago.
+  const pastAngle = trendInHg === null || trendInHg === undefined || inHg === null ? null : baroAngle(inHg - trendInHg);
 
   return (
-    <Tile label="Barometer" value={fmt(inHg, 2, " inHg")} sub={inHg === null ? undefined : pressureWord(inHg)}>
-      <svg viewBox="0 0 100 100" role="img" aria-label={`Barometer ${fmt(inHg, 2, " inHg")}`}>
-        <circle cx="50" cy="50" r="46" className="dial-bezel" />
-        <circle cx="50" cy="50" r="42" className="dial-face" />
+    <Tile
+      label="Barometer"
+      value={
+        <>
+          {fmt(inHg, 2, " inHg")}
+          {trend && <TrendArrow trend={trend} />}
+        </>
+      }
+      sub={trend ? trend.label : inHg === null ? undefined : pressureWord(inHg)}
+    >
+      <svg viewBox="0 0 100 100" role="img" aria-label={`Barometer ${fmt(inHg, 2, " inHg")}${trend ? `, ${trend.label.toLowerCase()}` : ""}`}>
+        <defs>
+          <radialGradient id={`${id}-brass`} cx="35%" cy="28%" r="85%">
+            <stop offset="0" stopColor="#f3d98a" />
+            <stop offset="0.45" stopColor="#c99a3d" />
+            <stop offset="1" stopColor="#7a5418" />
+          </radialGradient>
+          <radialGradient id={`${id}-face`} cx="50%" cy="45%" r="62%">
+            <stop offset="0.55" stopColor="#fbf5e3" />
+            <stop offset="1" stopColor="#e6dabb" />
+          </radialGradient>
+        </defs>
+        {/* Case: brass bezel with a beaded edge and a turned inner rim */}
+        <circle cx="50" cy="50" r="48" fill={`url(#${id}-brass)`} stroke="#5e4012" strokeWidth="0.8" />
+        <circle cx="50" cy="50" r="45.6" fill="none" stroke="#f6e3a4" strokeWidth="0.9" strokeDasharray="0.1 2.2" strokeLinecap="round" />
+        <circle cx="50" cy="50" r="43.4" fill="none" stroke="#6b4a14" strokeWidth="0.7" />
+        <circle cx="50" cy="50" r="42.2" fill="none" stroke="#f2d889" strokeWidth="0.6" />
+        {/* Porcelain dial */}
+        <circle cx="50" cy="50" r="41.5" fill={`url(#${id}-face)`} stroke="#3b2b0e" strokeWidth="0.8" />
         {ticks}
-        {labels}
-        <text x="29" y="79" className="dial-word" textAnchor="middle">RAIN</text>
-        <text x="71" y="79" className="dial-word" textAnchor="middle">FAIR</text>
+        {numerals}
+        {words}
+        <text x="50" y="68" className="antique-name" textAnchor="middle">ANEROID</text>
+        <text x="50" y="74" className="antique-name-small" textAnchor="middle">IRONWOOD</text>
+        {/* Brass set-hand showing the pressure three hours ago */}
+        {pastAngle !== null && (
+          <g className="needle" style={{ transform: `rotate(${pastAngle}deg)`, transformOrigin: "50px 50px" }}>
+            <line x1="50" y1="50" x2="50" y2="14.5" stroke="#b8862b" strokeWidth="1.1" strokeLinecap="round" />
+            <circle cx="50" cy="14.5" r="1.6" fill="#d9a840" stroke="#7a5418" strokeWidth="0.5" />
+          </g>
+        )}
+        {/* Blued-steel spade hand */}
         <g className="needle" style={{ transform: `rotate(${needleAngle}deg)`, transformOrigin: "50px 50px" }}>
-          <line x1="50" y1="58" x2="50" y2="14" className="needle-line" />
+          <line x1="50" y1="58" x2="50" y2="26" stroke="#1d2f52" strokeWidth="1.3" strokeLinecap="round" />
+          <path d="M50 12.5 L53.4 20.2 L50 27.5 L46.6 20.2 Z" fill="#26407a" stroke="#101c36" strokeWidth="0.5" />
+          <circle cx="50" cy="20.2" r="1.3" fill="#fbf5e3" stroke="#101c36" strokeWidth="0.4" />
         </g>
-        <circle cx="50" cy="50" r="3.2" className="needle-hub" />
+        <circle cx="50" cy="50" r="3.3" fill={`url(#${id}-brass)`} stroke="#5e4012" strokeWidth="0.6" />
+        <circle cx="50" cy="50" r="1" fill="#2a1d08" />
+        {/* Glass glint */}
+        <path d={arcPath(50, 50, 38, -62, -18)} fill="none" stroke="#fff" strokeOpacity="0.55" strokeWidth="2.2" strokeLinecap="round" />
       </svg>
     </Tile>
   );
