@@ -4,7 +4,7 @@ import { RefreshControls } from "./RefreshControls";
 import siteConfig from "../../config/site.config.json";
 import { iconTone, isSunUp, sunTimes } from "../lib/sky";
 import { moonPass, moonPhase } from "../lib/moon";
-import { Barometer, Hygrometer, RainGauge, Thermometer } from "./Instruments";
+import { Barometer, Hygrometer, RainGauge, Thermometer, WindCompass } from "./Instruments";
 import { MoonArc, SunArc } from "./SkyArcs";
 import { WindMastIcon, getConditionIcon, windSpinSeconds } from "../lib/weatherIcons";
 import { hasGust, isGusty, windCategory, windMeterFraction } from "../lib/wind";
@@ -110,6 +110,14 @@ export function StationCard({ live, fallback, nwsLive, nwsFallback }: Props) {
             <Barometer inHg={station.barometricPressureInHg} trendInHg={station.pressureTrendInHg} />
             <RainGauge todayIn={station.rainDayIn} rateInPerHr={station.rainRateInPerHr} />
             <Hygrometer pct={station.humidityPct} />
+            <WindCompass
+              speedMph={windSpeed}
+              gustMph={windGust}
+              directionDeg={station.windDirectionDeg}
+              category={category.label}
+              compass={windDir}
+              showGust={gustShown}
+            />
           </div>
           <div className="sky-row">
             <SunArc times={times} now={now} />

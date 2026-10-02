@@ -571,17 +571,20 @@
   margin: 0.5rem 0 0.5rem;
 }
 
-/* On phones the barometer gets a full row; rain and humidity share the next. */
-.instrument-row .instrument:first-child {
+/* On phones the barometer and wind compass get full rows; rain and
+   humidity share the one between them. */
+.instrument-row .instrument:first-child,
+.instrument-row .instrument:last-child {
   grid-column: 1 / -1;
 }
 
 @media (min-width: 640px) {
   .instrument-row {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
 
-  .instrument-row .instrument:first-child {
+  .instrument-row .instrument:first-child,
+  .instrument-row .instrument:last-child {
     grid-column: auto;
   }
 }
@@ -760,6 +763,35 @@
   display: block;
 }
 
+.curve-night {
+  fill: #2b3a73;
+  fill-opacity: 0.1;
+}
+
+:root[data-theme="night"] .curve-night {
+  fill: #000;
+  fill-opacity: 0.22;
+}
+
+.curve-sun-line {
+  stroke: #f59e0b;
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+  stroke-opacity: 0.8;
+}
+
+.curve-sun-dot {
+  fill: #f5a014;
+  stroke: #fff3c4;
+  stroke-width: 1.5;
+}
+
+.curve-sun-label {
+  fill: var(--muted);
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
 .curve-axis {
   stroke: var(--border);
   stroke-width: 1;
@@ -858,26 +890,55 @@
 }
 
 .forecast-item {
-  flex: 0 0 104px;
+  flex: 1 0 108px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   background: var(--surface);
-  border-radius: 10px;
-  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.55rem 0.5rem 0.6rem;
   text-align: center;
 }
 
+/* A soft wash of the condition's color, so a week of cards reads at a glance. */
+.forecast-item[data-tone="sun"] { background: linear-gradient(180deg, rgba(245, 158, 11, 0.20), var(--surface) 70%); }
+.forecast-item[data-tone="moon"] { background: linear-gradient(180deg, rgba(120, 130, 220, 0.20), var(--surface) 70%); }
+.forecast-item[data-tone="cloud"] { background: linear-gradient(180deg, rgba(125, 147, 178, 0.24), var(--surface) 70%); }
+.forecast-item[data-tone="rain"] { background: linear-gradient(180deg, rgba(47, 143, 224, 0.24), var(--surface) 70%); }
+.forecast-item[data-tone="snow"] { background: linear-gradient(180deg, rgba(95, 184, 230, 0.26), var(--surface) 70%); }
+.forecast-item[data-tone="storm"] { background: linear-gradient(180deg, rgba(138, 95, 214, 0.26), var(--surface) 70%); }
+
 .forecast-icon {
-  margin: 0.1rem 0;
+  margin: 0.15rem 0;
 }
 
 .forecast-name {
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.78rem;
+  font-weight: 700;
   margin-bottom: 0.15rem;
 }
 
-.forecast-temp {
-  font-size: 1.1rem;
+.forecast-temps {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
   font-weight: 700;
+}
+
+.forecast-high {
+  font-size: 1.2rem;
+  color: var(--text);
+}
+
+.forecast-low {
+  font-size: 0.95rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.forecast-item .forecast-desc {
+  min-height: 2.1em;
 }
 
 .forecast-desc {

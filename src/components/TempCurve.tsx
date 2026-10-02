@@ -1,4 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
+import siteConfig from "../../config/site.config.json";
+import { isSunUp, sunTimes } from "../lib/sky";
 import type { NwsHourlyPeriod } from "../types/weather";
 
 interface Props {
@@ -6,7 +8,7 @@ interface Props {
 }
 
 const HEIGHT = 190;
-const PAD = { left: 16, right: 16, top: 40, bottom: 28 };
+const PAD = { left: 16, right: 16, top: 58, bottom: 28 };
 
 const hourFmt = new Intl.DateTimeFormat("en-US", { hour: "numeric" });
 
@@ -89,7 +91,10 @@ export function TempCurve({ hourly: allHourly }: Props) {
   const spread = Math.max(6, hi - lo);
   const yMin = lo - spread * 0.12;
   const yMax = hi + spread * 0.12;
-  const xAt = (i: number) => PAD.left + (innerW * i) / (hourly.length - 1);
+  const t0 = new Date(hourly[0].startTime).getTime();
+  const tEnd = new Date(hourly[hourly.length - 1].startTime).getTime();
+  const xAtTime = (t: number) => PAD.left + (innerW * (t - t0)) / (tEnd - t0);
+  const xAt = (i: number) => xAtTime(new Date(hourly[i].startTime).getTime());
   const yAt = (t: number) => PAD.top + innerH * (1 - (t - yMin) / (yMax - yMin));
   const pts = hourly.map((p, i) => ({ x: xAt(i), y: yAt(p.temperature) }));
 
@@ -98,6 +103,31 @@ export function TempCurve({ hourly: allHourly }: Props) {
   const baseline = HEIGHT - PAD.bottom;
   const line = width > 0 ? smoothPath(pts) : "";
   const area = line ? `${line} L${pts[pts.length - 1].x.toFixed(1)} ${baseline} L${pts[0].x.toFixed(1)} ${baseline} Z` : "";
+
+  // Sunrise and sunset inside the window, plus the dark stretches between
+  // a sunset and the next sunrise (shaded behind the curve).
+  const { latitude, longitude } = siteConfig.location;
+  const events: { time: number; kind: "sunrise" | "sunset" }[] = [];
+  for (const offsetDays of [-1, 0, 1]) {
+    const day = sunTimes(new Date(t0 + offsetDays * 86400000), latitude, longitude);
+    if (!day) continue;
+    events.push({ time: day.sunrise.getTime(), kind: "sunrise" }, { time: day.sunset.getTime(), kind: "sunset" });
+  }
+  const inWindow = events
+    .filter((e) => e.time > t0 && e.time < tEnd)
+    .sort((a, b) => a.time - b.time)
+    .filter((e, i, all) => i === 0 || e.time - all[i - 1].time > 60000);
+  const nightSpans: { from: number; to: number }[] = [];
+  let darkSince: number | null = isSunUp(new Date(t0), latitude, longitude) ? null : t0;
+  for (const e of inWindow) {
+    if (e.kind === "sunset") darkSince = e.time;
+    else if (darkSince !== null) {
+      nightSpans.push({ from: darkSince, to: e.time });
+      darkSince = null;
+    }
+  }
+  if (darkSince !== null) nightSpans.push({ from: darkSince, to: tEnd });
+  const eventClock = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" });
 
   const hourOf = (i: number) => hourFmt.format(new Date(hourly[i].startTime));
 
@@ -125,9 +155,26 @@ export function TempCurve({ hourly: allHourly }: Props) {
               </linearGradient>
             </defs>
 
+            {nightSpans.map((s) => (
+              <rect key={s.from} x={xAtTime(s.from)} y={PAD.top - 12} width={xAtTime(s.to) - xAtTime(s.from)}
+                height={baseline - PAD.top + 12} className="curve-night" />
+            ))}
             <line x1={PAD.left} y1={baseline} x2={width - PAD.right} y2={baseline} className="curve-axis" />
             <path d={area} fill={`url(#${id}-fill)`} />
             <path d={line} className="curve-line" stroke={`url(#${id}-stroke)`} />
+
+            {inWindow.map((e) => {
+              const x = xAtTime(e.time);
+              const label = `${e.kind === "sunrise" ? "Sunrise" : "Sunset"} ${eventClock.format(new Date(e.time))}`;
+              const anchor = x < 70 ? "start" : x > width - 70 ? "end" : "middle";
+              return (
+                <g key={e.time}>
+                  <line x1={x} y1={PAD.top - 12} x2={x} y2={baseline} className="curve-sun-line" />
+                  <circle cx={x} cy={PAD.top - 20} r="4" className="curve-sun-dot" />
+                  <text x={x} y={PAD.top - 29} className="curve-sun-label" textAnchor={anchor}>{label}</text>
+                </g>
+              );
+            })}
 
             {/* Current hour */}
             <line x1={pts[0].x} y1={PAD.top - 6} x2={pts[0].x} y2={baseline} className="curve-now" />
@@ -153,7 +200,7 @@ export function TempCurve({ hourly: allHourly }: Props) {
             <text x={clampX(pts[hiIdx].x, width)} y={pts[hiIdx].y - 11} className="curve-extreme curve-extreme-hi" textAnchor="middle">
               H {hi}°
             </text>
-            <text x={clampX(pts[loIdx].x, width)} y={pts[loIdx].y + 20} className="curve-extreme curve-extreme-lo" textAnchor="middle">
+            <text x={clampX(pts[loIdx].x, width)} y={pts[loIdx].y - 11} className="curve-extreme curve-extreme-lo" textAnchor="middle">
               L {lo}°
             </text>
           </svg>

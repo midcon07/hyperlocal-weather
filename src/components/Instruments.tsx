@@ -1,6 +1,7 @@
 import { useId } from "react";
 import type { ReactNode } from "react";
 import { fmt } from "../lib/format";
+import { WIND_METER_MAX_MPH } from "../lib/wind";
 
 // Drawn instruments in the style of 1880s brass-and-porcelain hardware
 // (barometer, hygrometer, UV dial, copper rain gauge, glass thermometer).
@@ -375,6 +376,104 @@ export function RainGauge({ todayIn, rateInPerHr }: { todayIn: number | null; ra
             <circle cx="39" cy="4" r="1.2" className="rain-drop rain-drop-3" />
           </>
         )}
+      </svg>
+    </Tile>
+  );
+}
+
+// ---- Wind compass: speed ring filled to the current speed, needle at the
+// bearing the wind is coming from, and a tick for the recent gust.
+
+const WIND_MAX = WIND_METER_MAX_MPH;
+
+const WIND_BANDS = [
+  { from: 0, to: 8, color: "#4caf50" },
+  { from: 8, to: 15, color: "#9ccc3a" },
+  { from: 15, to: 25, color: "#f2c230" },
+  { from: 25, to: 32, color: "#f28c28" },
+  { from: 32, to: 40, color: "#e0463c" },
+];
+
+const COMPASS_POINTS = [
+  { text: "N", deg: 0 },
+  { text: "E", deg: 90 },
+  { text: "S", deg: 180 },
+  { text: "W", deg: 270 },
+];
+
+interface WindCompassProps {
+  speedMph: number | null;
+  gustMph: number | null | undefined;
+  directionDeg: number | null;
+  /** e.g. "Breezy" */
+  category: string;
+  /** e.g. "NNW" */
+  compass: string | null;
+  showGust: boolean;
+}
+
+export function WindCompass({ speedMph, gustMph, directionDeg, category, compass, showGust }: WindCompassProps) {
+  const id = useId();
+  const speed = speedMph ?? 0;
+  const ringAngle = (mph: number) => dialAngle(mph, 0, WIND_MAX);
+  const speedAngle = ringAngle(speed);
+
+  const minorTicks = [];
+  for (let deg = 0; deg < 360; deg += 10) {
+    const major = deg % 90 === 0;
+    const outer = polar(50, 50, 31, deg);
+    const inner = polar(50, 50, major ? 27 : 28.8, deg);
+    minorTicks.push(
+      <line key={deg} x1={outer.x} y1={outer.y} x2={inner.x} y2={inner.y}
+        className={deg % 30 === 0 ? "antique-tick-major" : "antique-tick"} />
+    );
+  }
+
+  const gustAngle = showGust && gustMph != null ? ringAngle(gustMph) : null;
+  const gustOuter = gustAngle === null ? null : polar(50, 50, 40, gustAngle);
+  const gustInner = gustAngle === null ? null : polar(50, 50, 33, gustAngle);
+
+  return (
+    <Tile
+      label="Wind"
+      value={fmt(speedMph, 0, " mph")}
+      sub={`${category}${compass ? ` from ${compass}` : ""}${showGust ? ` - gusts ${fmt(gustMph, 0, " mph")}` : ""}`}
+    >
+      <svg viewBox="0 0 100 100" role="img" aria-label={`Wind ${fmt(speedMph, 0, " mph")}${compass ? ` from the ${compass}` : ""}`}>
+        <BrassCase id={id} />
+        {/* Speed ring: dim track in the band colors, bright up to the current speed */}
+        {WIND_BANDS.map((b) => {
+          const from = ringAngle(b.from) + (b.from === 0 ? 0 : 0.6);
+          const to = ringAngle(b.to) - 0.6;
+          const reach = Math.min(to, speedAngle);
+          return (
+            <g key={b.from}>
+              <path d={arcPath(50, 50, 36.5, from, to)} fill="none" stroke={b.color} strokeWidth="4.2" strokeOpacity="0.28" />
+              {reach > from && <path d={arcPath(50, 50, 36.5, from, reach)} fill="none" stroke={b.color} strokeWidth="4.2" />}
+            </g>
+          );
+        })}
+        {gustOuter && gustInner && (
+          <line x1={gustOuter.x} y1={gustOuter.y} x2={gustInner.x} y2={gustInner.y} stroke="#1f1606" strokeWidth="1.6" strokeLinecap="round" />
+        )}
+        {minorTicks}
+        {COMPASS_POINTS.map((c) => {
+          const p = polar(50, 50, 21.5, c.deg);
+          return (
+            <text key={c.text} x={p.x} y={p.y} className="antique-num" textAnchor="middle" dominantBaseline="central"
+              style={c.text === "N" ? { fill: "#a02f2f" } : undefined}>
+              {c.text}
+            </text>
+          );
+        })}
+        {directionDeg !== null && (
+          <g className="needle" style={{ transform: `rotate(${directionDeg}deg)`, transformOrigin: "50px 50px" }}>
+            <path d="M50 14 L53.2 50 L50 56 L46.8 50 Z" fill="#a02f2f" stroke="#4b1212" strokeWidth="0.5" />
+            <path d="M50 86 L53.2 50 L50 44 L46.8 50 Z" fill="#cfd5e4" stroke="#6b7390" strokeWidth="0.5" />
+          </g>
+        )}
+        <DialHub id={id} />
+        <GlassGlint />
       </svg>
     </Tile>
   );
