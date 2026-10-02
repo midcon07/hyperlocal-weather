@@ -166,11 +166,169 @@
   cursor: pointer;
 }
 
-.radar-modal-frame {
+/* The map area clips the oversized iframe so NWS's banner, menu panel and
+   playback bar sit outside it (same crop as the card, sized in JS). */
+.radar-modal-map {
+  position: relative;
   flex: 1 1 auto;
-  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+  isolation: isolate;
+  contain: paint;
+}
+
+.radar-modal-frame {
+  display: block;
+  position: absolute;
+  left: 0;
   border: 0;
-  /* Square, no clipping parent: same compositing-bug caution as above. */
+  /* Square, no border-radius: same compositing-bug caution as the card. */
+}
+
+.radar-card-alerts {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+}
+
+.radar-modal-alerts {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  max-width: calc(100% - 20px);
+}
+
+/* Alerts button and list for the area the radar covers */
+.map-alerts-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.7rem;
+  border: 0;
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(20, 35, 63, 0.82);
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(3px);
+}
+
+.map-alerts-pill--clear { background: rgba(31, 157, 85, 0.92); }
+.map-alerts-pill--warning { background: rgba(220, 38, 38, 0.95); }
+.map-alerts-pill--watch { background: rgba(217, 119, 6, 0.95); }
+.map-alerts-pill--advisory { background: rgba(161, 120, 10, 0.95); }
+.map-alerts-pill--statement { background: rgba(47, 111, 220, 0.95); }
+
+.map-alerts-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.map-alerts-pill--warning .map-alerts-dot,
+.map-alerts-pill--watch .map-alerts-dot {
+  animation: alert-pulse 1.4s ease-in-out infinite;
+}
+
+.map-alerts-chevron {
+  font-size: 0.6rem;
+  opacity: 0.85;
+}
+
+.map-alerts-panel {
+  margin-top: 6px;
+  width: min(400px, 100%);
+  max-height: min(60vh, 440px);
+  overflow-y: auto;
+  background: var(--card-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+
+.map-alerts-empty {
+  margin: 0;
+  padding: 0.7rem 0.8rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.map-alert-item {
+  border-left: 4px solid var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.map-alert-item:last-child {
+  border-bottom: 0;
+}
+
+.map-alert-item--warning { border-left-color: #dc2626; }
+.map-alert-item--watch { border-left-color: #d97706; }
+.map-alert-item--advisory { border-left-color: #c9a01a; }
+.map-alert-item--statement { border-left-color: #2f6fdc; }
+
+.map-alert-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  width: 100%;
+  padding: 0.55rem 0.8rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.map-alert-event {
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.map-alert-area {
+  font-size: 0.74rem;
+  color: var(--muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.map-alert-count {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.map-alert-row {
+  font-size: 0.74rem;
+}
+
+.map-alert-until {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--link);
+}
+
+.map-alert-body {
+  padding: 0 0.8rem 0.7rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  white-space: pre-line;
+}
+
+.map-alert-body p {
+  margin: 0 0 0.4rem;
+}
+
+.map-alert-headline {
+  font-weight: 700;
 }
 
 /* Radar beside the forecast stack on wide screens; stacked everywhere else. */

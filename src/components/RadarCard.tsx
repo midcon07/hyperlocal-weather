@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { useElementWidth } from "../hooks/useElementWidth";
+import type { MapAlert } from "../api/mapAlerts";
+import { useElementSize, useElementWidth } from "../hooks/useElementWidth";
+import { useMapAlertsLive } from "../hooks/useMapAlertsLive";
+import type { LiveSourceState } from "../hooks/useLiveSource";
+import { MapAlerts } from "./MapAlerts";
 
 // Embeds NWS's own radar viewer, pre-configured to National Composite
 // Reflectivity (mosaicked from all nearby radar sites) centered on
@@ -48,9 +52,62 @@ function layoutFor(containerWidth: number) {
   return { scale, nativeWidth: containerWidth / scale };
 }
 
+// NWS's top banner renders taller at <=600px iframe width (measured).
+const CHROME_TOP_NARROW = 230;
+const CHROME_BOTTOM = 100;
+
+interface ModalProps {
+  alerts: LiveSourceState<MapAlert[]>;
+  alertsOpen: boolean;
+  onToggleAlerts: () => void;
+  onClose: () => void;
+}
+
+// The enlarged radar: the same crop as the card (NWS's banner, menu panel
+// and playback bar are cut off) at the size of the dialog, fully
+// interactive by mouse wheel, drag and pinch. Our own alerts button takes
+// the place of the NWS one that lived in the cropped panel.
+function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose }: ModalProps) {
+  const { ref, width, height } = useElementSize();
+  const chromeTop = width > 600 ? CHROME_TOP : CHROME_TOP_NARROW;
+
+  return (
+    <div className="radar-modal" role="dialog" aria-modal="true" aria-label="Radar, enlarged" onClick={onClose}>
+      <div className="radar-modal-body" onClick={(e) => e.stopPropagation()}>
+        <div className="radar-modal-bar">
+          <strong>Radar — Composite Reflectivity</strong>
+          <span>
+            <a className="radar-link" href={RADAR_URL} target="_blank" rel="noreferrer">
+              Open in new tab ↗
+            </a>
+            <button type="button" className="radar-modal-close" onClick={onClose} autoFocus>
+              Close ✕
+            </button>
+          </span>
+        </div>
+        <div className="radar-modal-map" ref={ref}>
+          {width > 0 && (
+            <iframe
+              className="radar-modal-frame"
+              src={RADAR_URL}
+              title="NWS radar, enlarged"
+              style={{ top: -chromeTop, width, height: height + chromeTop + CHROME_BOTTOM }}
+            />
+          )}
+          <div className="radar-modal-alerts">
+            <MapAlerts live={alerts} open={alertsOpen} onToggle={onToggleAlerts} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function RadarCard() {
   const { ref, width } = useElementWidth();
   const [open, setOpen] = useState(false);
+  const [alertsOpen, setAlertsOpen] = useState(false);
+  const alerts = useMapAlertsLive();
 
   useEffect(() => {
     if (!open) return;
@@ -94,27 +151,27 @@ export function RadarCard() {
             <button type="button" className="radar-expand" onClick={() => setOpen(true)} aria-label="Enlarge radar">
               <span className="radar-expand-pill">Click to enlarge</span>
             </button>
+            <div className="radar-card-alerts">
+              <MapAlerts
+                live={alerts}
+                open={false}
+                onToggle={() => {
+                  setAlertsOpen(true);
+                  setOpen(true);
+                }}
+              />
+            </div>
           </div>
         )}
       </div>
 
       {open && (
-        <div className="radar-modal" role="dialog" aria-modal="true" aria-label="Radar, enlarged" onClick={() => setOpen(false)}>
-          <div className="radar-modal-body" onClick={(e) => e.stopPropagation()}>
-            <div className="radar-modal-bar">
-              <strong>Radar — Composite Reflectivity</strong>
-              <span>
-                <a className="radar-link" href={RADAR_URL} target="_blank" rel="noreferrer">
-                  Open in new tab ↗
-                </a>
-                <button type="button" className="radar-modal-close" onClick={() => setOpen(false)} autoFocus>
-                  Close ✕
-                </button>
-              </span>
-            </div>
-            <iframe className="radar-modal-frame" src={RADAR_URL} title="NWS radar, enlarged" />
-          </div>
-        </div>
+        <RadarModal
+          alerts={alerts}
+          alertsOpen={alertsOpen}
+          onToggleAlerts={() => setAlertsOpen((v) => !v)}
+          onClose={() => setOpen(false)}
+        />
       )}
     </section>
   );

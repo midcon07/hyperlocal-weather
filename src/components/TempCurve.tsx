@@ -199,5 +199,5 @@ export function TempCurve({ hourly: allHourly }: Props) {
 
 // Keeps the high/low labels from running off either edge.
 function clampX(x: number, width: number) {
-  return Math.min(width - 24, Math.max(24, x));
+  return Math.min(width - 32, Math.max(32, x));
 }
