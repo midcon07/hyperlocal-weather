@@ -25,7 +25,7 @@ interface Props {
   /** The iframe's size and zoom, in its own CSS pixels. */
   iframe: MapViewSpec;
   /** The part of the iframe that is visible: left/top offset and size. */
-  visible: { top: number; width: number; height: number };
+  visible: { left?: number; top: number; width: number; height: number };
   /** Alerts under the pointer, drawn a little stronger. */
   highlight?: Set<string>;
 }
@@ -124,7 +124,7 @@ export function AlertOutlines({ alerts, iframe, visible, highlight }: Props) {
   return (
     <svg
       className="alert-outlines"
-      viewBox={`0 ${visible.top} ${visible.width} ${visible.height}`}
+      viewBox={`${visible.left ?? 0} ${visible.top} ${visible.width} ${visible.height}`}
       preserveAspectRatio="none"
       aria-hidden="true"
     >

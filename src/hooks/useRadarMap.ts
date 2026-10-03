@@ -20,8 +20,8 @@ export interface Layer {
 
 export const MIN_ZOOM = 4.5;
 export const MAX_ZOOM = 9;
-const IDLE_MS = 600; // how long the target must hold still before reloading
-export const SETTLE_MS = 4500; // after the page loads, time for the map tiles to draw
+const IDLE_MS = 400; // how long the target must hold still before reloading
+export const SETTLE_MS = 4000; // after the page loads, time for the map tiles to draw
 const GIVE_UP_MS = 20000; // swap in a slow layer anyway
 
 export const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));
@@ -40,27 +40,37 @@ interface Options {
   /** NWS chrome cropped above and below the visible window. */
   chromeTop: number;
   chromeBottom: number;
+  /**
+   * Extra map loaded on every side of the visible window, so a short drag
+   * reveals real map instantly instead of a blank edge while the sharp copy
+   * loads. (The top margin sits below NWS's banner, so it is clean map.)
+   */
+  margin: number;
   /** First position; the map starts once this and the size are known. */
   initial: MapPosition | null;
 }
 
-export function useRadarMap({ width, height, chromeTop, chromeBottom, initial }: Options) {
-  const iframeHeight = height + chromeTop + chromeBottom;
+export function useRadarMap({ width, height, chromeTop, chromeBottom, margin, initial }: Options) {
+  const iframeWidth = width + 2 * margin;
+  const iframeHeight = height + 2 * margin + chromeTop + chromeBottom;
   const [target, setTarget] = useState<MapPosition | null>(null);
   const [layers, setLayers] = useState<Layer[]>([]);
   const nextId = useRef(1);
 
+  // Positions below are in pixels of the visible window; the iframe extends
+  // `margin` beyond it on every side and `chromeTop` above its top margin.
   const specFor = (p: MapPosition): MapViewSpec => ({
-    width,
+    width: iframeWidth,
     height: iframeHeight,
     zoom: p.zoom,
     center: { lon: p.lon, lat: p.lat },
   });
   const toScreen = (p: MapPosition, lon: number, lat: number) => {
     const q = makeProjector(specFor(p))(lon, lat);
-    return { x: q.x, y: q.y - chromeTop };
+    return { x: q.x - margin, y: q.y - chromeTop - margin };
   };
-  const fromScreen = (p: MapPosition, x: number, y: number) => makeInverse(specFor(p))(x, y + chromeTop);
+  const fromScreen = (p: MapPosition, x: number, y: number) =>
+    makeInverse(specFor(p))(x + margin, y + chromeTop + margin);
   const centerOf = (p: MapPosition) => toScreen(p, p.lon, p.lat);
 
   const panBy = (p: MapPosition, dx: number, dy: number): MapPosition => {
@@ -126,6 +136,8 @@ export function useRadarMap({ width, height, chromeTop, chromeBottom, initial }:
     layers,
     markReady,
     refreshing,
+    margin,
+    iframeWidth,
     iframeHeight,
     specFor,
     toScreen,

@@ -5,7 +5,7 @@ import { useElementSize } from "../hooks/useElementWidth";
 import type { LiveSourceState } from "../hooks/useLiveSource";
 import { MAX_ZOOM, MIN_ZOOM, clampPosition, samePosition, useRadarMap } from "../hooks/useRadarMap";
 import { MAP_CENTER, MAP_DEFAULT_ZOOM } from "../lib/mapView";
-import { CHROME_BOTTOM, CHROME_TOP, CHROME_TOP_NARROW, VISIBLE_HEIGHT, radarUrl } from "../lib/radarEmbed";
+import { CHROME_BOTTOM, CHROME_TOP, OVERSCAN, VISIBLE_HEIGHT, radarUrl } from "../lib/radarEmbed";
 import type { MapPosition } from "../lib/radarEmbed";
 import { AlertOutlines, AlertTooltip, OutlineLegend, alertsAt } from "./AlertOutlines";
 import type { HoverInfo } from "./AlertOutlines";
@@ -33,7 +33,9 @@ interface Props {
 
 export function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose, coverageWidth, startView }: Props) {
   const { ref, width, height } = useElementSize();
-  const chromeTop = width > 600 ? CHROME_TOP : CHROME_TOP_NARROW;
+  // With the overscan margin the iframe is always wider than 600px, so NWS's
+  // desktop banner height applies even on a phone.
+  const chromeTop = CHROME_TOP;
 
   // Zoom out just enough that this dialog shows at least what the small map
   // shows (so no alert disappears when it opens).
@@ -43,7 +45,7 @@ export function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose, covera
   const initial = width > 0 && height > 0 ? clampPosition({ ...start, zoom: start.zoom + zoomAdjust }) : null;
   const homeView = clampPosition({ ...MAP_CENTER, zoom: MAP_DEFAULT_ZOOM + zoomAdjust });
 
-  const map = useRadarMap({ width, height, chromeTop, chromeBottom: CHROME_BOTTOM, initial });
+  const map = useRadarMap({ width, height, chromeTop, chromeBottom: CHROME_BOTTOM, margin: OVERSCAN, initial });
   const { target, setTarget, panBy, zoomAbout, centerOf } = map;
 
   // ---- Pointer gestures: drag to pan, wheel/pinch/double-click to zoom.
@@ -145,6 +147,7 @@ export function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose, covera
           <RadarLayers
             map={map}
             width={width}
+            height={height}
             chromeTop={chromeTop}
             frameClass="radar-modal-frame radar-modal-frame--locked"
           />
@@ -153,7 +156,7 @@ export function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose, covera
               <AlertOutlines
                 alerts={alerts.data}
                 iframe={map.specFor(target)}
-                visible={{ top: chromeTop, width, height }}
+                visible={{ left: OVERSCAN, top: chromeTop + OVERSCAN, width, height }}
                 highlight={highlight}
               />
             </div>

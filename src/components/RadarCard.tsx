@@ -4,7 +4,7 @@ import { useElementWidth } from "../hooks/useElementWidth";
 import { useMapAlertsLive } from "../hooks/useMapAlertsLive";
 import { samePosition, useRadarMap } from "../hooks/useRadarMap";
 import { MAP_CENTER, MAP_DEFAULT_ZOOM } from "../lib/mapView";
-import { CHROME_TOP, NATIVE_HEIGHT, VISIBLE_HEIGHT, layoutFor, radarUrl } from "../lib/radarEmbed";
+import { CHROME_TOP, NATIVE_HEIGHT, OVERSCAN, VISIBLE_HEIGHT, layoutFor, radarUrl } from "../lib/radarEmbed";
 import { AlertOutlines, AlertTooltip, alertsAt } from "./AlertOutlines";
 import type { HoverInfo } from "./AlertOutlines";
 import { MapAlerts } from "./MapAlerts";
@@ -50,6 +50,7 @@ export function RadarCard() {
     height: VISIBLE_HEIGHT,
     chromeTop: CHROME_TOP,
     chromeBottom: NATIVE_HEIGHT - VISIBLE_HEIGHT - CHROME_TOP,
+    margin: OVERSCAN,
     initial: width > 0 ? HOME_VIEW : null,
   });
   const { target, setTarget, panBy } = map;
@@ -111,13 +112,19 @@ export function RadarCard() {
               className="radar-scale"
               style={{ width: nativeWidth, height: VISIBLE_HEIGHT, transform: `scale(${scale})` }}
             >
-              <RadarLayers map={map} width={nativeWidth} chromeTop={CHROME_TOP} frameClass="radar-frame" />
+              <RadarLayers
+                map={map}
+                width={nativeWidth}
+                height={VISIBLE_HEIGHT}
+                chromeTop={CHROME_TOP}
+                frameClass="radar-frame"
+              />
               {target && alerts.data && (
                 <div className="alert-outlines-wrap">
                   <AlertOutlines
                     alerts={alerts.data}
                     iframe={map.specFor(target)}
-                    visible={{ top: CHROME_TOP, width: nativeWidth, height: VISIBLE_HEIGHT }}
+                    visible={{ left: OVERSCAN, top: CHROME_TOP + OVERSCAN, width: nativeWidth, height: VISIBLE_HEIGHT }}
                     highlight={new Set(cardHover?.alerts.map((a) => a.id))}
                   />
                 </div>

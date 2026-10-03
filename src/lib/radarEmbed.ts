@@ -40,6 +40,10 @@ export const VISIBLE_HEIGHT = 850;
 // NWS's top banner renders taller at <=600px iframe width (measured).
 export const CHROME_TOP_NARROW = 230;
 export const CHROME_BOTTOM = 100;
+// Extra map loaded on every side of what is visible (native pixels), so short
+// drags show real map right away. It also keeps every iframe wider than the
+// 600px at which NWS switches to its taller mobile banner.
+export const OVERSCAN = 240;
 // Never shrink below this on phones; below ~half size NWS's city labels stop
 // being legible, so phones show a bit less width instead.
 export const MIN_SCALE = 0.5;

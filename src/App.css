@@ -232,7 +232,6 @@
    shifted/scaled by inline transform to match where the user has dragged. */
 .radar-layer {
   position: absolute;
-  inset: 0;
   /* Clip to this layer's own window so dragging the stand-in picture never
      reveals NWS's cropped banner, menu panel or playback bar. */
   overflow: hidden;
