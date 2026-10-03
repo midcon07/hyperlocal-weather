@@ -13,12 +13,22 @@ import type { MapViewSpec } from "../lib/mapView";
 export const ADVISORY_COLOR = "#2b7de9";
 export const WATCH_COLOR = "#f59e0b";
 export const WARNING_COLOR = "#e11d2e";
+// Flood watches/warnings: the affected area itself is filled in this blue.
+export const FLOOD_COLOR = "#1d4ed8";
 
 const COLORS: Record<string, string> = {
   advisory: ADVISORY_COLOR,
   watch: WATCH_COLOR,
   warning: WARNING_COLOR,
 };
+
+const isFlood = (a: MapAlert) => a.event.toLowerCase().includes("flood");
+
+// Painting order, bottom to top: flood fills, then advisory, watch, warning.
+function drawRank(level: string, flood: boolean) {
+  if (flood) return level === "warning" ? 1 : 0;
+  return 2 + (LEVEL_RANK[level as keyof typeof LEVEL_RANK] ?? 0);
+}
 
 interface Props {
   alerts: MapAlert[];
@@ -78,7 +88,7 @@ export function AlertTooltip({ info, width, height }: { info: HoverInfo; width: 
         return (
           <div className="alert-tip-item" key={a.id}>
             <div className="alert-tip-event">
-              <i style={{ background: COLORS[level] ?? "#888" }} />
+              <i style={{ background: level !== "advisory" && isFlood(a) ? FLOOD_COLOR : (COLORS[level] ?? "#888") }} />
               {a.event}
             </div>
             <div className="alert-tip-area">{a.areaDesc}</div>
@@ -94,17 +104,18 @@ export function AlertTooltip({ info, width, height }: { info: HoverInfo; width: 
 export function AlertOutlines({ alerts, iframe, visible, highlight }: Props) {
   const project = makeProjector(iframe);
 
-  // Least severe first, so warnings land on top where outlines overlap.
+  // Flood watches and warnings are not outlined like the rest: the affected
+  // area is filled solid blue (a river warning's polygon is the stretch of
+  // river and floodplain, so just that stretch turns blue). Flood advisories
+  // keep the dashed blue outline. Drawn least severe first, with floods at
+  // the bottom, so warnings land on top where areas overlap.
   const drawn = alerts
     .map((a) => ({ alert: a, level: levelFor(a.event) }))
     .filter((d) => d.level === "advisory" || d.level === "watch" || d.level === "warning")
-    // Flood watches and warnings are handled separately (river-point
-    // warnings alone can number in the dozens), so they stay in the alerts
-    // list but get no outline. Flood advisories are few and are drawn.
-    .filter((d) => d.level === "advisory" || !d.alert.event.toLowerCase().includes("flood"))
-    .sort((a, b) => LEVEL_RANK[a.level] - LEVEL_RANK[b.level]);
+    .map((d) => ({ ...d, flood: d.level !== "advisory" && isFlood(d.alert) }))
+    .sort((a, b) => drawRank(a.level, a.flood) - drawRank(b.level, b.flood));
 
-  const paths = drawn.flatMap(({ alert, level }) =>
+  const paths = drawn.flatMap(({ alert, level, flood }) =>
     alert.shapes.map((shape, i) => {
       const d = shape.rings
         .map(
@@ -117,7 +128,7 @@ export function AlertOutlines({ alerts, iframe, visible, highlight }: Props) {
               .join(" ") + " Z"
         )
         .join(" ");
-      return { key: `${alert.id}-${i}`, id: alert.id, d, level };
+      return { key: `${alert.id}-${i}`, id: alert.id, d, level, flood };
     })
   );
 
@@ -128,18 +139,33 @@ export function AlertOutlines({ alerts, iframe, visible, highlight }: Props) {
       preserveAspectRatio="none"
       aria-hidden="true"
     >
-      {paths.map((p) => (
-        <g key={p.key}>
-          <path
-            d={p.d}
-            className={`alert-outline-fill${highlight?.has(p.id) ? " alert-outline-fill--hot" : ""}`}
-            fill={COLORS[p.level]}
-            data-alert-id={p.id}
-          />
-          <path d={p.d} className="alert-outline-halo" />
-          <path d={p.d} className="alert-outline" stroke={COLORS[p.level]} />
-        </g>
-      ))}
+      {paths.map((p) =>
+        p.flood ? (
+          <g key={p.key}>
+            <path
+              d={p.d}
+              className="alert-outline-fill"
+              fill={FLOOD_COLOR}
+              style={{ fillOpacity: (p.level === "warning" ? 0.55 : 0.2) + (highlight?.has(p.id) ? 0.2 : 0) }}
+              data-alert-id={p.id}
+            />
+            {p.level === "warning" && <path d={p.d} className="flood-edge" />}
+            {/* Thin river stretches are hard to hover, so give them a wider invisible target. */}
+            <path d={p.d} className="alert-hit" data-alert-id={p.id} />
+          </g>
+        ) : (
+          <g key={p.key}>
+            <path
+              d={p.d}
+              className={`alert-outline-fill${highlight?.has(p.id) ? " alert-outline-fill--hot" : ""}`}
+              fill={COLORS[p.level]}
+              data-alert-id={p.id}
+            />
+            <path d={p.d} className="alert-outline-halo" />
+            <path d={p.d} className="alert-outline" stroke={COLORS[p.level]} />
+          </g>
+        )
+      )}
     </svg>
   );
 }
@@ -155,6 +181,9 @@ export function OutlineLegend() {
       </span>
       <span>
         <i style={{ borderColor: WARNING_COLOR }} /> Warning
+      </span>
+      <span>
+        <i className="legend-solid" style={{ background: FLOOD_COLOR }} /> Flood
       </span>
     </div>
   );

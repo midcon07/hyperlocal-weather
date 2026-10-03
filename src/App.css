@@ -357,6 +357,29 @@
   pointer-events: all;
 }
 
+/* Flood warnings: a thin solid edge so a narrow river stretch stays visible. */
+.flood-edge {
+  fill: none;
+  stroke: #0b2f9e;
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.alert-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 12;
+  vector-effect: non-scaling-stroke;
+  pointer-events: stroke;
+}
+
+.outline-legend i.legend-solid {
+  height: 8px;
+  border-top: 0;
+  border-radius: 2px;
+}
+
 .alert-outline-fill--hot {
   fill-opacity: 0.32;
 }
