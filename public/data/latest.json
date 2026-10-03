@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-10-03T12:45:00.376Z",
+  "generatedAt": "2026-10-03T16:44:28.935Z",
   "location": {
     "name": "Altoona, IA",
     "latitude": 41.6312472,
     "longitude": -93.4658583
   },
   "station": {
-    "timestamp": "2026-10-03T12:44:00.000Z",
-    "temperatureF": 47.7,
-    "humidityPct": 86.3,
-    "windSpeedMph": 2.06,
-    "windGustMph": 4.56,
-    "windDirectionDeg": 53,
+    "timestamp": "2026-10-03T16:44:00.000Z",
+    "temperatureF": 66,
+    "humidityPct": 57.5,
+    "windSpeedMph": 8,
+    "windGustMph": 10,
+    "windDirectionDeg": 141,
     "rainRateInPerHr": 0,
     "rainDayIn": 0,
-    "barometricPressureInHg": 30.262,
-    "pressureTrendInHg": -0.012,
+    "barometricPressureInHg": 30.232,
+    "pressureTrendInHg": -0.033,
     "uvIndex": null,
     "solarRadiationWm2": null
   },
@@ -25,24 +25,24 @@
     "gridY": 51,
     "observation": {
       "stationId": "KIKV",
-      "timestamp": "2026-10-03T12:15:00+00:00",
-      "temperatureC": 7,
-      "relativeHumidity": 100,
+      "timestamp": "2026-10-03T16:15:00+00:00",
+      "temperatureC": null,
+      "relativeHumidity": null,
       "windSpeedKmh": null,
       "windDirectionDeg": null,
-      "barometricPressurePa": 102470,
+      "barometricPressurePa": null,
       "textDescription": "Clear"
     },
     "forecast": [
       {
         "name": "Today",
-        "startTime": "2026-10-03T07:00:00-05:00",
+        "startTime": "2026-10-03T11:00:00-05:00",
         "endTime": "2026-10-03T18:00:00-05:00",
         "isDaytime": true,
         "temperature": 68,
         "temperatureUnit": "F",
-        "windSpeed": "5 to 13 mph",
-        "windDirection": "SSE",
+        "windSpeed": "13 mph",
+        "windDirection": "S",
         "shortForecast": "Sunny",
         "probabilityOfPrecipitation": 2
       },
@@ -205,34 +205,6 @@
     ],
     "hourly": [
       {
-        "startTime": "2026-10-03T07:00:00-05:00",
-        "temperature": 46,
-        "temperatureUnit": "F",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 2
-      },
-      {
-        "startTime": "2026-10-03T08:00:00-05:00",
-        "temperature": 47,
-        "temperatureUnit": "F",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 2
-      },
-      {
-        "startTime": "2026-10-03T09:00:00-05:00",
-        "temperature": 51,
-        "temperatureUnit": "F",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 2
-      },
-      {
-        "startTime": "2026-10-03T10:00:00-05:00",
-        "temperature": 54,
-        "temperatureUnit": "F",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 2
-      },
-      {
         "startTime": "2026-10-03T11:00:00-05:00",
         "temperature": 58,
         "temperatureUnit": "F",
@@ -368,6 +340,34 @@
       {
         "startTime": "2026-10-04T06:00:00-05:00",
         "temperature": 54,
+        "temperatureUnit": "F",
+        "shortForecast": "Sunny",
+        "probabilityOfPrecipitation": 0
+      },
+      {
+        "startTime": "2026-10-04T07:00:00-05:00",
+        "temperature": 52,
+        "temperatureUnit": "F",
+        "shortForecast": "Sunny",
+        "probabilityOfPrecipitation": 0
+      },
+      {
+        "startTime": "2026-10-04T08:00:00-05:00",
+        "temperature": 54,
+        "temperatureUnit": "F",
+        "shortForecast": "Sunny",
+        "probabilityOfPrecipitation": 0
+      },
+      {
+        "startTime": "2026-10-04T09:00:00-05:00",
+        "temperature": 56,
+        "temperatureUnit": "F",
+        "shortForecast": "Sunny",
+        "probabilityOfPrecipitation": 0
+      },
+      {
+        "startTime": "2026-10-04T10:00:00-05:00",
+        "temperature": 60,
         "temperatureUnit": "F",
         "shortForecast": "Sunny",
         "probabilityOfPrecipitation": 0
