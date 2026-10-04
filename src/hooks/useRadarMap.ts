@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import type { Bounds } from "../api/mapAlerts";
 import { makeInverse, makeProjector } from "../lib/mapView";
 import type { MapViewSpec } from "../lib/mapView";
 import type { MapPosition } from "../lib/radarEmbed";
@@ -73,6 +74,14 @@ export function useRadarMap({ width, height, chromeTop, chromeBottom, margin, in
     makeInverse(specFor(p))(x + margin, y + chromeTop + margin);
   const centerOf = (p: MapPosition) => toScreen(p, p.lon, p.lat);
 
+  // The longitude/latitude rectangle the visible window covers at a position
+  // (plus `extra` pixels all round), for "which alerts are on screen".
+  const boundsFor = (p: MapPosition, extra = 0): Bounds => {
+    const topLeft = fromScreen(p, -extra, -extra);
+    const bottomRight = fromScreen(p, width + extra, height + extra);
+    return { west: topLeft.lon, east: bottomRight.lon, north: topLeft.lat, south: bottomRight.lat };
+  };
+
   const panBy = (p: MapPosition, dx: number, dy: number): MapPosition => {
     const c = centerOf(p);
     const ll = fromScreen(p, c.x - dx, c.y - dy);
@@ -143,6 +152,7 @@ export function useRadarMap({ width, height, chromeTop, chromeBottom, margin, in
     toScreen,
     fromScreen,
     centerOf,
+    boundsFor,
     panBy,
     zoomAbout,
   };

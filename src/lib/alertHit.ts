@@ -1,4 +1,4 @@
-import type { MapAlert } from "../api/mapAlerts";
+import type { Bounds, MapAlert } from "../api/mapAlerts";
 import { LEVEL_RANK, levelFor } from "./alertLevel";
 
 // Which alerts are at a point on the radar, found with plain geometry rather
@@ -43,7 +43,9 @@ export function alertsNearPoint(
   project: (lon: number, lat: number) => Pt,
   x: number,
   y: number,
-  tolerance: number
+  tolerance: number,
+  /** The longitude/latitude rectangle within `tolerance` of the point; alerts that don't reach it are skipped without projecting anything. */
+  near: Bounds
 ): MapAlert[] {
   const tolSq = tolerance * tolerance;
   const hits: MapAlert[] = [];
@@ -51,6 +53,8 @@ export function alertsNearPoint(
   for (const alert of alerts) {
     const level = levelFor(alert.event);
     if (level !== "advisory" && level !== "watch" && level !== "warning") continue;
+    const b = alert.bounds;
+    if (b.west > near.east || b.east < near.west || b.south > near.north || b.north < near.south) continue;
 
     let hit = false;
     for (const shape of alert.shapes) {

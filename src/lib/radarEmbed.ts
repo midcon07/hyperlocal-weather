@@ -23,11 +23,16 @@ export interface MapPosition {
   zoom: number;
 }
 
-// The embed URL for a given map position (defaults to the home view).
-export function radarUrl(view: MapPosition = { ...MAP_CENTER, zoom: MAP_DEFAULT_ZOOM }) {
+// The embed URL for a given map position (defaults to the home view). Our own
+// map draws every alert, so inside the embed NWS's own alert polygons are
+// hidden (they would be drawn twice); `nwsSite` is for the link to NWS's
+// radar site itself, which should list all alert types, not just short-fused.
+export function radarUrl(view: MapPosition = { ...MAP_CENTER, zoom: MAP_DEFAULT_ZOOM }, nwsSite = false) {
   const settings = JSON.parse(atob(RADAR_SETTINGS.slice(3)));
   settings.agenda.center = [Math.round(view.lon * 10000) / 10000, Math.round(view.lat * 10000) / 10000];
   settings.agenda.zoom = Math.round(view.zoom * 1000) / 1000;
+  if (nwsSite) settings.shortFusedOnly = false;
+  else settings.opacity.alerts = 0;
   return `https://radar.weather.gov/?settings=v1_${encodeURIComponent(btoa(JSON.stringify(settings)))}`;
 }
 

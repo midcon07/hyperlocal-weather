@@ -7,6 +7,7 @@ import { MAX_ZOOM, MIN_ZOOM, clampPosition, samePosition, useRadarMap } from "..
 import { MAP_CENTER, MAP_DEFAULT_ZOOM } from "../lib/mapView";
 import { CHROME_BOTTOM, CHROME_TOP, OVERSCAN, VISIBLE_HEIGHT, mapPageUrl, radarUrl } from "../lib/radarEmbed";
 import type { MapPosition } from "../lib/radarEmbed";
+import { alertsInBounds } from "../api/mapAlerts";
 import { alertsNearPoint } from "../lib/alertHit";
 import { AlertOutlines, AlertTooltip, OutlineLegend } from "./AlertOutlines";
 import type { HoverInfo } from "./AlertOutlines";
@@ -69,6 +70,11 @@ export function RadarModal({
   const map = useRadarMap({ width, height, chromeTop, chromeBottom: CHROME_BOTTOM, margin: OVERSCAN, initial });
   const { target, setTarget, panBy, zoomAbout, centerOf } = map;
 
+  // The alert feed is nationwide; the button, the outlines and the hover/tap
+  // all work from the ones that overlap the part of the map on screen.
+  const inView = target && alerts.data ? alertsInBounds(alerts.data, map.boundsFor(target, 20)) : [];
+  const liveInView: LiveSourceState<MapAlert[]> = { ...alerts, data: alerts.data ? inView : null };
+
   // ---- Pointer gestures: drag to pan, wheel/pinch/double-click to zoom.
   const [hover, setHover] = useState<HoverInfo | null>(null);
   // The full text of the alerts the visitor clicked or tapped on.
@@ -91,12 +97,16 @@ export function RadarModal({
   const alertsAtPointer = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (!target) return [];
     const pos = local(e);
+    const tol = e.pointerType === "touch" ? TAP_TOLERANCE_PX : HOVER_TOLERANCE_PX;
+    const a = map.fromScreen(target, pos.x - tol, pos.y - tol);
+    const b = map.fromScreen(target, pos.x + tol, pos.y + tol);
     return alertsNearPoint(
-      alerts.data ?? [],
+      inView,
       (lon, lat) => map.toScreen(target, lon, lat),
       pos.x,
       pos.y,
-      e.pointerType === "touch" ? TAP_TOLERANCE_PX : HOVER_TOLERANCE_PX
+      tol,
+      { west: Math.min(a.lon, b.lon), east: Math.max(a.lon, b.lon), south: Math.min(a.lat, b.lat), north: Math.max(a.lat, b.lat) }
     );
   };
 
@@ -194,7 +204,12 @@ export function RadarModal({
           <span>
             {page ? (
               <>
-                <a className="radar-link" href={radarUrl()} target="_blank" rel="noreferrer">
+                <a
+                  className="radar-link"
+                  href={radarUrl(startView ?? undefined, true)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   NWS radar site ↗
                 </a>
                 <a className="radar-modal-close" href={import.meta.env.BASE_URL}>
@@ -224,7 +239,7 @@ export function RadarModal({
           {target && width > 0 && alerts.data && (
             <div className="alert-outlines-wrap">
               <AlertOutlines
-                alerts={alerts.data}
+                alerts={inView}
                 iframe={map.specFor(target)}
                 visible={{ left: OVERSCAN, top: chromeTop + OVERSCAN, width, height }}
                 highlight={highlight}
@@ -251,7 +266,7 @@ export function RadarModal({
           )}
           {map.refreshing && <div className="radar-updating">Updating map…</div>}
           <div className="radar-modal-alerts">
-            <MapAlerts live={alerts} open={alertsOpen} onToggle={onToggleAlerts} />
+            <MapAlerts live={liveInView} open={alertsOpen} onToggle={onToggleAlerts} />
           </div>
           <div className="radar-modal-controls">
             <button type="button" className="radar-ctl" onClick={() => zoomBy(1)} disabled={!target || target.zoom >= MAX_ZOOM} aria-label="Zoom in">

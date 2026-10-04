@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import { useElementWidth } from "../hooks/useElementWidth";
+import { alertsInBounds } from "../api/mapAlerts";
+import type { MapAlert } from "../api/mapAlerts";
 import { useMapAlertsLive } from "../hooks/useMapAlertsLive";
+import type { LiveSourceState } from "../hooks/useLiveSource";
 import { samePosition, useRadarMap } from "../hooks/useRadarMap";
 import { MAP_CENTER, MAP_DEFAULT_ZOOM } from "../lib/mapView";
 import { CHROME_TOP, NATIVE_HEIGHT, OVERSCAN, VISIBLE_HEIGHT, layoutFor, mapPageUrl } from "../lib/radarEmbed";
@@ -60,6 +63,11 @@ export function RadarCard() {
   const { target, setTarget, panBy } = map;
   const moved = !!target && !samePosition(target, HOME_VIEW);
 
+  // The alert feed is nationwide; the card's button, outlines and hover/tap
+  // work from the ones that overlap the part of the map it shows.
+  const inView = target && alerts.data ? alertsInBounds(alerts.data, map.boundsFor(target, 10)) : [];
+  const liveInView: LiveSourceState<MapAlert[]> = { ...alerts, data: alerts.data ? inView : null };
+
   // Mouse drag to pan. The press only counts as a drag past a few pixels, and
   // a drag must not also fire the click that enlarges the map.
   const press = useRef<{ x: number; y: number; lastX: number; lastY: number; dragged: boolean } | null>(null);
@@ -72,12 +80,16 @@ export function RadarCard() {
     const rect = el.getBoundingClientRect();
     const x = clientX - rect.left;
     const y = clientY - rect.top;
+    const tol = (touch ? TAP_TOLERANCE_PX : HOVER_TOLERANCE_PX) / scale;
+    const a = map.fromScreen(target, x / scale - tol, y / scale - tol);
+    const b = map.fromScreen(target, x / scale + tol, y / scale + tol);
     const hit = alertsNearPoint(
-      alerts.data ?? [],
+      inView,
       (lon, lat) => map.toScreen(target, lon, lat),
       x / scale,
       y / scale,
-      (touch ? TAP_TOLERANCE_PX : HOVER_TOLERANCE_PX) / scale
+      tol,
+      { west: Math.min(a.lon, b.lon), east: Math.max(a.lon, b.lon), south: Math.min(a.lat, b.lat), north: Math.max(a.lat, b.lat) }
     );
     return { hit, x, y };
   };
@@ -146,7 +158,7 @@ export function RadarCard() {
               {target && alerts.data && (
                 <div className="alert-outlines-wrap">
                   <AlertOutlines
-                    alerts={alerts.data}
+                    alerts={inView}
                     iframe={map.specFor(target)}
                     visible={{ left: OVERSCAN, top: CHROME_TOP + OVERSCAN, width: nativeWidth, height: VISIBLE_HEIGHT }}
                     highlight={new Set(cardHover?.alerts.map((a) => a.id))}
@@ -188,7 +200,7 @@ export function RadarCard() {
             )}
             <div className="radar-card-alerts">
               <MapAlerts
-                live={alerts}
+                live={liveInView}
                 compact
                 open={false}
                 onToggle={() => {

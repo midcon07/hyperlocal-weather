@@ -16,12 +16,17 @@ const HEADERS = {
   Accept: "application/geo+json",
 };
 
-// States that overlap the radar's area, and a box a little wider than the
-// area the page watches (zones whose center is outside are dropped).
-const STATES = ["SD", "NE", "KS", "OK", "MN", "IA", "MO", "AR", "WI", "IL", "IN", "KY", "TN", "MI", "CO", "TX", "NM"];
-const KEEP = { south: 34.8, north: 47.2, west: -104.2, east: -83.8 };
-const EPSILON = 0.012; // degrees, Douglas-Peucker tolerance
-const CONCURRENCY = 5;
+// Every state plus DC: the alerts feed is nationwide, so visitors can pan to
+// wherever family lives. Zones whose center falls outside the (very wide)
+// box below, i.e. outside the continental US and Alaska/Hawaii, are dropped.
+const STATES = [
+  "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA",
+  "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR",
+  "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY",
+];
+const KEEP = { south: 15, north: 72, west: -180, east: -60 };
+const EPSILON = 0.02; // degrees (~2 km), Douglas-Peucker tolerance
+const CONCURRENCY = 8;
 
 async function getJson(url, tries = 4) {
   for (let attempt = 1; attempt <= tries; attempt++) {
