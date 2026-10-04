@@ -7,7 +7,8 @@ import { MAX_ZOOM, MIN_ZOOM, clampPosition, samePosition, useRadarMap } from "..
 import { MAP_CENTER, MAP_DEFAULT_ZOOM } from "../lib/mapView";
 import { CHROME_BOTTOM, CHROME_TOP, OVERSCAN, VISIBLE_HEIGHT, radarUrl } from "../lib/radarEmbed";
 import type { MapPosition } from "../lib/radarEmbed";
-import { AlertOutlines, AlertTooltip, OutlineLegend, alertsAt } from "./AlertOutlines";
+import { alertsNearPoint } from "../lib/alertHit";
+import { AlertOutlines, AlertTooltip, OutlineLegend } from "./AlertOutlines";
 import type { HoverInfo } from "./AlertOutlines";
 import { AlertDetails } from "./AlertDetails";
 import { MapAlerts } from "./MapAlerts";
@@ -20,6 +21,11 @@ import { RadarLayers } from "./RadarLayers";
 // useRadarMap for how the NWS map is kept in step with our own position).
 
 const DRAG_PX = 5;
+// A fingertip wobbles more than a mouse, so a touch press counts as a drag
+// only after more movement, and a tap may land farther from a thin shape.
+const TOUCH_DRAG_PX = 10;
+const HOVER_TOLERANCE_PX = 7;
+const TAP_TOLERANCE_PX = 22;
 
 interface Props {
   alerts: LiveSourceState<MapAlert[]>;
@@ -76,14 +82,32 @@ export function RadarModal({
     return { x: e.clientX - rect.left, y: e.clientY - rect.top };
   };
 
+  // Alerts at the pointer, by geometry; a finger gets a much bigger margin
+  // than a mouse so thin river stretches can be tapped.
+  const alertsAtPointer = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (!target) return [];
+    const pos = local(e);
+    return alertsNearPoint(
+      alerts.data ?? [],
+      (lon, lat) => map.toScreen(target, lon, lat),
+      pos.x,
+      pos.y,
+      e.pointerType === "touch" ? TAP_TOLERANCE_PX : HOVER_TOLERANCE_PX
+    );
+  };
+
   const showAlertsAt = (e: ReactPointerEvent<HTMLDivElement>) => {
-    const hit = alertsAt(e.clientX, e.clientY, alerts.data ?? []);
+    const hit = alertsAtPointer(e);
     setHover(hit.length ? { alerts: hit, ...local(e) } : null);
   };
 
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (e.pointerType === "mouse" && e.button !== 0) return;
-    e.currentTarget.setPointerCapture(e.pointerId);
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // Some touch browsers refuse capture; dragging still works without it.
+    }
     pointers.current.set(e.pointerId, local(e));
     setHover(null);
     if (pointers.current.size === 1) {
@@ -104,7 +128,8 @@ export function RadarModal({
     }
     pointers.current.set(e.pointerId, pos);
     if (pointers.current.size === 1) {
-      if (Math.hypot(e.clientX - drag.current.startX, e.clientY - drag.current.startY) > DRAG_PX) drag.current.moved = true;
+      const dragPx = e.pointerType === "touch" ? TOUCH_DRAG_PX : DRAG_PX;
+      if (Math.hypot(e.clientX - drag.current.startX, e.clientY - drag.current.startY) > dragPx) drag.current.moved = true;
       setTarget((t) => (t ? panBy(t, pos.x - prev.x, pos.y - prev.y) : t));
     } else if (pointers.current.size === 2 && pinch.current) {
       const [a, b] = [...pointers.current.values()];
@@ -126,7 +151,7 @@ export function RadarModal({
     // A press that never turned into a drag is a click or tap: open the full
     // text of whatever alert is there (or close the text if it's empty map).
     if (pointers.current.size === 0 && !drag.current.moved && e.type === "pointerup") {
-      const hit = alertsAt(e.clientX, e.clientY, alerts.data ?? []);
+      const hit = alertsAtPointer(e);
       setDetail(hit.length ? hit : null);
       setHover(null);
     }
@@ -189,7 +214,11 @@ export function RadarModal({
             onPointerMove={onPointerMove}
             onPointerUp={endPointer}
             onPointerCancel={endPointer}
-            onPointerLeave={() => setHover(null)}
+            onPointerLeave={(e) => {
+              // Touch pointers "leave" the instant a finger lifts; that must not
+              // dismiss anything.
+              if (e.pointerType === "mouse") setHover(null);
+            }}
             onWheel={onWheel}
             onDoubleClick={onDoubleClick}
           />

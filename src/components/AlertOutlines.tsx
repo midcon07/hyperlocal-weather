@@ -56,20 +56,6 @@ export interface HoverInfo {
   y: number;
 }
 
-// Every drawn alert whose area is under the given screen point, most
-// serious first. Works by asking the browser what's at that point (the
-// tinted areas carry data-alert-id), so overlapping alerts are all found.
-export function alertsAt(clientX: number, clientY: number, all: MapAlert[]): MapAlert[] {
-  const byId = new Map(all.map((a) => [a.id, a]));
-  const found = new Map<string, MapAlert>();
-  for (const el of document.elementsFromPoint(clientX, clientY)) {
-    const id = (el as SVGElement).dataset?.alertId;
-    const alert = id ? byId.get(id) : undefined;
-    if (alert) found.set(alert.id, alert);
-  }
-  return [...found.values()].sort((a, b) => LEVEL_RANK[levelFor(b.event)] - LEVEL_RANK[levelFor(a.event)]);
-}
-
 const untilFmt = new Intl.DateTimeFormat("en-US", { weekday: "short", hour: "numeric", minute: "2-digit" });
 const clockFmt = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" });
 
@@ -158,8 +144,6 @@ export function AlertOutlines({ alerts, iframe, visible, highlight }: Props) {
               data-alert-id={p.id}
             />
             {p.level === "warning" && <path d={p.d} className="flood-edge" />}
-            {/* Thin river stretches are hard to hover, so give them a wider invisible target. */}
-            <path d={p.d} className="alert-hit" data-alert-id={p.id} />
           </g>
         ) : (
           <g key={p.key}>

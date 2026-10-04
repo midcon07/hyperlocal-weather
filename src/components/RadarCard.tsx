@@ -5,7 +5,8 @@ import { useMapAlertsLive } from "../hooks/useMapAlertsLive";
 import { samePosition, useRadarMap } from "../hooks/useRadarMap";
 import { MAP_CENTER, MAP_DEFAULT_ZOOM } from "../lib/mapView";
 import { CHROME_TOP, NATIVE_HEIGHT, OVERSCAN, VISIBLE_HEIGHT, layoutFor, radarUrl } from "../lib/radarEmbed";
-import { AlertOutlines, AlertTooltip, alertsAt } from "./AlertOutlines";
+import { alertsNearPoint } from "../lib/alertHit";
+import { AlertOutlines, AlertTooltip } from "./AlertOutlines";
 import type { HoverInfo } from "./AlertOutlines";
 import { MapAlerts } from "./MapAlerts";
 import { RadarLayers } from "./RadarLayers";
@@ -22,6 +23,9 @@ import { RadarModal } from "./RadarModal";
 const RADAR_URL = radarUrl();
 const HOME_VIEW = { ...MAP_CENTER, zoom: MAP_DEFAULT_ZOOM };
 const DRAG_PX = 5;
+// Pointer margins in screen pixels: a fingertip is far less exact than a mouse.
+const HOVER_TOLERANCE_PX = 7;
+const TAP_TOLERANCE_PX = 22;
 
 export function RadarCard() {
   const { ref, width } = useElementWidth();
@@ -62,15 +66,35 @@ export function RadarCard() {
   const press = useRef<{ x: number; y: number; lastX: number; lastY: number; dragged: boolean } | null>(null);
   const suppressClick = useRef(false);
 
+  // Alerts at a point of the card, found by geometry in the map's native
+  // pixels (the card is drawn scaled down); a fingertip gets a bigger margin.
+  const alertsAtClient = (el: Element, clientX: number, clientY: number, touch: boolean) => {
+    if (!target) return { hit: [], x: 0, y: 0 };
+    const rect = el.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+    const hit = alertsNearPoint(
+      alerts.data ?? [],
+      (lon, lat) => map.toScreen(target, lon, lat),
+      x / scale,
+      y / scale,
+      (touch ? TAP_TOLERANCE_PX : HOVER_TOLERANCE_PX) / scale
+    );
+    return { hit, x, y };
+  };
+
   const hoverAt = (e: ReactPointerEvent<HTMLButtonElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const hit = alertsAt(e.clientX, e.clientY, alerts.data ?? []);
-    setCardHover(hit.length ? { alerts: hit, x: e.clientX - rect.left, y: e.clientY - rect.top } : null);
+    const { hit, x, y } = alertsAtClient(e.currentTarget, e.clientX, e.clientY, false);
+    setCardHover(hit.length ? { alerts: hit, x, y } : null);
   };
 
   const onPointerDown = (e: ReactPointerEvent<HTMLButtonElement>) => {
     if (e.pointerType !== "mouse" || e.button !== 0) return;
-    e.currentTarget.setPointerCapture(e.pointerId);
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // Dragging still works without capture.
+    }
     press.current = { x: e.clientX, y: e.clientY, lastX: e.clientX, lastY: e.clientY, dragged: false };
   };
 
@@ -138,14 +162,17 @@ export function RadarCard() {
                 if (suppressClick.current) return;
                 // Clicking on an alert area opens the enlarged map with that
                 // alert's full text; clicking bare map just enlarges.
-                setDetailIds(alertsAt(e.clientX, e.clientY, alerts.data ?? []).map((a) => a.id));
+                const touch = (e.nativeEvent as PointerEvent).pointerType === "touch" || matchMedia("(hover: none)").matches;
+                setDetailIds(alertsAtClient(e.currentTarget, e.clientX, e.clientY, touch).hit.map((a) => a.id));
                 setOpen(true);
               }}
               onPointerDown={onPointerDown}
               onPointerMove={onPointerMove}
               onPointerUp={onPointerUp}
               onPointerCancel={onPointerUp}
-              onPointerLeave={() => setCardHover(null)}
+              onPointerLeave={(e) => {
+                if (e.pointerType === "mouse") setCardHover(null);
+              }}
               aria-label="Enlarge radar"
             >
               <span className="radar-expand-pill">
