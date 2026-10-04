@@ -24,6 +24,13 @@ const COLORS: Record<string, string> = {
 
 const isFlood = (a: MapAlert) => a.event.toLowerCase().includes("flood");
 
+// The color an alert is drawn in (flood watches/warnings are the flood blue).
+export function alertColor(a: MapAlert): string {
+  const level = levelFor(a.event);
+  if (level !== "advisory" && isFlood(a)) return FLOOD_COLOR;
+  return COLORS[level] ?? "#888";
+}
+
 // Painting order, bottom to top: flood fills, then advisory, watch, warning.
 function drawRank(level: string, flood: boolean) {
   if (flood) return level === "warning" ? 1 : 0;
@@ -97,6 +104,7 @@ export function AlertTooltip({ info, width, height }: { info: HoverInfo; width: 
         );
       })}
       {info.alerts.length > MAX_LISTED && <div className="alert-tip-more">+{info.alerts.length - MAX_LISTED} more here</div>}
+      <div className="alert-tip-hint">Click for the full warning</div>
     </div>
   );
 }

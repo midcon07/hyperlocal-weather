@@ -28,6 +28,7 @@ export function RadarCard() {
   const [open, setOpen] = useState(false);
   const [alertsOpen, setAlertsOpen] = useState(false);
   const [cardHover, setCardHover] = useState<HoverInfo | null>(null);
+  const [detailIds, setDetailIds] = useState<string[]>([]);
   const alerts = useMapAlertsLive();
 
   useEffect(() => {
@@ -133,8 +134,12 @@ export function RadarCard() {
             <button
               type="button"
               className="radar-expand"
-              onClick={() => {
-                if (!suppressClick.current) setOpen(true);
+              onClick={(e) => {
+                if (suppressClick.current) return;
+                // Clicking on an alert area opens the enlarged map with that
+                // alert's full text; clicking bare map just enlarges.
+                setDetailIds(alertsAt(e.clientX, e.clientY, alerts.data ?? []).map((a) => a.id));
+                setOpen(true);
               }}
               onPointerDown={onPointerDown}
               onPointerMove={onPointerMove}
@@ -162,6 +167,7 @@ export function RadarCard() {
                 open={false}
                 onToggle={() => {
                   setAlertsOpen(true);
+                  setDetailIds([]);
                   setOpen(true);
                 }}
               />
@@ -178,6 +184,7 @@ export function RadarCard() {
           onClose={() => setOpen(false)}
           coverageWidth={nativeWidth}
           startView={target}
+          initialDetailIds={detailIds}
         />
       )}
     </section>

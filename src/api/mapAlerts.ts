@@ -27,6 +27,10 @@ export interface MapAlert {
   severity: string;
   areaDesc: string;
   expires: string | null;
+  /** NWS's "what to do" text, when the alert has any. */
+  instruction: string | null;
+  /** Issuing office, e.g. "NWS Des Moines IA". */
+  senderName: string | null;
   shapes: AlertShape[];
 }
 
@@ -50,6 +54,8 @@ interface AlertFeature {
     ends: string | null;
     messageType: string;
     affectedZones: string[];
+    instruction: string | null;
+    senderName: string | null;
   };
 }
 
@@ -171,6 +177,8 @@ export async function fetchMapAlerts(): Promise<MapAlert[]> {
       severity: p.severity,
       areaDesc: p.areaDesc,
       expires: end,
+      instruction: p.instruction ?? null,
+      senderName: p.senderName ?? null,
       shapes,
     });
   }

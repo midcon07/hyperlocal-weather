@@ -9,6 +9,7 @@ import { CHROME_BOTTOM, CHROME_TOP, OVERSCAN, VISIBLE_HEIGHT, radarUrl } from ".
 import type { MapPosition } from "../lib/radarEmbed";
 import { AlertOutlines, AlertTooltip, OutlineLegend, alertsAt } from "./AlertOutlines";
 import type { HoverInfo } from "./AlertOutlines";
+import { AlertDetails } from "./AlertDetails";
 import { MapAlerts } from "./MapAlerts";
 import { RadarLayers } from "./RadarLayers";
 
@@ -29,9 +30,19 @@ interface Props {
   coverageWidth: number;
   /** Where the small map was looking when it was enlarged. */
   startView: MapPosition | null;
+  /** Alerts the visitor clicked on the small map; their full text opens at once. */
+  initialDetailIds?: string[];
 }
 
-export function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose, coverageWidth, startView }: Props) {
+export function RadarModal({
+  alerts,
+  alertsOpen,
+  onToggleAlerts,
+  onClose,
+  coverageWidth,
+  startView,
+  initialDetailIds = [],
+}: Props) {
   const { ref, width, height } = useElementSize();
   // With the overscan margin the iframe is always wider than 600px, so NWS's
   // desktop banner height applies even on a phone.
@@ -50,6 +61,12 @@ export function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose, covera
 
   // ---- Pointer gestures: drag to pan, wheel/pinch/double-click to zoom.
   const [hover, setHover] = useState<HoverInfo | null>(null);
+  // The full text of the alerts the visitor clicked or tapped on.
+  const [detail, setDetail] = useState<MapAlert[] | null>(() => {
+    const ids = new Set(initialDetailIds);
+    const found = (alerts.data ?? []).filter((a) => ids.has(a.id));
+    return found.length ? found : null;
+  });
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const pinch = useRef<{ dist: number; mid: { x: number; y: number } } | null>(null);
   const drag = useRef({ moved: false, startX: 0, startY: 0 });
@@ -106,8 +123,13 @@ export function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose, covera
     if (!pointers.current.has(e.pointerId)) return;
     pointers.current.delete(e.pointerId);
     pinch.current = null;
-    // A press that never turned into a drag is a tap: say what's there.
-    if (pointers.current.size === 0 && !drag.current.moved && e.type === "pointerup") showAlertsAt(e);
+    // A press that never turned into a drag is a click or tap: open the full
+    // text of whatever alert is there (or close the text if it's empty map).
+    if (pointers.current.size === 0 && !drag.current.moved && e.type === "pointerup") {
+      const hit = alertsAt(e.clientX, e.clientY, alerts.data ?? []);
+      setDetail(hit.length ? hit : null);
+      setHover(null);
+    }
   };
 
   const onWheel = (e: ReactWheelEvent<HTMLDivElement>) => {
@@ -172,6 +194,9 @@ export function RadarModal({ alerts, alertsOpen, onToggleAlerts, onClose, covera
             onDoubleClick={onDoubleClick}
           />
           {hover && <AlertTooltip info={hover} width={width} height={height} />}
+          {detail && (
+            <AlertDetails key={detail.map((a) => a.id).join("|")} alerts={detail} onClose={() => setDetail(null)} />
+          )}
           {map.refreshing && <div className="radar-updating">Updating map…</div>}
           <div className="radar-modal-alerts">
             <MapAlerts live={alerts} open={alertsOpen} onToggle={onToggleAlerts} />
