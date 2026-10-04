@@ -5,7 +5,7 @@ import { useElementSize } from "../hooks/useElementWidth";
 import type { LiveSourceState } from "../hooks/useLiveSource";
 import { MAX_ZOOM, MIN_ZOOM, clampPosition, samePosition, useRadarMap } from "../hooks/useRadarMap";
 import { MAP_CENTER, MAP_DEFAULT_ZOOM } from "../lib/mapView";
-import { CHROME_BOTTOM, CHROME_TOP, OVERSCAN, VISIBLE_HEIGHT, radarUrl } from "../lib/radarEmbed";
+import { CHROME_BOTTOM, CHROME_TOP, OVERSCAN, VISIBLE_HEIGHT, mapPageUrl, radarUrl } from "../lib/radarEmbed";
 import type { MapPosition } from "../lib/radarEmbed";
 import { alertsNearPoint } from "../lib/alertHit";
 import { AlertOutlines, AlertTooltip, OutlineLegend } from "./AlertOutlines";
@@ -31,7 +31,10 @@ interface Props {
   alerts: LiveSourceState<MapAlert[]>;
   alertsOpen: boolean;
   onToggleAlerts: () => void;
-  onClose: () => void;
+  /** Closes the dialog; not used on the full-tab page. */
+  onClose?: () => void;
+  /** Full-tab page rather than a dialog over the dashboard. */
+  page?: boolean;
   /** Native width of the small map; the first view covers at least this much. */
   coverageWidth: number;
   /** Where the small map was looking when it was enlarged. */
@@ -45,6 +48,7 @@ export function RadarModal({
   alertsOpen,
   onToggleAlerts,
   onClose,
+  page = false,
   coverageWidth,
   startView,
   initialDetailIds = [],
@@ -177,17 +181,36 @@ export function RadarModal({
   const highlight = new Set(hover?.alerts.map((a) => a.id));
 
   return (
-    <div className="radar-modal" role="dialog" aria-modal="true" aria-label="Radar, enlarged" onClick={onClose}>
+    <div
+      className={`radar-modal${page ? " radar-modal--page" : ""}`}
+      role="dialog"
+      aria-modal={!page}
+      aria-label="Radar, enlarged"
+      onClick={page ? undefined : onClose}
+    >
       <div className="radar-modal-body" onClick={(e) => e.stopPropagation()}>
         <div className="radar-modal-bar">
           <strong>Radar — Composite Reflectivity</strong>
           <span>
-            <a className="radar-link" href={radarUrl()} target="_blank" rel="noreferrer">
-              Open in new tab ↗
-            </a>
-            <button type="button" className="radar-modal-close" onClick={onClose} autoFocus>
-              Close ✕
-            </button>
+            {page ? (
+              <>
+                <a className="radar-link" href={radarUrl()} target="_blank" rel="noreferrer">
+                  NWS radar site ↗
+                </a>
+                <a className="radar-modal-close" href={import.meta.env.BASE_URL}>
+                  ← Dashboard
+                </a>
+              </>
+            ) : (
+              <>
+                <a className="radar-link" href={mapPageUrl(target)} target="_blank" rel="noreferrer">
+                  Open in new tab ↗
+                </a>
+                <button type="button" className="radar-modal-close" onClick={onClose} autoFocus>
+                  Close ✕
+                </button>
+              </>
+            )}
           </span>
         </div>
         <div className="radar-modal-map" ref={ref}>

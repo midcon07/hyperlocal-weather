@@ -167,6 +167,23 @@
   background: rgba(5, 12, 30, 0.72);
 }
 
+/* The same map as a whole-tab page: no backdrop gap, square, no shadow. */
+.radar-modal--page {
+  padding: 0;
+  background: var(--card-bg);
+}
+
+.radar-modal--page .radar-modal-body {
+  width: 100%;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+a.radar-modal-close {
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
 .radar-modal-body {
   display: flex;
   flex-direction: column;

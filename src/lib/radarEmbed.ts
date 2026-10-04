@@ -31,6 +31,33 @@ export function radarUrl(view: MapPosition = { ...MAP_CENTER, zoom: MAP_DEFAULT_
   return `https://radar.weather.gov/?settings=v1_${encodeURIComponent(btoa(JSON.stringify(settings)))}`;
 }
 
+// The full-tab version of our enlarged map (src/components/RadarPage.tsx):
+// "Open in new tab" goes here, not to radar.weather.gov, so the alert outlines
+// and warning text come along. The view being looked at travels in the URL.
+export function mapPageUrl(view?: MapPosition | null) {
+  const params = new URLSearchParams({ map: "1" });
+  if (view) {
+    params.set("lon", view.lon.toFixed(3));
+    params.set("lat", view.lat.toFixed(3));
+    params.set("z", view.zoom.toFixed(2));
+  }
+  return `${import.meta.env.BASE_URL}?${params.toString()}`;
+}
+
+export function isMapPage(search: string) {
+  return new URLSearchParams(search).get("map") === "1";
+}
+
+export function mapPageStart(search: string): MapPosition | null {
+  const params = new URLSearchParams(search);
+  const lon = Number(params.get("lon"));
+  const lat = Number(params.get("lat"));
+  const zoom = Number(params.get("z"));
+  return params.has("lon") && params.has("lat") && params.has("z") && [lon, lat, zoom].every(Number.isFinite)
+    ? { lon, lat, zoom }
+    : null;
+}
+
 // The card shows a 1100px-wide window onto a 1110px-tall iframe, with the top
 // 160px shifted off and the bottom 100px cut, leaving 850px visible.
 export const NATIVE_WIDTH = 1100;

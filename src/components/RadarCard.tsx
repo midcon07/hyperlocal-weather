@@ -4,7 +4,7 @@ import { useElementWidth } from "../hooks/useElementWidth";
 import { useMapAlertsLive } from "../hooks/useMapAlertsLive";
 import { samePosition, useRadarMap } from "../hooks/useRadarMap";
 import { MAP_CENTER, MAP_DEFAULT_ZOOM } from "../lib/mapView";
-import { CHROME_TOP, NATIVE_HEIGHT, OVERSCAN, VISIBLE_HEIGHT, layoutFor, radarUrl } from "../lib/radarEmbed";
+import { CHROME_TOP, NATIVE_HEIGHT, OVERSCAN, VISIBLE_HEIGHT, layoutFor, mapPageUrl } from "../lib/radarEmbed";
 import { alertsNearPoint } from "../lib/alertHit";
 import { AlertOutlines, AlertTooltip } from "./AlertOutlines";
 import type { HoverInfo } from "./AlertOutlines";
@@ -20,7 +20,6 @@ import { RadarModal } from "./RadarModal";
 // RadarModal) at the same spot. On touch screens a one-finger drag has to
 // scroll the page, so there a tap enlarges and the enlarged map is where you
 // drag and pinch. Shared embed facts live in lib/radarEmbed.ts.
-const RADAR_URL = radarUrl();
 const HOME_VIEW = { ...MAP_CENTER, zoom: MAP_DEFAULT_ZOOM };
 const DRAG_PX = 5;
 // Pointer margins in screen pixels: a fingertip is far less exact than a mouse.
@@ -126,7 +125,7 @@ export function RadarCard() {
     <section className="card radar-card">
       <div className="card-header">
         <h2>Radar</h2>
-        <a className="radar-link" href={RADAR_URL} target="_blank" rel="noreferrer">
+        <a className="radar-link" href={mapPageUrl(target)} target="_blank" rel="noreferrer">
           Open in new tab ↗
         </a>
       </div>
