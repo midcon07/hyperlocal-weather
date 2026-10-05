@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-10-04T22:33:02.359Z",
+  "generatedAt": "2026-10-05T01:10:21.720Z",
   "location": {
     "name": "Altoona, IA",
     "latitude": 41.6312472,
     "longitude": -93.4658583
   },
   "station": {
-    "timestamp": "2026-10-04T22:33:00.000Z",
-    "temperatureF": 72.8,
-    "humidityPct": 39.1,
-    "windSpeedMph": 4.5,
-    "windGustMph": 6.13,
+    "timestamp": "2026-10-05T01:10:00.000Z",
+    "temperatureF": 61.2,
+    "humidityPct": 61.2,
+    "windSpeedMph": 0,
+    "windGustMph": 0,
     "windDirectionDeg": 179,
     "rainRateInPerHr": 0,
     "rainDayIn": 0,
-    "barometricPressureInHg": 30.252,
-    "pressureTrendInHg": -0.019,
+    "barometricPressureInHg": 30.255,
+    "pressureTrendInHg": -0.004,
     "uvIndex": null,
     "solarRadiationWm2": null
   },
@@ -25,35 +25,23 @@
     "gridY": 51,
     "observation": {
       "stationId": "KIKV",
-      "timestamp": "2026-10-04T21:55:00+00:00",
-      "temperatureC": 22,
-      "relativeHumidity": 37.924772238276,
-      "windSpeedKmh": 9.36,
-      "windDirectionDeg": 290,
+      "timestamp": "2026-10-05T00:35:00+00:00",
+      "temperatureC": null,
+      "relativeHumidity": null,
+      "windSpeedKmh": 0,
+      "windDirectionDeg": 0,
       "barometricPressurePa": 102440,
       "textDescription": "Clear"
     },
     "forecast": [
       {
-        "name": "This Afternoon",
-        "startTime": "2026-10-04T17:00:00-05:00",
-        "endTime": "2026-10-04T18:00:00-05:00",
-        "isDaytime": true,
-        "temperature": 74,
-        "temperatureUnit": "F",
-        "windSpeed": "5 mph",
-        "windDirection": "NNW",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 0
-      },
-      {
         "name": "Tonight",
-        "startTime": "2026-10-04T18:00:00-05:00",
+        "startTime": "2026-10-04T20:00:00-05:00",
         "endTime": "2026-10-05T06:00:00-05:00",
         "isDaytime": false,
         "temperature": 46,
         "temperatureUnit": "F",
-        "windSpeed": "1 to 5 mph",
+        "windSpeed": "2 mph",
         "windDirection": "NW",
         "shortForecast": "Mostly Clear",
         "probabilityOfPrecipitation": 0
@@ -201,30 +189,21 @@
         "windDirection": "SSE",
         "shortForecast": "Mostly Clear",
         "probabilityOfPrecipitation": 1
+      },
+      {
+        "name": "Sunday",
+        "startTime": "2026-10-11T06:00:00-05:00",
+        "endTime": "2026-10-11T18:00:00-05:00",
+        "isDaytime": true,
+        "temperature": 76,
+        "temperatureUnit": "F",
+        "windSpeed": "10 to 14 mph",
+        "windDirection": "S",
+        "shortForecast": "Mostly Sunny",
+        "probabilityOfPrecipitation": 7
       }
     ],
     "hourly": [
-      {
-        "startTime": "2026-10-04T17:00:00-05:00",
-        "temperature": 72,
-        "temperatureUnit": "F",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 0
-      },
-      {
-        "startTime": "2026-10-04T18:00:00-05:00",
-        "temperature": 70,
-        "temperatureUnit": "F",
-        "shortForecast": "Clear",
-        "probabilityOfPrecipitation": 0
-      },
-      {
-        "startTime": "2026-10-04T19:00:00-05:00",
-        "temperature": 66,
-        "temperatureUnit": "F",
-        "shortForecast": "Clear",
-        "probabilityOfPrecipitation": 0
-      },
       {
         "startTime": "2026-10-04T20:00:00-05:00",
         "temperature": 63,
@@ -371,6 +350,27 @@
         "temperatureUnit": "F",
         "shortForecast": "Sunny",
         "probabilityOfPrecipitation": 0
+      },
+      {
+        "startTime": "2026-10-05T17:00:00-05:00",
+        "temperature": 69,
+        "temperatureUnit": "F",
+        "shortForecast": "Sunny",
+        "probabilityOfPrecipitation": 0
+      },
+      {
+        "startTime": "2026-10-05T18:00:00-05:00",
+        "temperature": 67,
+        "temperatureUnit": "F",
+        "shortForecast": "Clear",
+        "probabilityOfPrecipitation": 0
+      },
+      {
+        "startTime": "2026-10-05T19:00:00-05:00",
+        "temperature": 64,
+        "temperatureUnit": "F",
+        "shortForecast": "Clear",
+        "probabilityOfPrecipitation": 1
       }
     ]
   }
