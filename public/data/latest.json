@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-10-07T11:52:03.677Z",
+  "generatedAt": "2026-10-07T17:58:49.312Z",
   "location": {
     "name": "Altoona, IA",
     "latitude": 41.6312472,
     "longitude": -93.4658583
   },
   "station": {
-    "timestamp": "2026-10-07T11:51:00.000Z",
-    "temperatureF": 58,
-    "humidityPct": 92.3,
-    "windSpeedMph": 0,
-    "windGustMph": 2,
-    "windDirectionDeg": 194,
+    "timestamp": "2026-10-07T17:58:00.000Z",
+    "temperatureF": 76,
+    "humidityPct": 47.8,
+    "windSpeedMph": 2.06,
+    "windGustMph": 6.75,
+    "windDirectionDeg": 239,
     "rainRateInPerHr": 0,
     "rainDayIn": 0,
-    "barometricPressureInHg": 29.899,
-    "pressureTrendInHg": 0.038,
+    "barometricPressureInHg": 29.998,
+    "pressureTrendInHg": 0.017,
     "uvIndex": null,
     "solarRadiationWm2": null
   },
@@ -25,26 +25,26 @@
     "gridY": 51,
     "observation": {
       "stationId": "KIKV",
-      "timestamp": "2026-10-07T11:15:00+00:00",
-      "temperatureC": 13,
-      "relativeHumidity": 100,
-      "windSpeedKmh": 0,
-      "windDirectionDeg": 0,
-      "barometricPressurePa": 101220,
-      "textDescription": "Fog/Mist"
+      "timestamp": "2026-10-07T14:35:00+00:00",
+      "temperatureC": 18,
+      "relativeHumidity": 72.582141630914,
+      "windSpeedKmh": 11.16,
+      "windDirectionDeg": 360,
+      "barometricPressurePa": 101490,
+      "textDescription": "Clear"
     },
     "forecast": [
       {
-        "name": "Today",
-        "startTime": "2026-10-07T06:00:00-05:00",
+        "name": "This Afternoon",
+        "startTime": "2026-10-07T12:00:00-05:00",
         "endTime": "2026-10-07T18:00:00-05:00",
         "isDaytime": true,
-        "temperature": 77,
+        "temperature": 79,
         "temperatureUnit": "F",
-        "windSpeed": "3 to 8 mph",
+        "windSpeed": "5 to 8 mph",
         "windDirection": "NNW",
-        "shortForecast": "Patchy Fog then Sunny",
-        "probabilityOfPrecipitation": 1
+        "shortForecast": "Sunny",
+        "probabilityOfPrecipitation": 0
       },
       {
         "name": "Tonight",
@@ -53,9 +53,9 @@
         "isDaytime": false,
         "temperature": 53,
         "temperatureUnit": "F",
-        "windSpeed": "5 mph",
+        "windSpeed": "6 mph",
         "windDirection": "NW",
-        "shortForecast": "Mostly Clear",
+        "shortForecast": "Partly Cloudy",
         "probabilityOfPrecipitation": 1
       },
       {
@@ -205,106 +205,64 @@
     ],
     "hourly": [
       {
-        "startTime": "2026-10-07T06:00:00-05:00",
-        "temperature": 57,
-        "temperatureUnit": "F",
-        "shortForecast": "Patchy Fog",
-        "probabilityOfPrecipitation": 1
-      },
-      {
-        "startTime": "2026-10-07T07:00:00-05:00",
-        "temperature": 57,
-        "temperatureUnit": "F",
-        "shortForecast": "Patchy Fog",
-        "probabilityOfPrecipitation": 1
-      },
-      {
-        "startTime": "2026-10-07T08:00:00-05:00",
-        "temperature": 57,
-        "temperatureUnit": "F",
-        "shortForecast": "Mostly Sunny",
-        "probabilityOfPrecipitation": 0
-      },
-      {
-        "startTime": "2026-10-07T09:00:00-05:00",
-        "temperature": 61,
-        "temperatureUnit": "F",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 0
-      },
-      {
-        "startTime": "2026-10-07T10:00:00-05:00",
-        "temperature": 65,
-        "temperatureUnit": "F",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 0
-      },
-      {
-        "startTime": "2026-10-07T11:00:00-05:00",
-        "temperature": 69,
-        "temperatureUnit": "F",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 0
-      },
-      {
         "startTime": "2026-10-07T12:00:00-05:00",
-        "temperature": 72,
-        "temperatureUnit": "F",
-        "shortForecast": "Mostly Sunny",
-        "probabilityOfPrecipitation": 0
-      },
-      {
-        "startTime": "2026-10-07T13:00:00-05:00",
         "temperature": 75,
         "temperatureUnit": "F",
         "shortForecast": "Sunny",
         "probabilityOfPrecipitation": 0
       },
       {
-        "startTime": "2026-10-07T14:00:00-05:00",
+        "startTime": "2026-10-07T13:00:00-05:00",
         "temperature": 76,
+        "temperatureUnit": "F",
+        "shortForecast": "Sunny",
+        "probabilityOfPrecipitation": 0
+      },
+      {
+        "startTime": "2026-10-07T14:00:00-05:00",
+        "temperature": 78,
         "temperatureUnit": "F",
         "shortForecast": "Sunny",
         "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-10-07T15:00:00-05:00",
-        "temperature": 77,
+        "temperature": 78,
         "temperatureUnit": "F",
         "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 1
+        "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-10-07T16:00:00-05:00",
-        "temperature": 77,
+        "temperature": 79,
         "temperatureUnit": "F",
         "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 1
+        "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-10-07T17:00:00-05:00",
-        "temperature": 76,
+        "temperature": 77,
         "temperatureUnit": "F",
         "shortForecast": "Sunny",
         "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-10-07T18:00:00-05:00",
-        "temperature": 74,
+        "temperature": 75,
         "temperatureUnit": "F",
         "shortForecast": "Mostly Clear",
         "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-10-07T19:00:00-05:00",
-        "temperature": 70,
+        "temperature": 71,
         "temperatureUnit": "F",
-        "shortForecast": "Mostly Clear",
+        "shortForecast": "Partly Cloudy",
         "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-10-07T20:00:00-05:00",
-        "temperature": 65,
+        "temperature": 66,
         "temperatureUnit": "F",
         "shortForecast": "Partly Cloudy",
         "probabilityOfPrecipitation": 0
@@ -313,14 +271,14 @@
         "startTime": "2026-10-07T21:00:00-05:00",
         "temperature": 64,
         "temperatureUnit": "F",
-        "shortForecast": "Mostly Clear",
-        "probabilityOfPrecipitation": 1
+        "shortForecast": "Partly Cloudy",
+        "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-10-07T22:00:00-05:00",
-        "temperature": 63,
+        "temperature": 62,
         "temperatureUnit": "F",
-        "shortForecast": "Mostly Clear",
+        "shortForecast": "Partly Cloudy",
         "probabilityOfPrecipitation": 1
       },
       {
@@ -370,6 +328,48 @@
         "temperature": 55,
         "temperatureUnit": "F",
         "shortForecast": "Partly Cloudy",
+        "probabilityOfPrecipitation": 0
+      },
+      {
+        "startTime": "2026-10-08T06:00:00-05:00",
+        "temperature": 54,
+        "temperatureUnit": "F",
+        "shortForecast": "Mostly Sunny",
+        "probabilityOfPrecipitation": 1
+      },
+      {
+        "startTime": "2026-10-08T07:00:00-05:00",
+        "temperature": 53,
+        "temperatureUnit": "F",
+        "shortForecast": "Mostly Sunny",
+        "probabilityOfPrecipitation": 0
+      },
+      {
+        "startTime": "2026-10-08T08:00:00-05:00",
+        "temperature": 54,
+        "temperatureUnit": "F",
+        "shortForecast": "Mostly Sunny",
+        "probabilityOfPrecipitation": 0
+      },
+      {
+        "startTime": "2026-10-08T09:00:00-05:00",
+        "temperature": 57,
+        "temperatureUnit": "F",
+        "shortForecast": "Mostly Sunny",
+        "probabilityOfPrecipitation": 0
+      },
+      {
+        "startTime": "2026-10-08T10:00:00-05:00",
+        "temperature": 62,
+        "temperatureUnit": "F",
+        "shortForecast": "Sunny",
+        "probabilityOfPrecipitation": 0
+      },
+      {
+        "startTime": "2026-10-08T11:00:00-05:00",
+        "temperature": 65,
+        "temperatureUnit": "F",
+        "shortForecast": "Sunny",
         "probabilityOfPrecipitation": 0
       }
     ]
