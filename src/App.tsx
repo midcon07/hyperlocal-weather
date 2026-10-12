@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { StationCard } from "./components/StationCard";
 import { ForecastList } from "./components/ForecastList";
 import { TempCurve } from "./components/TempCurve";
@@ -20,6 +21,15 @@ function App() {
   const alertsLive = useAlertsLive();
   const metarLive = useMetarLive();
 
+  // The "Weather history" link only shows once some history has been loaded.
+  const [hasHistory, setHasHistory] = useState(false);
+  useEffect(() => {
+    fetch(`${import.meta.env.BASE_URL}data/history/index.json`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((list: { days: number }[]) => setHasHistory(list.some((s) => s.days > 0)))
+      .catch(() => setHasHistory(false));
+  }, []);
+
   const forecastPeriods = nwsLive.data?.forecast ?? latest?.nws?.forecast ?? [];
   const hourlyPeriods = nwsLive.data?.hourly ?? latest?.nws?.hourly ?? [];
 
@@ -32,6 +42,13 @@ function App() {
       <header className="app-header">
         <h1>Hyperlocal Weather</h1>
         <p className="location">{latest?.location.name ?? "Loading location…"}</p>
+        {hasHistory && (
+          <nav className="header-links">
+            <a className="history-link" href={`${import.meta.env.BASE_URL}?history=1`}>
+              Weather history →
+            </a>
+          </nav>
+        )}
         <button
           type="button"
           className="scroll-note"

@@ -1952,3 +1952,252 @@ a.radar-modal-close {
 .metar-decoded {
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
 }
+
+/* ---- Weather history page (?history=1) ---- */
+.history-back,
+.history-link {
+  display: inline-block;
+  margin-top: 0.35rem;
+  padding: 0.25rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+  text-shadow: 0 1px 3px rgba(0, 20, 60, 0.4);
+}
+
+.history-back:hover,
+.history-link:hover {
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.header-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.hist-station-pick select,
+.hist-date {
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.hist-station-pick {
+  color: #fff;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0, 20, 60, 0.4);
+}
+
+.hist-day-title {
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+}
+
+.hist-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+@media (min-width: 700px) {
+  .hist-tiles {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.hist-tile {
+  padding: 0.6rem 0.7rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.hist-tile-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hist-tile-main {
+  margin-top: 0.15rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.hist-tile-sub {
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+.hist-sub {
+  margin: 1rem 0 0.4rem;
+  font-size: 0.85rem;
+}
+
+.hist-table-wrap {
+  overflow-x: auto;
+}
+
+.hist-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.hist-table th,
+.hist-table td {
+  padding: 0.3rem 0.5rem;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.hist-table th:first-child,
+.hist-table td:first-child {
+  text-align: left;
+}
+
+.hist-table th {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.hist-table button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--link);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.hist-table tr.is-selected td {
+  background: var(--surface);
+}
+
+.hist-table--months td {
+  font-variant-numeric: tabular-nums;
+}
+
+.hist-ranges {
+  display: inline-flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.hist-ranges button {
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.hist-ranges button.is-on {
+  background: var(--link);
+  border-color: var(--link);
+  color: #fff;
+}
+
+.history-charts svg {
+  display: block;
+  touch-action: pan-y;
+}
+
+.history-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.9rem;
+  min-height: 1.4rem;
+  margin-bottom: 0.2rem;
+  font-size: 0.82rem;
+}
+
+.history-readout .hi { color: #e0663a; font-weight: 700; }
+.history-readout .lo { color: #2f8fe0; font-weight: 700; }
+.history-readout .muted { color: var(--muted); }
+
+.hist-grid {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.hist-axis {
+  fill: var(--muted);
+  font-size: 10.5px;
+}
+
+.hist-band {
+  fill: #e0663a;
+  fill-opacity: 0.14;
+}
+
+.hist-line {
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+.hist-line--high { stroke: #e0663a; }
+.hist-line--low { stroke: #2f8fe0; }
+
+.hist-rain {
+  fill: #3f98e0;
+}
+
+.hist-cursor {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.hist-records {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 0.5rem;
+}
+
+.hist-record {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.05rem;
+  padding: 0.55rem 0.7rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.hist-record-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hist-record-value {
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.hist-record-date {
+  font-size: 0.74rem;
+  color: var(--muted);
+}
