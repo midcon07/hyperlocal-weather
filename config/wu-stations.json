@@ -1,4 +1,10 @@
 {
   "_help": "One entry per Weather Underground station whose history we import. id is the public station ID shown on its Weather Underground page; label is what the history page calls it; start/end are the first and last day it was running (end may be omitted for a station that is still running).",
-  "stations": []
+  "stations": [
+    {
+      "id": "KIAALTOO53",
+      "label": "Altoona (current station)",
+      "start": "2024-02-08"
+    }
+  ]
 }
