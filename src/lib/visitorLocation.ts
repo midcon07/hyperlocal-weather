@@ -1,4 +1,6 @@
 import { useMemo, useSyncExternalStore } from "react";
+import siteConfig from "../../config/site.config.json";
+import { milesBetween } from "./geo";
 import { MAP_CENTER, MAP_DEFAULT_ZOOM } from "./mapView";
 import type { MapPosition } from "./radarEmbed";
 
@@ -96,6 +98,40 @@ function subscribe(listener: () => void) {
 export function useVisitorPlace(): VisitorPlace | null {
   const raw = useSyncExternalStore(subscribe, () => read() ?? autoRaw, () => null);
   return useMemo(() => parse(raw), [raw]);
+}
+
+// ---- Which place the whole page is about
+
+// Within this many miles of the station, the page shows the station's own
+// readings (the visitor's place just centers the radar). Farther away, the page
+// is about the visitor's place instead and uses nearby official stations.
+export const NEAR_STATION_MILES = 25;
+
+export interface ActivePlace {
+  lat: number;
+  lon: number;
+  label: string;
+  /** True when the page is about somewhere other than the station's area. */
+  remote: boolean;
+  /** Changes whenever the place does; used to reload data. */
+  key: string;
+}
+
+export function useActivePlace(): ActivePlace {
+  const place = useVisitorPlace();
+  return useMemo(() => {
+    const { latitude, longitude, name } = siteConfig.location;
+    if (!place || place.home || milesBetween(latitude, longitude, place.lat, place.lon) <= NEAR_STATION_MILES) {
+      return { lat: latitude, lon: longitude, label: name, remote: false, key: "station" };
+    }
+    return {
+      lat: place.lat,
+      lon: place.lon,
+      label: place.label,
+      remote: true,
+      key: `${place.lat.toFixed(2)},${place.lon.toFixed(2)}`,
+    };
+  }, [place]);
 }
 
 // Forget the saved choice and go back to guessing from the connection.

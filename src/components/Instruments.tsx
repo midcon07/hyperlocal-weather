@@ -325,9 +325,15 @@ export function RainGauge({ todayIn, rateInPerHr }: { todayIn: number | null; ra
 
   return (
     <Tile
-      label="Rain today"
+      label={rateInPerHr === null ? "Rain, 24 hours" : "Rain today"}
       value={fmt(todayIn, 2, " in")}
-      sub={raining ? `Raining ${fmt(rateInPerHr, 2, " in/hr")}` : "Rate 0.00 in/hr"}
+      sub={
+        rateInPerHr === null
+          ? "Nearest station's hourly reports"
+          : raining
+            ? `Raining ${fmt(rateInPerHr, 2, " in/hr")}`
+            : "Rate 0.00 in/hr"
+      }
     >
       <svg viewBox="0 0 100 100" role="img" aria-label={`Rain today ${fmt(todayIn, 2, " in")}`}>
         <defs>

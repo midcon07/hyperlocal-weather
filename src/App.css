@@ -2368,3 +2368,29 @@ a.radar-modal-close {
   line-height: 1.35;
   color: var(--muted);
 }
+/* ---- Station card for a visitor's own place ---- */
+.station-subtitle {
+  margin: 0.1rem 0 0;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+.station-card .card-header h2 {
+  margin-bottom: 0;
+}
+
+/* Three instruments (no rain gauge): one row on wide screens, and on phones the
+   barometer gets a row and humidity and wind share the next. */
+.instrument-row--three {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.instrument-row--three .instrument:last-child {
+  grid-column: auto;
+}
+
+@media (min-width: 640px) {
+  .instrument-row--three {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

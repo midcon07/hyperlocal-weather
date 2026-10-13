@@ -24,6 +24,16 @@ export interface NwsObservation {
   windDirectionDeg: number | null;
   barometricPressurePa: number | null;
   textDescription: string | null;
+  // The fields below exist only on observations fetched live for a visitor's
+  // own place (see api/nws.ts); older committed snapshots lack them.
+  windGustKmh?: number | null;
+  dewpointC?: number | null;
+  seaLevelPressurePa?: number | null;
+  stationName?: string | null;
+  /** Rain over the last 24 hours, in inches, added up from the station's hourly reports. */
+  precip24hIn?: number | null;
+  /** How far the reporting station is from the place asked about. */
+  stationDistanceMi?: number | null;
 }
 
 export interface NwsForecastPeriod {
@@ -54,6 +64,8 @@ export interface NwsData {
   observation: NwsObservation | null;
   forecast: NwsForecastPeriod[];
   hourly: NwsHourlyPeriod[];
+  /** Nearest airport weather stations (four-letter K-codes), nearest first. */
+  nearbyAirports?: string[];
 }
 
 export interface LatestData {

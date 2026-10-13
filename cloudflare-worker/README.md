@@ -62,6 +62,9 @@ comma-separated list of ICAO ids, in display order; it defaults to
 `KDSM,KIKV`. Redeploy (`npx wrangler deploy`) after pulling this change for
 the "Aviation Weather" card to go live.
 
+`/metar?ids=KDPA,KORD` asks for up to four specific airports instead. The page
+uses this for visitors far from the station, so they see airports near them.
+
 ## Visitor location route
 
 `<your-worker-url>/where` returns a rough guess of where the visitor is (city,

@@ -20,9 +20,12 @@ function readOverrides(): { theme?: SkyTheme; sky?: SkyCondition } {
 // Sets data-theme (day/night, from the real sun position at the station)
 // and data-sky (from current conditions) on <html>; the CSS turns those
 // into the page gradient and card colors.
-export function useSkyTheme(conditionsText: string | null | undefined) {
+export function useSkyTheme(
+  conditionsText: string | null | undefined,
+  latitude: number = siteConfig.location.latitude,
+  longitude: number = siteConfig.location.longitude
+) {
   useEffect(() => {
-    const { latitude, longitude } = siteConfig.location;
     const overrides = readOverrides();
 
     function apply() {
@@ -35,5 +38,5 @@ export function useSkyTheme(conditionsText: string | null | undefined) {
     apply();
     const interval = setInterval(apply, 60_000);
     return () => clearInterval(interval);
-  }, [conditionsText]);
+  }, [conditionsText, latitude, longitude]);
 }

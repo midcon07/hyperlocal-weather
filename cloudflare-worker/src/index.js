@@ -42,11 +42,21 @@ function toMetarReading(latest) {
   };
 }
 
-async function handleMetar(env, corsHeaders) {
-  const stationIds = (env.METAR_STATION_IDS || "KDSM,KIKV")
+async function handleMetar(request, env, corsHeaders) {
+  // A visitor far from the station can ask for the airports nearest them with
+  // ?ids=KDPA,KORD (at most four plain airport codes); otherwise use ours.
+  const asked = new URL(request.url).searchParams.get("ids");
+  const requested = (asked || "")
     .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
+    .map((s) => s.trim().toUpperCase())
+    .filter((s) => /^[A-Z0-9]{3,4}$/.test(s))
+    .slice(0, 4);
+  const stationIds = requested.length
+    ? requested
+    : (env.METAR_STATION_IDS || "KDSM,KIKV")
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
 
   const res = await fetch(
     `https://aviationweather.gov/api/data/metar?ids=${stationIds.join(",")}&format=json&hours=2`
@@ -112,7 +122,7 @@ export default {
     }
     if (pathname === "/metar") {
       try {
-        return await handleMetar(env, corsHeaders);
+        return await handleMetar(request, env, corsHeaders);
       } catch (err) {
         return jsonResponse({ error: String(err) }, 500, corsHeaders);
       }

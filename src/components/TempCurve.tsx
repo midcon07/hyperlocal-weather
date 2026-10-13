@@ -1,11 +1,13 @@
 import { useId } from "react";
-import siteConfig from "../../config/site.config.json";
 import { useElementWidth } from "../hooks/useElementWidth";
 import { isSunUp, sunTimes } from "../lib/sky";
 import type { NwsHourlyPeriod } from "../types/weather";
 
 interface Props {
   hourly: NwsHourlyPeriod[];
+  /** Where the forecast is for, so sunrise and sunset are right. */
+  lat: number;
+  lon: number;
 }
 
 const HEIGHT = 190;
@@ -55,7 +57,7 @@ function smoothPath(pts: { x: number; y: number }[]) {
   return d;
 }
 
-export function TempCurve({ hourly: allHourly }: Props) {
+export function TempCurve({ hourly: allHourly, lat, lon }: Props) {
   const id = useId();
   const { ref, width } = useElementWidth();
 
@@ -93,7 +95,8 @@ export function TempCurve({ hourly: allHourly }: Props) {
 
   // Sunrise and sunset inside the window, plus the dark stretches between
   // a sunset and the next sunrise (shaded behind the curve).
-  const { latitude, longitude } = siteConfig.location;
+  const latitude = lat;
+  const longitude = lon;
   const events: { time: number; kind: "sunrise" | "sunset" }[] = [];
   for (const offsetDays of [-1, 0, 1]) {
     const day = sunTimes(new Date(t0 + offsetDays * 86400000), latitude, longitude);

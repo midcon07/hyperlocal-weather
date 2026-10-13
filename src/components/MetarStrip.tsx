@@ -68,7 +68,7 @@ export function MetarStrip({ live }: Props) {
         stations.map((metar) => <MetarStation key={metar.stationId} metar={metar} />)
       ) : (
         <p className="empty-state">
-          No METAR yet. Requires the Cloudflare Worker's /metar route — see cloudflare-worker/README.md.
+          {live.loading ? "Looking for airport reports…" : "No airport weather report is available nearby right now."}
         </p>
       )}
 

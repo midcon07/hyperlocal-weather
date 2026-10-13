@@ -1,17 +1,20 @@
-// Fetches the latest KIKV METAR via the same Cloudflare Worker proxy used
-// for the WeatherLink station (see cloudflare-worker/) — aviationweather.gov
-// doesn't send CORS headers, so the browser can't hit it directly. Requires
-// the Worker's /metar route to be deployed.
+// Fetches airport METARs via the same Cloudflare Worker proxy used for the
+// WeatherLink station (see cloudflare-worker/) — aviationweather.gov doesn't
+// send CORS headers, so the browser can't hit it directly. With no station list
+// the Worker uses its default airports; a visitor far away asks for the ones
+// nearest them.
 
 import type { MetarReading } from "../types/weather";
 
-export async function fetchMetar(): Promise<MetarReading[]> {
+export async function fetchMetar(airports?: string[]): Promise<MetarReading[]> {
   const proxyUrl = import.meta.env.VITE_WEATHERLINK_PROXY_URL;
   if (!proxyUrl) {
     throw new Error("METAR proxy not configured (VITE_WEATHERLINK_PROXY_URL).");
   }
 
-  const res = await fetch(new URL("/metar", proxyUrl));
+  const url = new URL("/metar", proxyUrl);
+  if (airports?.length) url.searchParams.set("ids", airports.join(","));
+  const res = await fetch(url);
   if (!res.ok) {
     throw new Error(`METAR proxy request failed: ${res.status} ${res.statusText}`);
   }
