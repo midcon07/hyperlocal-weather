@@ -2236,3 +2236,10 @@ a.radar-modal-close {
 .radar-ctl--on {
   background: rgba(31, 95, 208, 0.92);
 }
+.pressure-letter {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 900;
+  stroke: #fff;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}

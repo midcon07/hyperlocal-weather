@@ -303,7 +303,7 @@ export function RadarModal({
               onClick={() => setShowFronts((v) => !v)}
               aria-pressed={showFronts}
             >
-              Fronts: {showFronts ? "on" : "off"}
+              Fronts &amp; H/L: {showFronts ? "on" : "off"}
             </button>
             <OutlineLegend />
             {showFronts && fronts.data && <FrontLegend valid={fronts.data.valid} />}

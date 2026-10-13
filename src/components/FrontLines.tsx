@@ -123,6 +123,12 @@ export function FrontLines({ fronts, iframe, visible, scale = 1 }: Props) {
     })
   );
 
+  // Big blue H and red L at the pressure centers, with a white outline so
+  // they read over the radar.
+  const letters = fronts.centers
+    .map((c) => ({ ...c, at: project(c.lon, c.lat) }))
+    .filter((c) => inside(c.at));
+
   return (
     <svg
       className="front-lines"
@@ -158,6 +164,21 @@ export function FrontLines({ fronts, iframe, visible, scale = 1 }: Props) {
           </g>
         );
       })}
+      {letters.map((c) => (
+        <text
+          key={`${c.kind}-${c.lon}-${c.lat}`}
+          x={c.at.x}
+          y={c.at.y}
+          textAnchor="middle"
+          dominantBaseline="central"
+          className="pressure-letter"
+          fontSize={30 * scale}
+          fill={c.kind === "high" ? FRONT_COLORS.cold : FRONT_COLORS.warm}
+          strokeWidth={4 * scale}
+        >
+          {c.kind === "high" ? "H" : "L"}
+        </text>
+      ))}
     </svg>
   );
 }
@@ -173,6 +194,9 @@ export function FrontLegend({ valid }: { valid: string | null }) {
         <b style={{ color: FRONT_COLORS.warm }}>●</b> Stationary
       </span>
       <span style={{ color: FRONT_COLORS.trough }}>╌ Trough</span>
+      <span>
+        <b style={{ color: FRONT_COLORS.cold }}>H</b> High / <b style={{ color: FRONT_COLORS.warm }}>L</b> Low pressure
+      </span>
       {valid && <em>valid {valid}</em>}
     </div>
   );
