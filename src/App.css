@@ -2243,3 +2243,122 @@ a.radar-modal-close {
   stroke-linejoin: round;
   paint-order: stroke;
 }
+/* ---- "Center on me" (visitor location) ---- */
+.radar-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* The panel is positioned against the card's header (not the button), so it
+   stays inside the card on narrow screens. */
+.radar-card .card-header {
+  position: relative;
+}
+
+.loc-picker {
+  position: static;
+}
+
+.loc-button {
+  padding: 0.2rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.loc-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 30;
+  width: 270px;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card-bg);
+  color: var(--text);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+.loc-title {
+  margin: 0 0 0.5rem;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.loc-primary,
+.loc-zip button,
+.loc-clear {
+  padding: 0.4rem 0.8rem;
+  border: 0;
+  border-radius: 8px;
+  background: var(--link);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.loc-primary {
+  width: 100%;
+}
+
+.loc-primary:disabled,
+.loc-zip button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.loc-zip {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.loc-zip label {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 0.2rem;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+.loc-zip input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.loc-clear {
+  margin-top: 0.6rem;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.loc-error {
+  margin: 0.5rem 0 0;
+  font-size: 0.76rem;
+  color: #c0392b;
+}
+
+.loc-note {
+  margin: 0.6rem 0 0;
+  font-size: 0.7rem;
+  color: var(--muted);
+}

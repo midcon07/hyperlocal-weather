@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import { useElementWidth } from "../hooks/useElementWidth";
 import { alertsInBounds } from "../api/mapAlerts";
@@ -7,12 +7,14 @@ import { useFrontsLive } from "../hooks/useFrontsLive";
 import { useMapAlertsLive } from "../hooks/useMapAlertsLive";
 import type { LiveSourceState } from "../hooks/useLiveSource";
 import { samePosition, useRadarMap } from "../hooks/useRadarMap";
-import { MAP_CENTER, MAP_DEFAULT_ZOOM } from "../lib/mapView";
+import { homeFor, useVisitorPlace } from "../lib/visitorLocation";
 import { CHROME_TOP, NATIVE_HEIGHT, OVERSCAN, VISIBLE_HEIGHT, layoutFor, mapPageUrl } from "../lib/radarEmbed";
 import { alertsNearPoint } from "../lib/alertHit";
 import { AlertOutlines, AlertTooltip } from "./AlertOutlines";
 import type { HoverInfo } from "./AlertOutlines";
 import { FrontLines } from "./FrontLines";
+import { LocationDot } from "./LocationDot";
+import { LocationPicker } from "./LocationPicker";
 import { MapAlerts } from "./MapAlerts";
 import { RadarLayers } from "./RadarLayers";
 import { RadarModal } from "./RadarModal";
@@ -25,7 +27,6 @@ import { RadarModal } from "./RadarModal";
 // RadarModal) at the same spot. On touch screens a one-finger drag has to
 // scroll the page, so there a tap enlarges and the enlarged map is where you
 // drag and pinch. Shared embed facts live in lib/radarEmbed.ts.
-const HOME_VIEW = { ...MAP_CENTER, zoom: MAP_DEFAULT_ZOOM };
 const DRAG_PX = 5;
 // Pointer margins in screen pixels: a fingertip is far less exact than a mouse.
 const HOVER_TOLERANCE_PX = 7;
@@ -39,6 +40,8 @@ export function RadarCard() {
   const [detailIds, setDetailIds] = useState<string[]>([]);
   const alerts = useMapAlertsLive();
   const fronts = useFrontsLive();
+  const place = useVisitorPlace();
+  const home = useMemo(() => homeFor(place), [place]);
 
   useEffect(() => {
     if (!open) return;
@@ -61,10 +64,19 @@ export function RadarCard() {
     chromeTop: CHROME_TOP,
     chromeBottom: NATIVE_HEIGHT - VISIBLE_HEIGHT - CHROME_TOP,
     margin: OVERSCAN,
-    initial: width > 0 ? HOME_VIEW : null,
+    initial: width > 0 ? home : null,
   });
   const { target, setTarget, panBy } = map;
-  const moved = !!target && !samePosition(target, HOME_VIEW);
+  const moved = !!target && !samePosition(target, home);
+
+  // When the visitor picks (or clears) their place, move the map there.
+  const previousPlace = useRef(place);
+  useEffect(() => {
+    if (previousPlace.current !== place) {
+      previousPlace.current = place;
+      setTarget(home);
+    }
+  }, [place, home, setTarget]);
 
   // The alert feed is nationwide; the card's button, outlines and hover/tap
   // work from the ones that overlap the part of the map it shows.
@@ -140,9 +152,12 @@ export function RadarCard() {
     <section className="card radar-card">
       <div className="card-header">
         <h2>Radar</h2>
-        <a className="radar-link" href={mapPageUrl(target)} target="_blank" rel="noreferrer">
-          Open in new tab ↗
-        </a>
+        <span className="radar-header-actions">
+          <LocationPicker />
+          <a className="radar-link" href={mapPageUrl(target)} target="_blank" rel="noreferrer">
+            Open in new tab ↗
+          </a>
+        </span>
       </div>
       <div className="radar-measure" ref={ref}>
         {width > 0 && (
@@ -163,6 +178,14 @@ export function RadarCard() {
                   {fronts.data && (
                     <FrontLines
                       fronts={fronts.data}
+                      iframe={map.specFor(target)}
+                      visible={{ left: OVERSCAN, top: CHROME_TOP + OVERSCAN, width: nativeWidth, height: VISIBLE_HEIGHT }}
+                      scale={1 / scale}
+                    />
+                  )}
+                  {place && (
+                    <LocationDot
+                      place={place}
                       iframe={map.specFor(target)}
                       visible={{ left: OVERSCAN, top: CHROME_TOP + OVERSCAN, width: nativeWidth, height: VISIBLE_HEIGHT }}
                       scale={1 / scale}
@@ -207,7 +230,7 @@ export function RadarCard() {
             {cardHover && <AlertTooltip info={cardHover} width={width} height={VISIBLE_HEIGHT * scale} />}
             {map.refreshing && <div className="radar-updating">Updating map…</div>}
             {moved && (
-              <button type="button" className="radar-reset" onClick={() => setTarget(HOME_VIEW)}>
+              <button type="button" className="radar-reset" onClick={() => setTarget(home)}>
                 Reset view
               </button>
             )}

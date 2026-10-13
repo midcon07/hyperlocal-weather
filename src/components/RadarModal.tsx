@@ -4,7 +4,7 @@ import type { MapAlert } from "../api/mapAlerts";
 import { useElementSize } from "../hooks/useElementWidth";
 import type { LiveSourceState } from "../hooks/useLiveSource";
 import { MAX_ZOOM, MIN_ZOOM, clampPosition, samePosition, useRadarMap } from "../hooks/useRadarMap";
-import { MAP_CENTER, MAP_DEFAULT_ZOOM } from "../lib/mapView";
+import { homeFor, useVisitorPlace } from "../lib/visitorLocation";
 import { CHROME_BOTTOM, CHROME_TOP, OVERSCAN, VISIBLE_HEIGHT, mapPageUrl, radarUrl } from "../lib/radarEmbed";
 import type { MapPosition } from "../lib/radarEmbed";
 import type { FrontSet } from "../api/fronts";
@@ -14,6 +14,7 @@ import { AlertOutlines, AlertTooltip, OutlineLegend } from "./AlertOutlines";
 import type { HoverInfo } from "./AlertOutlines";
 import { AlertDetails } from "./AlertDetails";
 import { FrontLegend, FrontLines } from "./FrontLines";
+import { LocationDot } from "./LocationDot";
 import { MapAlerts } from "./MapAlerts";
 import { RadarLayers } from "./RadarLayers";
 
@@ -67,9 +68,12 @@ export function RadarModal({
   // shows (so no alert disappears when it opens).
   const fit = Math.min(1, width / coverageWidth, height / VISIBLE_HEIGHT);
   const zoomAdjust = Math.log2(fit || 1);
-  const start = startView ?? { ...MAP_CENTER, zoom: MAP_DEFAULT_ZOOM };
+  // "Home" is the visitor's chosen place, or the station's own area.
+  const place = useVisitorPlace();
+  const home = homeFor(place);
+  const start = startView ?? home;
   const initial = width > 0 && height > 0 ? clampPosition({ ...start, zoom: start.zoom + zoomAdjust }) : null;
-  const homeView = clampPosition({ ...MAP_CENTER, zoom: MAP_DEFAULT_ZOOM + zoomAdjust });
+  const homeView = clampPosition({ ...home, zoom: home.zoom + zoomAdjust });
 
   const map = useRadarMap({ width, height, chromeTop, chromeBottom: CHROME_BOTTOM, margin: OVERSCAN, initial });
   const { target, setTarget, panBy, zoomAbout, centerOf } = map;
@@ -246,6 +250,13 @@ export function RadarModal({
               {showFronts && fronts.data && (
                 <FrontLines
                   fronts={fronts.data}
+                  iframe={map.specFor(target)}
+                  visible={{ left: OVERSCAN, top: chromeTop + OVERSCAN, width, height }}
+                />
+              )}
+              {place && (
+                <LocationDot
+                  place={place}
                   iframe={map.specFor(target)}
                   visible={{ left: OVERSCAN, top: chromeTop + OVERSCAN, width, height }}
                 />
