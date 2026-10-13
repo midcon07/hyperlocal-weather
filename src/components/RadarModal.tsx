@@ -7,11 +7,13 @@ import { MAX_ZOOM, MIN_ZOOM, clampPosition, samePosition, useRadarMap } from "..
 import { MAP_CENTER, MAP_DEFAULT_ZOOM } from "../lib/mapView";
 import { CHROME_BOTTOM, CHROME_TOP, OVERSCAN, VISIBLE_HEIGHT, mapPageUrl, radarUrl } from "../lib/radarEmbed";
 import type { MapPosition } from "../lib/radarEmbed";
+import type { FrontSet } from "../api/fronts";
 import { alertsInBounds } from "../api/mapAlerts";
 import { alertsNearPoint } from "../lib/alertHit";
 import { AlertOutlines, AlertTooltip, OutlineLegend } from "./AlertOutlines";
 import type { HoverInfo } from "./AlertOutlines";
 import { AlertDetails } from "./AlertDetails";
+import { FrontLegend, FrontLines } from "./FrontLines";
 import { MapAlerts } from "./MapAlerts";
 import { RadarLayers } from "./RadarLayers";
 
@@ -30,6 +32,7 @@ const TAP_TOLERANCE_PX = 22;
 
 interface Props {
   alerts: LiveSourceState<MapAlert[]>;
+  fronts: LiveSourceState<FrontSet>;
   alertsOpen: boolean;
   onToggleAlerts: () => void;
   /** Closes the dialog; not used on the full-tab page. */
@@ -46,6 +49,7 @@ interface Props {
 
 export function RadarModal({
   alerts,
+  fronts,
   alertsOpen,
   onToggleAlerts,
   onClose,
@@ -77,6 +81,7 @@ export function RadarModal({
 
   // ---- Pointer gestures: drag to pan, wheel/pinch/double-click to zoom.
   const [hover, setHover] = useState<HoverInfo | null>(null);
+  const [showFronts, setShowFronts] = useState(true);
   // The full text of the alerts the visitor clicked or tapped on.
   const [detail, setDetail] = useState<MapAlert[] | null>(() => {
     const ids = new Set(initialDetailIds);
@@ -236,14 +241,23 @@ export function RadarModal({
             chromeTop={chromeTop}
             frameClass="radar-modal-frame radar-modal-frame--locked"
           />
-          {target && width > 0 && alerts.data && (
+          {target && width > 0 && (
             <div className="alert-outlines-wrap">
-              <AlertOutlines
-                alerts={inView}
-                iframe={map.specFor(target)}
-                visible={{ left: OVERSCAN, top: chromeTop + OVERSCAN, width, height }}
-                highlight={highlight}
-              />
+              {showFronts && fronts.data && (
+                <FrontLines
+                  fronts={fronts.data}
+                  iframe={map.specFor(target)}
+                  visible={{ left: OVERSCAN, top: chromeTop + OVERSCAN, width, height }}
+                />
+              )}
+              {alerts.data && (
+                <AlertOutlines
+                  alerts={inView}
+                  iframe={map.specFor(target)}
+                  visible={{ left: OVERSCAN, top: chromeTop + OVERSCAN, width, height }}
+                  highlight={highlight}
+                />
+              )}
             </div>
           )}
           <div
@@ -283,7 +297,16 @@ export function RadarModal({
             >
               Reset view
             </button>
+            <button
+              type="button"
+              className={`radar-ctl radar-ctl--wide${showFronts ? " radar-ctl--on" : ""}`}
+              onClick={() => setShowFronts((v) => !v)}
+              aria-pressed={showFronts}
+            >
+              Fronts: {showFronts ? "on" : "off"}
+            </button>
             <OutlineLegend />
+            {showFronts && fronts.data && <FrontLegend valid={fronts.data.valid} />}
           </div>
         </div>
       </div>

@@ -3,6 +3,7 @@ import type { PointerEvent as ReactPointerEvent } from "react";
 import { useElementWidth } from "../hooks/useElementWidth";
 import { alertsInBounds } from "../api/mapAlerts";
 import type { MapAlert } from "../api/mapAlerts";
+import { useFrontsLive } from "../hooks/useFrontsLive";
 import { useMapAlertsLive } from "../hooks/useMapAlertsLive";
 import type { LiveSourceState } from "../hooks/useLiveSource";
 import { samePosition, useRadarMap } from "../hooks/useRadarMap";
@@ -11,6 +12,7 @@ import { CHROME_TOP, NATIVE_HEIGHT, OVERSCAN, VISIBLE_HEIGHT, layoutFor, mapPage
 import { alertsNearPoint } from "../lib/alertHit";
 import { AlertOutlines, AlertTooltip } from "./AlertOutlines";
 import type { HoverInfo } from "./AlertOutlines";
+import { FrontLines } from "./FrontLines";
 import { MapAlerts } from "./MapAlerts";
 import { RadarLayers } from "./RadarLayers";
 import { RadarModal } from "./RadarModal";
@@ -36,6 +38,7 @@ export function RadarCard() {
   const [cardHover, setCardHover] = useState<HoverInfo | null>(null);
   const [detailIds, setDetailIds] = useState<string[]>([]);
   const alerts = useMapAlertsLive();
+  const fronts = useFrontsLive();
 
   useEffect(() => {
     if (!open) return;
@@ -155,14 +158,24 @@ export function RadarCard() {
                 chromeTop={CHROME_TOP}
                 frameClass="radar-frame"
               />
-              {target && alerts.data && (
+              {target && (
                 <div className="alert-outlines-wrap">
-                  <AlertOutlines
-                    alerts={inView}
-                    iframe={map.specFor(target)}
-                    visible={{ left: OVERSCAN, top: CHROME_TOP + OVERSCAN, width: nativeWidth, height: VISIBLE_HEIGHT }}
-                    highlight={new Set(cardHover?.alerts.map((a) => a.id))}
-                  />
+                  {fronts.data && (
+                    <FrontLines
+                      fronts={fronts.data}
+                      iframe={map.specFor(target)}
+                      visible={{ left: OVERSCAN, top: CHROME_TOP + OVERSCAN, width: nativeWidth, height: VISIBLE_HEIGHT }}
+                      scale={1 / scale}
+                    />
+                  )}
+                  {alerts.data && (
+                    <AlertOutlines
+                      alerts={inView}
+                      iframe={map.specFor(target)}
+                      visible={{ left: OVERSCAN, top: CHROME_TOP + OVERSCAN, width: nativeWidth, height: VISIBLE_HEIGHT }}
+                      highlight={new Set(cardHover?.alerts.map((a) => a.id))}
+                    />
+                  )}
                 </div>
               )}
             </div>
@@ -217,6 +230,7 @@ export function RadarCard() {
       {open && (
         <RadarModal
           alerts={alerts}
+          fronts={fronts}
           alertsOpen={alertsOpen}
           onToggleAlerts={() => setAlertsOpen((v) => !v)}
           onClose={() => setOpen(false)}

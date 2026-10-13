@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useFrontsLive } from "../hooks/useFrontsLive";
 import { useMapAlertsLive } from "../hooks/useMapAlertsLive";
 import { useSkyTheme } from "../hooks/useSkyTheme";
 import { layoutFor, mapPageStart } from "../lib/radarEmbed";
@@ -10,6 +11,7 @@ import { RadarModal } from "./RadarModal";
 
 export function RadarPage() {
   const alerts = useMapAlertsLive();
+  const fronts = useFrontsLive();
   const [alertsOpen, setAlertsOpen] = useState(false);
   useSkyTheme(null);
 
@@ -21,6 +23,7 @@ export function RadarPage() {
     <RadarModal
       page
       alerts={alerts}
+      fronts={fronts}
       alertsOpen={alertsOpen}
       onToggleAlerts={() => setAlertsOpen((v) => !v)}
       coverageWidth={layoutFor(Math.max(320, window.innerWidth - 32)).nativeWidth}

@@ -2201,3 +2201,38 @@ a.radar-modal-close {
   font-size: 0.74rem;
   color: var(--muted);
 }
+/* ---- Fronts overlay ---- */
+.front-lines {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.front-lines .front-stroke {
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.front-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.6rem;
+  max-width: 250px;
+  padding: 0.25rem 0.55rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.front-legend em {
+  flex-basis: 100%;
+  color: #4a5a78;
+  font-weight: 500;
+}
+
+.radar-ctl--on {
+  background: rgba(31, 95, 208, 0.92);
+}
