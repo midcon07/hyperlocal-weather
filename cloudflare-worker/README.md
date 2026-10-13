@@ -65,6 +65,13 @@ the "Aviation Weather" card to go live.
 `/metar?ids=KDPA,KORD` asks for up to four specific airports instead. The page
 uses this for visitors far from the station, so they see airports near them.
 
+## National Weather Service fallback route
+
+`/nws?u=<api.weather.gov address>` makes the same request to api.weather.gov
+on the page's behalf. The page tries NWS directly first and only uses this
+route if the browser's own request fails. Addresses on any other host are
+refused (400).
+
 ## Visitor location route
 
 `<your-worker-url>/where` returns a rough guess of where the visitor is (city,

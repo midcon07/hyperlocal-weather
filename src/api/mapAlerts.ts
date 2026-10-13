@@ -12,6 +12,8 @@
 //     so the alert is drawn as the actual counties it covers. Marine-zone
 //     alerts have no entries there and are left out.
 
+import { fetchNws } from "./nws";
+
 // Where an alert applies, for drawing on the map: one or more closed outlines
 // of [lon, lat] points.
 export interface AlertShape {
@@ -67,7 +69,7 @@ type GeoJsonGeometry =
   | { type: "GeometryCollection"; geometries: GeoJsonGeometry[] };
 
 async function getJson<T>(url: string): Promise<T> {
-  const res = await fetch(url, { headers: { Accept: "application/geo+json" } });
+  const res = await fetchNws(url);
   if (!res.ok) throw new Error(`NWS request failed: ${res.status} ${res.statusText}`);
   return res.json() as Promise<T>;
 }

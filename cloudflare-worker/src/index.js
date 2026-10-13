@@ -105,6 +105,29 @@ function handleWhere(request, corsHeaders) {
   );
 }
 
+// A stand-in for the browser's own call to api.weather.gov, used only when the
+// browser can't make that call itself. Only api.weather.gov addresses pass.
+async function handleNws(request, corsHeaders) {
+  const target = new URL(request.url).searchParams.get("u") || "";
+  let url;
+  try {
+    url = new URL(target);
+  } catch {
+    return jsonResponse({ error: "Bad address." }, 400, corsHeaders);
+  }
+  if (url.protocol !== "https:" || url.hostname !== "api.weather.gov") {
+    return jsonResponse({ error: "Only api.weather.gov is allowed." }, 400, corsHeaders);
+  }
+  const res = await fetch(url, {
+    headers: { Accept: "application/geo+json", "User-Agent": "hyperlocal-weather (midcon07.github.io)" },
+    cf: { cacheTtl: 30, cacheEverything: true },
+  });
+  return new Response(res.body, {
+    status: res.status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
 export default {
   async fetch(request, env) {
     const corsHeaders = {
@@ -119,6 +142,13 @@ export default {
     const { pathname } = new URL(request.url);
     if (pathname === "/where") {
       return handleWhere(request, corsHeaders);
+    }
+    if (pathname === "/nws") {
+      try {
+        return await handleNws(request, corsHeaders);
+      } catch (err) {
+        return jsonResponse({ error: String(err) }, 502, corsHeaders);
+      }
     }
     if (pathname === "/metar") {
       try {

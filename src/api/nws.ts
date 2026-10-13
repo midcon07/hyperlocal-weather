@@ -6,8 +6,30 @@
 import { milesBetween } from "../lib/geo";
 import type { NwsAlert, NwsData } from "../types/weather";
 
+// If the browser can't reach api.weather.gov itself (blocked, offline route,
+// odd network), ask our Worker to make the same request, and keep using it
+// for the rest of the visit.
+let useProxy = false;
+
+export async function fetchNws(url: string): Promise<Response> {
+  const proxyUrl = import.meta.env.VITE_WEATHERLINK_PROXY_URL;
+  const viaProxy = () => {
+    const p = new URL("/nws", proxyUrl);
+    p.searchParams.set("u", url);
+    return fetch(p);
+  };
+  if (proxyUrl && useProxy) return viaProxy();
+  try {
+    return await fetch(url, { headers: { Accept: "application/geo+json" } });
+  } catch (err) {
+    if (!proxyUrl) throw err;
+    useProxy = true;
+    return viaProxy();
+  }
+}
+
 async function getJson<T>(url: string): Promise<T> {
-  const res = await fetch(url, { headers: { Accept: "application/geo+json" } });
+  const res = await fetchNws(url);
   if (!res.ok) {
     throw new Error(`NWS request failed: ${res.status} ${res.statusText}`);
   }
