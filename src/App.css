@@ -2362,3 +2362,9 @@ a.radar-modal-close {
   font-size: 0.7rem;
   color: var(--muted);
 }
+.loc-guess {
+  margin: 0 0 0.5rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--muted);
+}

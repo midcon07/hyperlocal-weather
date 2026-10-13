@@ -7,7 +7,7 @@ import { useFrontsLive } from "../hooks/useFrontsLive";
 import { useMapAlertsLive } from "../hooks/useMapAlertsLive";
 import type { LiveSourceState } from "../hooks/useLiveSource";
 import { samePosition, useRadarMap } from "../hooks/useRadarMap";
-import { homeFor, useVisitorPlace } from "../lib/visitorLocation";
+import { detectPlace, homeFor, useVisitorPlace } from "../lib/visitorLocation";
 import { CHROME_TOP, NATIVE_HEIGHT, OVERSCAN, VISIBLE_HEIGHT, layoutFor, mapPageUrl } from "../lib/radarEmbed";
 import { alertsNearPoint } from "../lib/alertHit";
 import { AlertOutlines, AlertTooltip } from "./AlertOutlines";
@@ -42,6 +42,9 @@ export function RadarCard() {
   const fronts = useFrontsLive();
   const place = useVisitorPlace();
   const home = useMemo(() => homeFor(place), [place]);
+  useEffect(() => {
+    void detectPlace(); // a first guess from the connection, unless they've chosen
+  }, []);
 
   useEffect(() => {
     if (!open) return;

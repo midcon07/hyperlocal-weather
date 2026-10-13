@@ -71,6 +71,30 @@ async function handleMetar(env, corsHeaders) {
   return jsonResponse(readings, 200, corsHeaders);
 }
 
+// Roughly where the visitor is, from Cloudflare's own lookup of the request's
+// IP address (city level at best, and sometimes wrong for phones on a mobile
+// carrier). Nothing is stored; the answer goes straight back to the visitor's
+// browser so the radar can start near them. US visitors only.
+function handleWhere(request, corsHeaders) {
+  const cf = request.cf || {};
+  const lat = Number(cf.latitude);
+  const lon = Number(cf.longitude);
+  if (cf.country !== "US" || !Number.isFinite(lat) || !Number.isFinite(lon)) {
+    return jsonResponse({ error: "Location unknown." }, 404, corsHeaders);
+  }
+  return jsonResponse(
+    {
+      lat,
+      lon,
+      city: cf.city || null,
+      region: cf.regionCode || cf.region || null,
+      postalCode: cf.postalCode || null,
+    },
+    200,
+    corsHeaders
+  );
+}
+
 export default {
   async fetch(request, env) {
     const corsHeaders = {
@@ -83,6 +107,9 @@ export default {
     }
 
     const { pathname } = new URL(request.url);
+    if (pathname === "/where") {
+      return handleWhere(request, corsHeaders);
+    }
     if (pathname === "/metar") {
       try {
         return await handleMetar(env, corsHeaders);

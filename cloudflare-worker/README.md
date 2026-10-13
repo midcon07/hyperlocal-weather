@@ -61,3 +61,12 @@ To watch different stations, set a `METAR_STATION_IDS` Worker variable to a
 comma-separated list of ICAO ids, in display order; it defaults to
 `KDSM,KIKV`. Redeploy (`npx wrangler deploy`) after pulling this change for
 the "Aviation Weather" card to go live.
+
+## Visitor location route
+
+`<your-worker-url>/where` returns a rough guess of where the visitor is (city,
+region, postal code, latitude and longitude) from Cloudflare's own lookup of
+the request's IP address, for US visitors only. The radar uses it to start the
+map near whoever opens the page. The guess is city-level at best and can be
+wrong (for example phones on a mobile carrier). Nothing is stored. No setup
+needed.

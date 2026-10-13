@@ -14,6 +14,7 @@ interface Props {
 }
 
 export function LocationDot({ place, iframe, visible, scale = 1 }: Props) {
+  if (place.home) return null;
   const p = makeProjector(iframe)(place.lon, place.lat);
   const left = visible.left ?? 0;
   if (p.x < left || p.x > left + visible.width || p.y < visible.top || p.y > visible.top + visible.height) return null;

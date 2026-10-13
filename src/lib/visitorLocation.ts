@@ -12,11 +12,48 @@ export interface VisitorPlace {
   lon: number;
   /** What to call it, e.g. "Wheaton, IL" or "Your location". */
   label: string;
+  /** Guessed from the visitor's internet connection, not chosen by them. */
+  auto?: boolean;
+  /** The station's own area, picked on purpose (no dot is drawn for it). */
+  home?: boolean;
 }
+
+export const STATION_PLACE: VisitorPlace = { lat: MAP_CENTER.lat, lon: MAP_CENTER.lon, label: "Altoona, IA", home: true };
 
 const KEY = "hw-visitor-place-v1";
 const listeners = new Set<() => void>();
 let cached: string | null | undefined;
+
+// A first guess at where the visitor is, from the Worker's /where route (the
+// connection's rough location). Kept only in memory for this page load, and
+// used only when the visitor hasn't chosen a place themselves.
+let autoRaw: string | null = null;
+let detecting = false;
+
+export async function detectPlace() {
+  if (detecting || autoRaw || read()) return;
+  const proxy = import.meta.env.VITE_WEATHERLINK_PROXY_URL;
+  if (!proxy) return;
+  detecting = true;
+  try {
+    const res = await fetch(new URL("/where", proxy));
+    if (!res.ok) return;
+    const d = (await res.json()) as { lat: number; lon: number; city: string | null; region: string | null };
+    if (!Number.isFinite(d.lat) || !Number.isFinite(d.lon) || read()) return;
+    const place: VisitorPlace = {
+      lat: d.lat,
+      lon: d.lon,
+      label: d.city && d.region ? `${d.city}, ${d.region}` : "Near you",
+      auto: true,
+    };
+    autoRaw = JSON.stringify(place);
+    listeners.forEach((l) => l());
+  } catch {
+    // No guess is fine: the map just starts at the station.
+  } finally {
+    detecting = false;
+  }
+}
 
 function read(): string | null {
   if (cached === undefined) {
@@ -57,8 +94,15 @@ function subscribe(listener: () => void) {
 
 // The visitor's chosen place, or null (use the station's own area).
 export function useVisitorPlace(): VisitorPlace | null {
-  const raw = useSyncExternalStore(subscribe, read, () => null);
+  const raw = useSyncExternalStore(subscribe, () => read() ?? autoRaw, () => null);
   return useMemo(() => parse(raw), [raw]);
+}
+
+// Forget the saved choice and go back to guessing from the connection.
+export function resetToApproximatePlace() {
+  autoRaw = null;
+  savePlace(null);
+  void detectPlace();
 }
 
 // Where the map starts and where "Reset view" goes.

@@ -3,6 +3,7 @@ import { useFrontsLive } from "../hooks/useFrontsLive";
 import { useMapAlertsLive } from "../hooks/useMapAlertsLive";
 import { useSkyTheme } from "../hooks/useSkyTheme";
 import { layoutFor, mapPageStart } from "../lib/radarEmbed";
+import { detectPlace } from "../lib/visitorLocation";
 import { RadarModal } from "./RadarModal";
 
 // The enlarged radar as a page of its own (opened by "Open in new tab"): the
@@ -14,6 +15,9 @@ export function RadarPage() {
   const fronts = useFrontsLive();
   const [alertsOpen, setAlertsOpen] = useState(false);
   useSkyTheme(null);
+  useEffect(() => {
+    void detectPlace();
+  }, []);
 
   useEffect(() => {
     document.title = "Radar - Hyperlocal Weather";
