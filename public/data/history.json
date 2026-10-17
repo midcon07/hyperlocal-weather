@@ -558,5 +558,10 @@
     "timestamp": "2026-10-17T11:23:21.501Z",
     "stationTemperatureF": 33.3,
     "nwsTemperatureC": 0
+  },
+  {
+    "timestamp": "2026-10-17T14:17:09.711Z",
+    "stationTemperatureF": 38.8,
+    "nwsTemperatureC": 3
   }
 ]
