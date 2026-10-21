@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-10-20T22:55:32.001Z",
+  "generatedAt": "2026-10-21T01:05:42.390Z",
   "location": {
     "name": "Altoona, IA",
     "latitude": 41.6312472,
     "longitude": -93.4658583
   },
   "station": {
-    "timestamp": "2026-10-20T22:55:00.000Z",
-    "temperatureF": 69,
-    "humidityPct": 48.9,
-    "windSpeedMph": 1.06,
-    "windGustMph": 2.69,
-    "windDirectionDeg": 34,
+    "timestamp": "2026-10-21T01:05:00.000Z",
+    "temperatureF": 60.2,
+    "humidityPct": 66.2,
+    "windSpeedMph": 0,
+    "windGustMph": 1.63,
+    "windDirectionDeg": 45,
     "rainRateInPerHr": 0,
     "rainDayIn": 0,
-    "barometricPressureInHg": 30.235,
-    "pressureTrendInHg": -0.031,
+    "barometricPressureInHg": 30.249,
+    "pressureTrendInHg": 0.011,
     "uvIndex": null,
     "solarRadiationWm2": null
   },
@@ -25,30 +25,18 @@
     "gridY": 51,
     "observation": {
       "stationId": "KIKV",
-      "timestamp": "2026-10-20T22:15:00+00:00",
-      "temperatureC": 21,
-      "relativeHumidity": 37.63838929391,
-      "windSpeedKmh": 12.96,
-      "windDirectionDeg": 170,
-      "barometricPressurePa": 102370,
+      "timestamp": "2026-10-21T00:35:00+00:00",
+      "temperatureC": 14,
+      "relativeHumidity": 67.145798064498,
+      "windSpeedKmh": 0,
+      "windDirectionDeg": 0,
+      "barometricPressurePa": 102410,
       "textDescription": "Clear"
     },
     "forecast": [
       {
-        "name": "This Afternoon",
-        "startTime": "2026-10-20T17:00:00-05:00",
-        "endTime": "2026-10-20T18:00:00-05:00",
-        "isDaytime": true,
-        "temperature": 72,
-        "temperatureUnit": "F",
-        "windSpeed": "6 mph",
-        "windDirection": "SSE",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 3
-      },
-      {
         "name": "Tonight",
-        "startTime": "2026-10-20T18:00:00-05:00",
+        "startTime": "2026-10-20T20:00:00-05:00",
         "endTime": "2026-10-21T06:00:00-05:00",
         "isDaytime": false,
         "temperature": 49,
@@ -201,30 +189,21 @@
         "windDirection": "N",
         "shortForecast": "Slight Chance Rain Showers then Mostly Cloudy",
         "probabilityOfPrecipitation": 16
+      },
+      {
+        "name": "Tuesday",
+        "startTime": "2026-10-27T06:00:00-05:00",
+        "endTime": "2026-10-27T18:00:00-05:00",
+        "isDaytime": true,
+        "temperature": 59,
+        "temperatureUnit": "F",
+        "windSpeed": "7 mph",
+        "windDirection": "NNE",
+        "shortForecast": "Mostly Sunny",
+        "probabilityOfPrecipitation": 13
       }
     ],
     "hourly": [
-      {
-        "startTime": "2026-10-20T17:00:00-05:00",
-        "temperature": 69,
-        "temperatureUnit": "F",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 3
-      },
-      {
-        "startTime": "2026-10-20T18:00:00-05:00",
-        "temperature": 66,
-        "temperatureUnit": "F",
-        "shortForecast": "Mostly Clear",
-        "probabilityOfPrecipitation": 3
-      },
-      {
-        "startTime": "2026-10-20T19:00:00-05:00",
-        "temperature": 62,
-        "temperatureUnit": "F",
-        "shortForecast": "Clear",
-        "probabilityOfPrecipitation": 4
-      },
       {
         "startTime": "2026-10-20T20:00:00-05:00",
         "temperature": 59,
@@ -371,6 +350,27 @@
         "temperatureUnit": "F",
         "shortForecast": "Sunny",
         "probabilityOfPrecipitation": 1
+      },
+      {
+        "startTime": "2026-10-21T17:00:00-05:00",
+        "temperature": 75,
+        "temperatureUnit": "F",
+        "shortForecast": "Sunny",
+        "probabilityOfPrecipitation": 1
+      },
+      {
+        "startTime": "2026-10-21T18:00:00-05:00",
+        "temperature": 71,
+        "temperatureUnit": "F",
+        "shortForecast": "Clear",
+        "probabilityOfPrecipitation": 0
+      },
+      {
+        "startTime": "2026-10-21T19:00:00-05:00",
+        "temperature": 67,
+        "temperatureUnit": "F",
+        "shortForecast": "Mostly Clear",
+        "probabilityOfPrecipitation": 0
       }
     ]
   }
