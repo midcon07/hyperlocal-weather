@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-11-13T21:06:42.305Z",
+  "generatedAt": "2026-11-14T01:24:39.848Z",
   "location": {
     "name": "Altoona, IA",
     "latitude": 41.6312472,
     "longitude": -93.4658583
   },
   "station": {
-    "timestamp": "2026-11-13T21:00:00.000Z",
-    "temperatureF": 41.3,
-    "humidityPct": 58.1,
+    "timestamp": "2026-11-14T01:15:00.000Z",
+    "temperatureF": 33.7,
+    "humidityPct": 71.6,
     "windSpeedMph": 0,
-    "windGustMph": 7.13,
-    "windDirectionDeg": 337,
+    "windGustMph": 0,
+    "windDirectionDeg": 280,
     "rainRateInPerHr": 0,
     "rainDayIn": 0,
-    "barometricPressureInHg": 30.172,
-    "pressureTrendInHg": -0.042,
+    "barometricPressureInHg": 30.196,
+    "pressureTrendInHg": 0.022,
     "uvIndex": null,
     "solarRadiationWm2": null
   },
@@ -25,36 +25,24 @@
     "gridY": 51,
     "observation": {
       "stationId": "KIKV",
-      "timestamp": "2026-11-13T19:55:00+00:00",
-      "temperatureC": 5,
-      "relativeHumidity": 56.238915325569,
+      "timestamp": "2026-11-14T00:55:00+00:00",
+      "temperatureC": 0,
+      "relativeHumidity": 86.394921766766,
       "windSpeedKmh": 0,
       "windDirectionDeg": 0,
-      "barometricPressurePa": 102200,
+      "barometricPressurePa": 102240,
       "textDescription": ""
     },
     "forecast": [
       {
-        "name": "This Afternoon",
-        "startTime": "2026-11-13T15:00:00-06:00",
-        "endTime": "2026-11-13T18:00:00-06:00",
-        "isDaytime": true,
-        "temperature": 42,
-        "temperatureUnit": "F",
-        "windSpeed": "8 mph",
-        "windDirection": "N",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 0
-      },
-      {
         "name": "Tonight",
-        "startTime": "2026-11-13T18:00:00-06:00",
+        "startTime": "2026-11-13T19:00:00-06:00",
         "endTime": "2026-11-14T06:00:00-06:00",
         "isDaytime": false,
         "temperature": 23,
         "temperatureUnit": "F",
-        "windSpeed": "0 to 5 mph",
-        "windDirection": "NE",
+        "windSpeed": "0 to 3 mph",
+        "windDirection": "NNE",
         "shortForecast": "Clear",
         "probabilityOfPrecipitation": 0
       },
@@ -201,37 +189,21 @@
         "windDirection": "SSE",
         "shortForecast": "Slight Chance Rain Showers",
         "probabilityOfPrecipitation": 19
+      },
+      {
+        "name": "Friday",
+        "startTime": "2026-11-20T06:00:00-06:00",
+        "endTime": "2026-11-20T18:00:00-06:00",
+        "isDaytime": true,
+        "temperature": 61,
+        "temperatureUnit": "F",
+        "windSpeed": "3 to 7 mph",
+        "windDirection": "ESE",
+        "shortForecast": "Chance Rain Showers",
+        "probabilityOfPrecipitation": 30
       }
     ],
     "hourly": [
-      {
-        "startTime": "2026-11-13T15:00:00-06:00",
-        "temperature": 41,
-        "temperatureUnit": "F",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 0
-      },
-      {
-        "startTime": "2026-11-13T16:00:00-06:00",
-        "temperature": 39,
-        "temperatureUnit": "F",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 0
-      },
-      {
-        "startTime": "2026-11-13T17:00:00-06:00",
-        "temperature": 37,
-        "temperatureUnit": "F",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 0
-      },
-      {
-        "startTime": "2026-11-13T18:00:00-06:00",
-        "temperature": 35,
-        "temperatureUnit": "F",
-        "shortForecast": "Clear",
-        "probabilityOfPrecipitation": 0
-      },
       {
         "startTime": "2026-11-13T19:00:00-06:00",
         "temperature": 33,
@@ -241,42 +213,42 @@
       },
       {
         "startTime": "2026-11-13T20:00:00-06:00",
-        "temperature": 31,
+        "temperature": 32,
         "temperatureUnit": "F",
         "shortForecast": "Clear",
         "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-11-13T21:00:00-06:00",
-        "temperature": 29,
+        "temperature": 32,
         "temperatureUnit": "F",
         "shortForecast": "Clear",
         "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-11-13T22:00:00-06:00",
-        "temperature": 28,
+        "temperature": 31,
         "temperatureUnit": "F",
         "shortForecast": "Clear",
         "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-11-13T23:00:00-06:00",
-        "temperature": 27,
+        "temperature": 31,
         "temperatureUnit": "F",
         "shortForecast": "Clear",
         "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-11-14T00:00:00-06:00",
-        "temperature": 26,
+        "temperature": 29,
         "temperatureUnit": "F",
         "shortForecast": "Clear",
         "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-11-14T01:00:00-06:00",
-        "temperature": 26,
+        "temperature": 27,
         "temperatureUnit": "F",
         "shortForecast": "Clear",
         "probabilityOfPrecipitation": 0
@@ -370,6 +342,34 @@
         "temperature": 45,
         "temperatureUnit": "F",
         "shortForecast": "Sunny",
+        "probabilityOfPrecipitation": 0
+      },
+      {
+        "startTime": "2026-11-14T15:00:00-06:00",
+        "temperature": 46,
+        "temperatureUnit": "F",
+        "shortForecast": "Sunny",
+        "probabilityOfPrecipitation": 0
+      },
+      {
+        "startTime": "2026-11-14T16:00:00-06:00",
+        "temperature": 44,
+        "temperatureUnit": "F",
+        "shortForecast": "Sunny",
+        "probabilityOfPrecipitation": 0
+      },
+      {
+        "startTime": "2026-11-14T17:00:00-06:00",
+        "temperature": 41,
+        "temperatureUnit": "F",
+        "shortForecast": "Sunny",
+        "probabilityOfPrecipitation": 0
+      },
+      {
+        "startTime": "2026-11-14T18:00:00-06:00",
+        "temperature": 36,
+        "temperatureUnit": "F",
+        "shortForecast": "Mostly Clear",
         "probabilityOfPrecipitation": 0
       }
     ]
