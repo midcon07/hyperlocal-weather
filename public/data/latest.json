@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-11-19T12:17:56.477Z",
+  "generatedAt": "2026-11-19T20:43:20.115Z",
   "location": {
     "name": "Altoona, IA",
     "latitude": 41.6312472,
     "longitude": -93.4658583
   },
   "station": {
-    "timestamp": "2026-11-19T12:15:00.000Z",
-    "temperatureF": 44.3,
-    "humidityPct": 84.6,
-    "windSpeedMph": 0.81,
-    "windGustMph": 2.06,
-    "windDirectionDeg": 135,
+    "timestamp": "2026-11-19T20:30:00.000Z",
+    "temperatureF": 66.1,
+    "humidityPct": 59.6,
+    "windSpeedMph": 0.38,
+    "windGustMph": 4.06,
+    "windDirectionDeg": 139,
     "rainRateInPerHr": 0,
     "rainDayIn": 0,
-    "barometricPressureInHg": 30.23,
-    "pressureTrendInHg": 0.009,
+    "barometricPressureInHg": 30.227,
+    "pressureTrendInHg": -0.045,
     "uvIndex": null,
     "solarRadiationWm2": null
   },
@@ -25,24 +25,24 @@
     "gridY": 51,
     "observation": {
       "stationId": "KIKV",
-      "timestamp": "2026-11-19T11:35:00+00:00",
-      "temperatureC": null,
-      "relativeHumidity": null,
-      "windSpeedKmh": 5.4,
-      "windDirectionDeg": 160,
-      "barometricPressurePa": 102370,
+      "timestamp": "2026-11-19T20:15:00+00:00",
+      "temperatureC": 19,
+      "relativeHumidity": 52.278271459276,
+      "windSpeedKmh": 11.16,
+      "windDirectionDeg": null,
+      "barometricPressurePa": 102340,
       "textDescription": "Clear"
     },
     "forecast": [
       {
-        "name": "Today",
-        "startTime": "2026-11-19T06:00:00-06:00",
+        "name": "This Afternoon",
+        "startTime": "2026-11-19T14:00:00-06:00",
         "endTime": "2026-11-19T18:00:00-06:00",
         "isDaytime": true,
         "temperature": 67,
         "temperatureUnit": "F",
-        "windSpeed": "3 to 8 mph",
-        "windDirection": "SW",
+        "windSpeed": "7 mph",
+        "windDirection": "SSW",
         "shortForecast": "Sunny",
         "probabilityOfPrecipitation": 0
       },
@@ -51,11 +51,11 @@
         "startTime": "2026-11-19T18:00:00-06:00",
         "endTime": "2026-11-20T06:00:00-06:00",
         "isDaytime": false,
-        "temperature": 46,
+        "temperature": 47,
         "temperatureUnit": "F",
         "windSpeed": "5 to 8 mph",
         "windDirection": "SSE",
-        "shortForecast": "Partly Cloudy",
+        "shortForecast": "Mostly Clear",
         "probabilityOfPrecipitation": 0
       },
       {
@@ -65,10 +65,10 @@
         "isDaytime": true,
         "temperature": 68,
         "temperatureUnit": "F",
-        "windSpeed": "10 to 22 mph",
+        "windSpeed": "9 to 22 mph",
         "windDirection": "S",
         "shortForecast": "Mostly Sunny",
-        "probabilityOfPrecipitation": 0
+        "probabilityOfPrecipitation": 1
       },
       {
         "name": "Friday Night",
@@ -77,22 +77,22 @@
         "isDaytime": false,
         "temperature": 55,
         "temperatureUnit": "F",
-        "windSpeed": "15 to 18 mph",
+        "windSpeed": "14 to 17 mph",
         "windDirection": "S",
         "shortForecast": "Partly Cloudy",
-        "probabilityOfPrecipitation": 1
+        "probabilityOfPrecipitation": 4
       },
       {
         "name": "Saturday",
         "startTime": "2026-11-21T06:00:00-06:00",
         "endTime": "2026-11-21T18:00:00-06:00",
         "isDaytime": true,
-        "temperature": 63,
+        "temperature": 64,
         "temperatureUnit": "F",
         "windSpeed": "9 to 14 mph",
         "windDirection": "SSW",
-        "shortForecast": "Mostly Cloudy then Rain Showers",
-        "probabilityOfPrecipitation": 75
+        "shortForecast": "Mostly Cloudy then Rain Showers Likely",
+        "probabilityOfPrecipitation": 63
       },
       {
         "name": "Saturday Night",
@@ -101,10 +101,10 @@
         "isDaytime": false,
         "temperature": 40,
         "temperatureUnit": "F",
-        "windSpeed": "9 to 13 mph",
+        "windSpeed": "9 to 15 mph",
         "windDirection": "WNW",
         "shortForecast": "Showers And Thunderstorms",
-        "probabilityOfPrecipitation": 86
+        "probabilityOfPrecipitation": 98
       },
       {
         "name": "Sunday",
@@ -113,10 +113,10 @@
         "isDaytime": true,
         "temperature": 46,
         "temperatureUnit": "F",
-        "windSpeed": "9 to 14 mph",
+        "windSpeed": "10 to 15 mph",
         "windDirection": "NNW",
         "shortForecast": "Mostly Sunny",
-        "probabilityOfPrecipitation": 6
+        "probabilityOfPrecipitation": 9
       },
       {
         "name": "Sunday Night",
@@ -125,7 +125,7 @@
         "isDaytime": false,
         "temperature": 27,
         "temperatureUnit": "F",
-        "windSpeed": "3 to 7 mph",
+        "windSpeed": "3 to 8 mph",
         "windDirection": "NNW",
         "shortForecast": "Mostly Clear",
         "probabilityOfPrecipitation": 0
@@ -137,7 +137,7 @@
         "isDaytime": true,
         "temperature": 40,
         "temperatureUnit": "F",
-        "windSpeed": "5 mph",
+        "windSpeed": "6 mph",
         "windDirection": "N",
         "shortForecast": "Sunny",
         "probabilityOfPrecipitation": 0
@@ -147,12 +147,12 @@
         "startTime": "2026-11-23T18:00:00-06:00",
         "endTime": "2026-11-24T06:00:00-06:00",
         "isDaytime": false,
-        "temperature": 25,
+        "temperature": 26,
         "temperatureUnit": "F",
         "windSpeed": "5 mph",
         "windDirection": "NE",
-        "shortForecast": "Partly Cloudy",
-        "probabilityOfPrecipitation": 0
+        "shortForecast": "Mostly Cloudy",
+        "probabilityOfPrecipitation": 2
       },
       {
         "name": "Tuesday",
@@ -161,20 +161,20 @@
         "isDaytime": true,
         "temperature": 38,
         "temperatureUnit": "F",
-        "windSpeed": "7 mph",
+        "windSpeed": "5 mph",
         "windDirection": "ENE",
         "shortForecast": "Partly Sunny",
-        "probabilityOfPrecipitation": 2
+        "probabilityOfPrecipitation": 5
       },
       {
         "name": "Tuesday Night",
         "startTime": "2026-11-24T18:00:00-06:00",
         "endTime": "2026-11-25T06:00:00-06:00",
         "isDaytime": false,
-        "temperature": 23,
+        "temperature": 24,
         "temperatureUnit": "F",
         "windSpeed": "5 mph",
-        "windDirection": "ENE",
+        "windDirection": "E",
         "shortForecast": "Mostly Cloudy",
         "probabilityOfPrecipitation": 5
       },
@@ -186,90 +186,34 @@
         "temperature": 38,
         "temperatureUnit": "F",
         "windSpeed": "5 mph",
-        "windDirection": "E",
+        "windDirection": "ESE",
         "shortForecast": "Mostly Sunny",
-        "probabilityOfPrecipitation": 6
+        "probabilityOfPrecipitation": 4
       },
       {
         "name": "Wednesday Night",
         "startTime": "2026-11-25T18:00:00-06:00",
         "endTime": "2026-11-26T06:00:00-06:00",
         "isDaytime": false,
-        "temperature": 21,
+        "temperature": 22,
         "temperatureUnit": "F",
-        "windSpeed": "5 mph",
-        "windDirection": "E",
+        "windSpeed": "3 mph",
+        "windDirection": "SE",
         "shortForecast": "Partly Cloudy",
-        "probabilityOfPrecipitation": 2
+        "probabilityOfPrecipitation": 0
       }
     ],
     "hourly": [
       {
-        "startTime": "2026-11-19T06:00:00-06:00",
-        "temperature": 44,
-        "temperatureUnit": "F",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 0
-      },
-      {
-        "startTime": "2026-11-19T07:00:00-06:00",
-        "temperature": 43,
-        "temperatureUnit": "F",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 0
-      },
-      {
-        "startTime": "2026-11-19T08:00:00-06:00",
-        "temperature": 45,
-        "temperatureUnit": "F",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 0
-      },
-      {
-        "startTime": "2026-11-19T09:00:00-06:00",
-        "temperature": 49,
-        "temperatureUnit": "F",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 0
-      },
-      {
-        "startTime": "2026-11-19T10:00:00-06:00",
-        "temperature": 55,
-        "temperatureUnit": "F",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 0
-      },
-      {
-        "startTime": "2026-11-19T11:00:00-06:00",
-        "temperature": 59,
-        "temperatureUnit": "F",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 0
-      },
-      {
-        "startTime": "2026-11-19T12:00:00-06:00",
-        "temperature": 64,
-        "temperatureUnit": "F",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 0
-      },
-      {
-        "startTime": "2026-11-19T13:00:00-06:00",
+        "startTime": "2026-11-19T14:00:00-06:00",
         "temperature": 66,
         "temperatureUnit": "F",
         "shortForecast": "Sunny",
         "probabilityOfPrecipitation": 0
       },
       {
-        "startTime": "2026-11-19T14:00:00-06:00",
-        "temperature": 67,
-        "temperatureUnit": "F",
-        "shortForecast": "Sunny",
-        "probabilityOfPrecipitation": 0
-      },
-      {
         "startTime": "2026-11-19T15:00:00-06:00",
-        "temperature": 67,
+        "temperature": 66,
         "temperatureUnit": "F",
         "shortForecast": "Sunny",
         "probabilityOfPrecipitation": 0
@@ -292,85 +236,141 @@
         "startTime": "2026-11-19T18:00:00-06:00",
         "temperature": 58,
         "temperatureUnit": "F",
-        "shortForecast": "Mostly Clear",
+        "shortForecast": "Clear",
         "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-11-19T19:00:00-06:00",
         "temperature": 54,
         "temperatureUnit": "F",
-        "shortForecast": "Mostly Clear",
+        "shortForecast": "Clear",
         "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-11-19T20:00:00-06:00",
         "temperature": 53,
         "temperatureUnit": "F",
-        "shortForecast": "Mostly Clear",
+        "shortForecast": "Clear",
         "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-11-19T21:00:00-06:00",
-        "temperature": 51,
+        "temperature": 52,
         "temperatureUnit": "F",
-        "shortForecast": "Mostly Clear",
+        "shortForecast": "Clear",
         "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-11-19T22:00:00-06:00",
-        "temperature": 49,
+        "temperature": 51,
         "temperatureUnit": "F",
-        "shortForecast": "Partly Cloudy",
+        "shortForecast": "Clear",
         "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-11-19T23:00:00-06:00",
         "temperature": 50,
         "temperatureUnit": "F",
-        "shortForecast": "Partly Cloudy",
+        "shortForecast": "Mostly Clear",
         "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-11-20T00:00:00-06:00",
-        "temperature": 49,
+        "temperature": 50,
         "temperatureUnit": "F",
         "shortForecast": "Partly Cloudy",
         "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-11-20T01:00:00-06:00",
-        "temperature": 47,
+        "temperature": 48,
         "temperatureUnit": "F",
         "shortForecast": "Partly Cloudy",
         "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-11-20T02:00:00-06:00",
-        "temperature": 47,
+        "temperature": 49,
         "temperatureUnit": "F",
         "shortForecast": "Partly Cloudy",
         "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-11-20T03:00:00-06:00",
-        "temperature": 47,
+        "temperature": 48,
         "temperatureUnit": "F",
         "shortForecast": "Partly Cloudy",
         "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-11-20T04:00:00-06:00",
-        "temperature": 46,
+        "temperature": 47,
         "temperatureUnit": "F",
         "shortForecast": "Partly Cloudy",
         "probabilityOfPrecipitation": 0
       },
       {
         "startTime": "2026-11-20T05:00:00-06:00",
-        "temperature": 46,
+        "temperature": 48,
         "temperatureUnit": "F",
         "shortForecast": "Partly Cloudy",
         "probabilityOfPrecipitation": 0
+      },
+      {
+        "startTime": "2026-11-20T06:00:00-06:00",
+        "temperature": 48,
+        "temperatureUnit": "F",
+        "shortForecast": "Partly Sunny",
+        "probabilityOfPrecipitation": 1
+      },
+      {
+        "startTime": "2026-11-20T07:00:00-06:00",
+        "temperature": 48,
+        "temperatureUnit": "F",
+        "shortForecast": "Mostly Sunny",
+        "probabilityOfPrecipitation": 1
+      },
+      {
+        "startTime": "2026-11-20T08:00:00-06:00",
+        "temperature": 50,
+        "temperatureUnit": "F",
+        "shortForecast": "Mostly Sunny",
+        "probabilityOfPrecipitation": 1
+      },
+      {
+        "startTime": "2026-11-20T09:00:00-06:00",
+        "temperature": 54,
+        "temperatureUnit": "F",
+        "shortForecast": "Mostly Sunny",
+        "probabilityOfPrecipitation": 1
+      },
+      {
+        "startTime": "2026-11-20T10:00:00-06:00",
+        "temperature": 58,
+        "temperatureUnit": "F",
+        "shortForecast": "Mostly Sunny",
+        "probabilityOfPrecipitation": 1
+      },
+      {
+        "startTime": "2026-11-20T11:00:00-06:00",
+        "temperature": 62,
+        "temperatureUnit": "F",
+        "shortForecast": "Sunny",
+        "probabilityOfPrecipitation": 1
+      },
+      {
+        "startTime": "2026-11-20T12:00:00-06:00",
+        "temperature": 66,
+        "temperatureUnit": "F",
+        "shortForecast": "Mostly Sunny",
+        "probabilityOfPrecipitation": 1
+      },
+      {
+        "startTime": "2026-11-20T13:00:00-06:00",
+        "temperature": 67,
+        "temperatureUnit": "F",
+        "shortForecast": "Mostly Sunny",
+        "probabilityOfPrecipitation": 1
       }
     ]
   }
